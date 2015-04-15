@@ -11,6 +11,7 @@ Recensor=function(phi,Time,CensorTime,Rx){
 
 # do a log-rank test
 # Could generalise this to other tests.
+#build a formula style interface
 Test=function(phi,Time,CensorTime,Rx,Arm, target=0){
   require(survival)
   Sstar=Recensor( phi,Time,CensorTime,Rx)
