@@ -1,16 +1,3 @@
-Recensor=function(phi,Time,CensorTime,Rx){
-  require(survival)
-  #Put in the data= argument and process.
-    
-  if( any (!(0<=Rx & Rx<=1))){stop("Invalid values for Rx. Must be proportions in [0,1]")}
-  if( any(CensorTime<Time)){warning("You have observed events AFTER censoring. These are handled as censored")}
-  U=Time*((1-Rx)+Rx*exp(phi))
-  Cstar=pmin(CensorTime, CensorTime*exp(phi))
-  Tstar=pmin(U,Cstar)
-  deltaStar=1*(U<Cstar)
-  Surv(Tstar,deltaStar)
-}
-
 # do a log-rank test
 # Could generalise this to other tests.
 #build a formula style interface

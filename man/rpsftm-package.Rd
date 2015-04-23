@@ -3,12 +3,13 @@
 \alias{rpsftm}
 \docType{package}
 \title{
-What the package does (short line)
-~~ package title ~~
+Rank Preserving Structural Failure Time Models
 }
 \description{
-More about what it does (maybe more than one line)
-~~ A concise (1-5 lines) description of the package ~~
+This implements the method of Robins JM, Tsiatis AA. Correcting for non-compliance in randomized trials using rank
+preserving structural failure time models. Communications in Statistics--Theory and
+Methods 1991; 20: 2609--2631
+
 }
 \details{
 \tabular{ll}{
@@ -16,24 +17,28 @@ Package: \tab rpsftm\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
 Date: \tab 2015-04-15\cr
-License: \tab What license is it under?\cr
+License: \tab GPL\cr
 }
-~~ An overview of how to use the package, including the most important functions ~~
+The key function is \code{rpsftm()}, which provides estimates of the causal parameter of interest.
 }
 \author{
-Who wrote it
+Simon Bond
 
-Maintainer: Who to complain to <yourfault@somewhere.net>
-~~ The author and/or maintainer of the package ~~
+Maintainer: Simon Bond <simon.bond@addenbrookes.nhs.uk>
+
 }
 \references{
-~~ Literature or other references for background information ~~
+Robins JM, Tsiatis AA. Correcting for non-compliance in randomized trials using rank
+preserving structural failure time models. Communications in Statistics--Theory and
+Methods 1991; 20: 2609--2631
 }
 ~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation directory ~~
-\keyword{ package }
+\keyword{ package 
+models
+survival
+}
 \seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
+\code{\link[<pkg>:<pkg>-package]{survival}}
 }
 \examples{
 ~~ simple examples of the most important functions ~~

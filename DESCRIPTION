@@ -1,9 +1,9 @@
 Package: rpsftm
 Type: Package
-Title: What the package does (short line)
+Title: Rank Preserving Structural Failure Time Models
 Version: 1.0
 Date: 2015-04-15
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: Simon Bond
+Maintainer: Simon Bond <simon.bond@addrenbrookes.nhs.uk>
+Description: Implements methods described by the paper Robins \& Tsiatis, 1991.
+License: GPL
