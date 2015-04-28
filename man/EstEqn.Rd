@@ -2,7 +2,7 @@
 % Please edit documentation in R/EstEqn.R
 \name{EstEqn}
 \alias{EstEqn}
-\title{Estimating Equations for \code{rpfsftm()}}
+\title{Estimating Equations for \code{rpsftm()}}
 \usage{
 EstEqn(phi, Time, CensorTime, Rx, data, Arm, adjustors = NULL, target = 0,
   test = survdiff, ...)
@@ -29,12 +29,15 @@ EstEqn(phi, Time, CensorTime, Rx, data, Arm, adjustors = NULL, target = 0,
 \item{\code{...}}{arguments to supply to the test function.}
 }
 \value{
-A scalar value of the estimating equation
+A scalar value of the estimating equation: the z-statistics from a test minus a target value
 }
 \description{
 Calculates the Estimating Equation to be solved in RPSFTM models
 }
 \author{
 Simon Bond
+}
+\seealso{
+Recensor
 }
 

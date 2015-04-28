@@ -3,7 +3,7 @@ NULL
 
 #'Calculates the Estimating Equation to be solved in RPSFTM models
 #' @export
-#' @title Estimating Equations for \code{rpfsftm()}
+#' @title Estimating Equations for \code{rpsftm()}
 #' @name EstEqn
 #' @inheritParams Recensor
 #' @param Arm the randomisation that is independent of the recensored survival times
@@ -11,7 +11,8 @@ NULL
 #' @param target the value to subtract off from the z-statistic 
 #' @param test the survival regression function to calculate the z-statistic: survdiff, coxph, survreg
 #' @param \code{...} arguments to supply to the test function.
-#' @return A scalar value of the estimating equation
+#' @return A scalar value of the estimating equation: the z-statistics from a test minus a target value
+#' @seealso Recensor
 #' @author Simon Bond
 
 
