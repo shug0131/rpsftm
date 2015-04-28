@@ -8,6 +8,6 @@ Maintainer: Simon Bond <simon.bond@addrenbrookes.nhs.uk>
 Description: Implements methods described by the paper Robins \& Tsiatis, 1991.
 License: GPL
 Collate:
-    'Functions.R'
     'Recensor.R'
-    'Test.R'
+    'EstEqn.R'
+    'Functions.R'

@@ -52,15 +52,15 @@ rpsftm=function(Time, CensorTime, Rx, Arm,data, adjustors=NULL, test=logrank, lo
   #argument for a different test other than log rank.
   
   #solve to find the value of phi that gives the root to z=0
-  ans=uniroot(Test, c(lowphi,hiphi), 
+  ans=uniroot(EstEqn, c(lowphi,hiphi), 
               Time=Time, CensorTime=CensorTime, Rx=Rx, Arm=Arm, 
               data=data, adjustors=adjustors,
               target=0)
-  lower=uniroot(Test, c(lowphi,hiphi), 
+  lower=uniroot(EstEqn, c(lowphi,hiphi), 
                 Time=Time, CensorTime=CensorTime, Rx=Rx, Arm=Arm, 
                 data=data, adjustors=adjustors,
                 target=qnorm(1-alpha/2))
-  upper=uniroot(Test, c(lowphi,hiphi), 
+  upper=uniroot(EstEqn, c(lowphi,hiphi), 
                 Time=Time, CensorTime=CensorTime, Rx=Rx, Arm=Arm, 
                 data=data, adjustors=adjustors,
                 target=qnorm(alpha/2))

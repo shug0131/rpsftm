@@ -10,7 +10,7 @@
 \usage{
 Test(phi, Time, CensorTime, Rx, Arm, target = 0)
 }
-%- maybe also 'usage' for other objects documented here.
+%- maybe also 'usage' for other objects documented here. 
 \arguments{
   \item{phi}{
 %%     ~~Describe \code{phi} here~~

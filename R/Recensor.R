@@ -10,7 +10,6 @@
 #' @return A Surv() object with the recensoring applied
 #' @author Simon Bond
 
-
 Recensor=function(phi,Time,CensorTime,Rx, data){
   require(survival)
   #Put in the data= argument and process.
