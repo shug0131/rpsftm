@@ -1,31 +1,4 @@
-# do a log-rank test
-# Could generalise this to other tests.
-#build a formula style interface
-Test=function(phi,Time,CensorTime,Rx,Arm, data, adjustors, target=0, test, ...){
-  require(survival)
-  Sstar=Recensor( phi,Time,CensorTime,Rx)
-  data=cbind(Sstar, data)
-  # needs a check that Arm is two levels
-  if( length(unique(Arm))!=2){stop("Arm must have exactly 2 observed values")}
-  # Might want to generalise to allow other tests, and adjustors.
-  #build a formula object,
-  if(is.null(adjustors)){
-    MyFormula=as.formula("~1")
-  }else{
-    MyFormula= as.formula(adjustors)
-  }
-  MyFormula=update(MyFormula, Sstar~.+Arm)
-  
-  # mycall=list(test, formula, data,...)
-  # mycall=as.call(mycall)
-  # fit=eval(mycall)
-  
-  
-  fit=survdiff( MyFormula,data)
-  
-  ExtractZ(fit)-target
-  
-}
+
 
 ExtractZ=function(x,...){UseMethod("ExtractZ")}
 ExtractZ.survdiff=function(fit){
