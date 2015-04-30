@@ -6,8 +6,12 @@ Date: 2015-04-15
 Author: Simon Bond
 Maintainer: Simon Bond <simon.bond@addrenbrookes.nhs.uk>
 Description: Implements methods described by the paper Robins \& Tsiatis, 1991.
-License: GPL
+License: GPL-2
 Collate:
     'Recensor.R'
     'EstEqn.R'
-    'Functions.R'
+    'ExtractZ.R'
+    'rpsftm.R'
+    'utils.R'
+Imports:
+    survival

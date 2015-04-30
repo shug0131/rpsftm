@@ -17,7 +17,7 @@ Package: \tab rpsftm\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
 Date: \tab 2015-04-15\cr
-License: \tab GPL\cr
+License: \tab GPL-2\cr
 }
 The key function is \code{rpsftm()}, which provides estimates of the causal parameter of interest.
 }
