@@ -27,7 +27,7 @@
 #' @author Simon Bond
 
 rpsftm=function(time, censor_time, rx, arm,data, adjustors=NULL, 
-                test=logrank, lowphi=-10,hiphi=10, alpha=0.05,...){
+                test=survdiff, lowphi=-10,hiphi=10, alpha=0.05,...){
   
   #create formula for fitting, and to feed into model.frame()
   if(is.null(adjustors)){
@@ -37,39 +37,43 @@ rpsftm=function(time, censor_time, rx, arm,data, adjustors=NULL,
   fit_formula=update.formula(adjustors, update_formula)
   update_formula=paste("~.",substitute(time), substitute(censor_time),substitute(rx),sep="+")
   data_formula=update.formula(fit_formula, update_formula)
-  df=model.frame(data_formula,data=data)
-    
+  #this solves issues with strata(..),
+  df=get_all_vars(data_formula,data=data)
+  #Check that the number of arms is 2.
+  if( length(unique(df[,deparse(substitute(arm))]))!=2){
+    stop("arm must have exactly 2 observed values")
+  }
     
   #check or handle missing data.
   
   
+  # Work out argument passing for uniroot. Why is test= different to the others???
   
-  #argument for adjustors or formula//
-  #argument for a different test other than log rank.
   
   #solve to find the value of phi that gives the root to z=0
+  
+  #turn this into a function in utils, with the argument target.
   ans=uniroot(EstEqn, c(lowphi,hiphi), 
               time=time, censor_time=censor_time, rx=rx, arm=arm, 
-              data=df, formula=fit_formula, test=test,
+              data=df, formula=fit_formula, test=deparse(substitute(test)),
               target=0)
   lower=uniroot(EstEqn, c(lowphi,hiphi), 
                 time=time, censor_time=censor_time, rx=rx, arm=arm, 
-                data=df, formula=fit_formula,test=test,
+                data=df, formula=fit_formula,test=deparse(substitute(test)),
                 target=qnorm(1-alpha/2))
+  
+  #check out upper- it disagrees with stata, but not the point estimate or the lower bound?
+  
   upper=uniroot(EstEqn, c(lowphi,hiphi), 
                 time=time, censor_time=censor_time, rx=rx, arm=arm, 
-                data=df, formula=fit_formula,test=test,
+                data=df, formula=fit_formula,test=deparse(substitute(test)),
                 target=qnorm(alpha/2))
   
   
   
   phiHat=ans$root
-  Sstar=Recensor(phiHat, time, censor_time,rx, data=df)
-  #not sure about this, maybe survfit(Sstart~1)??
-  
- 
-  #might need to use update.formula to add in the LHS
-  fit=survival::survfit(Sstar,fit_formula, df)
+  Sstar=recensor(phiHat, time, censor_time,rx, data=df)
+  fit=survival::survfit(update(fit_formula, Sstar~.), df)
   
   
   list(phi=phiHat, 

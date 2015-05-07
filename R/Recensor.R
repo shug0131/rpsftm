@@ -12,14 +12,14 @@
 
 recensor=function(phi,time,censor_time,rx, data){
   #Put in the data= argument and process.
-  attach(data)
-  if( any (!(0<=rx & rx<=1))){stop("Invalid values for rx. Must be proportions in [0,1]")}
-  if( any(censor_time<time)){warning("You have observed events AFTER censoring. These are handled as censored")}
-  U=time*((1-rx)+rx*exp(phi))
-  Cstar=pmin(censor_time, censor_time*exp(phi))
-  Tstar=pmin(U,Cstar)
-  deltaStar=1*(U<Cstar)
-  output=survival::Surv(Tstar,deltaStar)
-  detach(data)
-  retrun(output)
+  with(data,{
+    if( any (!(0<=rx & rx<=1))){stop("Invalid values for rx. Must be proportions in [0,1]")}
+    if( any(censor_time<time)){warning("You have observed events AFTER censoring. These are handled as censored")}
+    U=time*((1-rx)+rx*exp(phi))
+    Cstar=pmin(censor_time, censor_time*exp(phi))
+    Tstar=pmin(U,Cstar)
+    deltaStar=1*(U<Cstar)
+    output=survival::Surv(Tstar,deltaStar)
+    return(output)
+  })
 }
