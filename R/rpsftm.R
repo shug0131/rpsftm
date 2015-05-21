@@ -34,13 +34,16 @@ rpsftm=function(time, censor_time, rx, arm,data, adjustors=NULL,
     adjustors=as.formula("~1")
   }
   update_formula=paste("~.",substitute(arm),sep="+")
+  
+  # to change "strata" to "survival::strata"
   fit_formula=update.formula(adjustors, update_formula)
+  fit_formula=as.character(fit_formula)[2]
+  fit_formula=gsub("^strata| strata", " survival::strata", fit_formula)
+  fit_formula=gsub("^cluster| cluster", " survival::cluster", fit_formula)
+  fit_formula=reformulate(fit_formula)
   update_formula=paste("~.",substitute(time), substitute(censor_time),substitute(rx),sep="+")
   data_formula=update.formula(fit_formula, update_formula)
   #this solves issues with strata(..),
-  #
-  
-  #NO It needs to use survival::strata or convert etc.
   
   #Test this with a combination of vars that are in/out of the original data arguyment
   df=get_all_vars(data_formula,data=data)

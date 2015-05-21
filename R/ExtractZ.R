@@ -7,6 +7,8 @@
 #'@author Simon Bond
 
 
+## NEEDS an extra argument giving the "Arm" variable, to cope with adjustors.
+
 ExtractZ=function(x){UseMethod("ExtractZ")}
 
 #' @describeIn ExtractZ Method for survdiff
