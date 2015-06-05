@@ -25,6 +25,7 @@
 #' \item call the R call object
 #' }
 #' @author Simon Bond
+#' @author
 #' @importFrom survival strata cluster
 
 rpsftm=function(time, censor_time, rx, arm,data, adjustors=NULL, 

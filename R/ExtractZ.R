@@ -15,7 +15,7 @@ ExtractZ=function(x){UseMethod("ExtractZ")}
 
 
 ExtractZ.survdiff=function(fit){
-print(fit)
+#print(fit)
   #print(fit$obs)
 #print(fit$exp)
 #print(fit$var)
@@ -36,7 +36,7 @@ print(fit)
     #chi <- sum(solve(vv, temp2) * temp2)
     z<- temp2/sqrt(vv)
   }
-  print(z)
+ # print(z)
   z
 }
 
