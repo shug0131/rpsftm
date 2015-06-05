@@ -4,17 +4,17 @@
 \alias{rpsftm}
 \title{Rank Preserving Sturctural Failure Time Model}
 \usage{
-rpsftm(Time, CensorTime, Rx, Arm, data, adjustors = NULL, test = logrank,
+rpsftm(time, censor_time, rx, arm, data, adjustors = NULL, test = survdiff,
   lowphi = -10, hiphi = 10, alpha = 0.05, ...)
 }
 \arguments{
-\item{Time}{the observed failure or censoring time.}
+\item{time}{the observed failure or censoring time.}
 
-\item{CensorTime}{the theoretical censoring time, either observed or set after Time.}
+\item{censor_time}{the theoretical censoring time, either observed or set after Time.}
 
-\item{Rx}{the proportion of Time spent on treatment}
+\item{rx}{the proportion of Time spent on treatment}
 
-\item{Arm}{the randomisation that is independent of the recensored survival times}
+\item{arm}{the randomisation that is independent of the recensored survival times}
 
 \item{data}{a data.frame object containing the variables}
 

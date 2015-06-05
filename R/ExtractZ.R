@@ -15,6 +15,10 @@ ExtractZ=function(x){UseMethod("ExtractZ")}
 
 
 ExtractZ.survdiff=function(fit){
+print(fit)
+  #print(fit$obs)
+#print(fit$exp)
+#print(fit$var)
   if (is.matrix(fit$obs)) {
     otmp <- apply(fit$obs, 1, sum)
     etmp <- apply(fit$exp, 1, sum)
@@ -25,13 +29,14 @@ ExtractZ.survdiff=function(fit){
   }
   df <- (etmp > 0)
   if (sum(df) < 2) 
-    chi <- 0
+    z <- 0
   else {
     temp2 <- ((otmp - etmp)[df])[-1]
     vv <- (fit$var[df, df])[-1, -1, drop = FALSE]
     #chi <- sum(solve(vv, temp2) * temp2)
     z<- temp2/sqrt(vv)
   }
+  print(z)
   z
 }
 

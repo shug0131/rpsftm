@@ -8,10 +8,10 @@ Maintainer: Simon Bond <simon.bond@addrenbrookes.nhs.uk>
 Description: Implements methods described by the paper Robins \& Tsiatis, 1991.
 License: GPL-2
 Collate:
-    'Recensor.R'
+    'recensor.R'
     'EstEqn.R'
     'ExtractZ.R'
     'rpsftm.R'
     'utils.R'
-Imports:
+Depends:
     survival

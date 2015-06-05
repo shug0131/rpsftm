@@ -1,18 +1,19 @@
-#' @include Recensor.R
+#' @include recensor.R
 NULL
 
 #'Calculates the Estimating Equation to be solved in RPSFTM models
 #' 
 #' @title Estimating Equations for \code{rpsftm()}
 #' @name EstEqn
-#' @inheritParams Recensor
+#' @inheritParams recensor
 #' @param arm the randomisation that is independent of the recensored survival times
 #' @param adjustors a forumula object of covariates to adjust for: \code{~strata(A)+B*C}
 #' @param target the value to subtract off from the z-statistic 
 #' @param test the survival regression function to calculate the z-statistic: survdiff, coxph, survreg
 #' @param \code{...} arguments to supply to the test function.
 #' @return A scalar value of the estimating equation: the z-statistics from a test minus a target value
-#' @seealso Recensor
+#' @seealso recensor
+#' @importFrom survival survdiff strata cluster
 #' @author Simon Bond
 
 

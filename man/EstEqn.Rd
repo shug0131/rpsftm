@@ -4,27 +4,27 @@
 \alias{EstEqn}
 \title{Estimating Equations for \code{rpsftm()}}
 \usage{
-EstEqn(phi, Time, CensorTime, Rx, data, Arm, adjustors = NULL, target = 0,
-  test = survdiff, ...)
+EstEqn(phi, time, censor_time, rx, data, arm, formula, target = 0,
+  test = "survdiff", ...)
 }
 \arguments{
 \item{phi}{the parameter that measures how more rapidly the lifetime is expended under treatment}
 
-\item{Time}{the observed failure or censoring time.}
+\item{time}{the observed failure or censoring time.}
 
-\item{CensorTime}{the theoretical censoring time, either observed or set after Time.}
+\item{censor_time}{the theoretical censoring time, either observed or set after time.}
 
-\item{Rx}{the proportion of Time spent on treatment}
+\item{rx}{the proportion of time spent on treatment}
 
 \item{data}{a data.frame object containing the variables}
 
-\item{Arm}{the randomisation that is independent of the recensored survival times}
-
-\item{adjustors}{a forumula object of covariates to adjust for: \code{~strata(A)+B*C}}
+\item{arm}{the randomisation that is independent of the recensored survival times}
 
 \item{target}{the value to subtract off from the z-statistic}
 
 \item{test}{the survival regression function to calculate the z-statistic: survdiff, coxph, survreg}
+
+\item{adjustors}{a forumula object of covariates to adjust for: \code{~strata(A)+B*C}}
 
 \item{\code{...}}{arguments to supply to the test function.}
 }
@@ -38,6 +38,6 @@ Calculates the Estimating Equation to be solved in RPSFTM models
 Simon Bond
 }
 \seealso{
-Recensor
+recensor
 }
 

@@ -7,7 +7,7 @@
 \alias{ExtractZ.survreg}
 \title{Extracting the z-statistic from a survival object}
 \usage{
-ExtractZ(x, ...)
+ExtractZ(x)
 
 \method{ExtractZ}{survdiff}(fit)
 

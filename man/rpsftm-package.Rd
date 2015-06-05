@@ -32,7 +32,6 @@ Robins JM, Tsiatis AA. Correcting for non-compliance in randomized trials using 
 preserving structural failure time models. Communications in Statistics--Theory and
 Methods 1991; 20: 2609--2631
 }
-~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation directory ~~
 \keyword{ package 
 models
 survival
@@ -41,5 +40,4 @@ survival
 \code{\link[<pkg>:<pkg>-package]{survival}}
 }
 \examples{
-~~ simple examples of the most important functions ~~
 }
