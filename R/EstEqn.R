@@ -25,7 +25,6 @@ EstEqn=function(phi,time,censor_time,rx, data, arm, formula, target=0, test="sur
   fit_formula=update(formula, Sstar~.)
   #allow different methods to test the independence of arm
   #constrained to be from the survival package.
- # strata=get("strata", asNamespace("survival"))
   functionName=get(test, asNamespace("survival"))
   fit=  do.call(functionName, list(fit_formula,data) )
   ExtractZ(fit)-target
