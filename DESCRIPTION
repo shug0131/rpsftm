@@ -13,5 +13,6 @@ Collate:
     'ExtractZ.R'
     'rpsftm.R'
     'utils.R'
-Depends:
+Imports:
     survival
+
