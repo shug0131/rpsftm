@@ -26,7 +26,7 @@
 #' }
 #' @author Simon Bond
 #' @author
-#' @importFrom survival strata cluster
+
 
 rpsftm=function(time, censor_time, rx, arm,data, adjustors=NULL, 
                 test=survdiff, lowphi=-10,hiphi=10, alpha=0.05,...){
@@ -38,7 +38,8 @@ rpsftm=function(time, censor_time, rx, arm,data, adjustors=NULL,
   update_formula=paste("~.",substitute(arm),sep="+")
   
   # to change "strata" to "survival::strata"
-  
+  strata=get("strata", asNamespace("survival"))
+  cluster=get("cluster", asNamespace("survival"))
   #ERROR it mishandles survival::strata() how to resolve this??
   fit_formula=update.formula(adjustors, update_formula)
   fit_formula=as.character(fit_formula)[2]

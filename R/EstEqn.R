@@ -13,7 +13,6 @@ NULL
 #' @param \code{...} arguments to supply to the test function.
 #' @return A scalar value of the estimating equation: the z-statistics from a test minus a target value
 #' @seealso recensor
-#' @importFrom survival survdiff strata cluster
 #' @author Simon Bond
 
 
@@ -26,6 +25,7 @@ EstEqn=function(phi,time,censor_time,rx, data, arm, formula, target=0, test="sur
   fit_formula=update(formula, Sstar~.)
   #allow different methods to test the independence of arm
   #constrained to be from the survival package.
+ # strata=get("strata", asNamespace("survival"))
   functionName=get(test, asNamespace("survival"))
   fit=  do.call(functionName, list(fit_formula,data) )
   ExtractZ(fit)-target
