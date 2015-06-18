@@ -17,7 +17,7 @@ NULL
 
 
 
-EstEqn=function(phi,time,censor_time,rx, data, arm, formula, target=0, test="survdiff",...){
+EstEqn=function(phi,time,censor_time,rx, data, armName, formula, target=0, test="survdiff",...){
 
   Sstar=recensor( phi,time,censor_time,rx)
   data=cbind(Sstar, data)
@@ -26,7 +26,7 @@ EstEqn=function(phi,time,censor_time,rx, data, arm, formula, target=0, test="sur
   #allow different methods to test the independence of arm
   #constrained to be from the survival package.
   functionName=get(test, asNamespace("survival"))
-  fit=  do.call(functionName, list(fit_formula,data) )
-  ExtractZ(fit)-target
+  fit=  do.call(functionName, list(fit_formula,data,...) )
+  ExtractZ(fit, armName=armName)-target
   
 }

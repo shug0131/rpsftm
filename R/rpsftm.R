@@ -1,4 +1,4 @@
-#'Main Function used for estmating causal parameters under the Rank Preserving Sturctural Failure Time Model
+#'Main Function used for estmating causal parameters under the Rank Preserving Structural Failure Time Model
 #'
 #'@export
 #'@title Rank Preserving Sturctural Failure Time Model
@@ -42,7 +42,7 @@ rpsftm=function(time, censor_time, rx, arm,data, adjustors=NULL,
   update_formula=paste("~.",substitute(time), substitute(censor_time),substitute(rx),sep="+")
   data_formula=update.formula(fit_formula, update_formula)
    
-  #Test this with a combination of vars that are in/out of the original data arguyment
+ 
   df=get_all_vars(data_formula,data=data)
   #Check that the number of arms is 2.
   if( length(unique(df[,deparse(substitute(arm))]))!=2){
@@ -61,25 +61,27 @@ rpsftm=function(time, censor_time, rx, arm,data, adjustors=NULL,
   time=df[,deparse(substitute(time))]
   rx=df[,deparse(substitute(rx))]
   censor_time=df[,deparse(substitute(censor_time))]
-  
+  armName=deparse(substitute(arm))
   
   #solve to find the value of phi wthat gives the root to z=0
   #turn this into a function in utils, with the argument target.
+  print("estimate")
   ans=uniroot(EstEqn, c(lowphi,hiphi), 
               time=time, censor_time=censor_time, rx=rx, 
-              data=df, arm=arm, formula=fit_formula,target=0,test=test,
+              data=df, armName=armName, formula=fit_formula,target=0,test=test,...=...
               )
+  print("lower")
   lower=uniroot(EstEqn, c(lowphi,hiphi), 
-                time=time, censor_time=censor_time, rx=rx, arm=arm, 
+                time=time, censor_time=censor_time, rx=rx, armName=armName, 
                 data=df, formula=fit_formula,test=test,
-                target=qnorm(1-alpha/2))
-  
+                target=qnorm(1-alpha/2),...=...)
+  print("upper")
   #check out upper- it disagrees with stata, but not the point estimate or the lower bound?
   
   upper=uniroot(EstEqn, c(lowphi,hiphi), 
-                time=time, censor_time=censor_time, rx=rx, arm=arm, 
+                time=time, censor_time=censor_time, rx=rx, armName=armName, 
                 data=df, formula=fit_formula,test=test,
-                target=qnorm(alpha/2))
+                target=qnorm(alpha/2),...=...)
   
   
   

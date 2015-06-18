@@ -9,12 +9,12 @@
 
 ## NEEDS an extra argument giving the "Arm" variable, to cope with adjustors.
 
-ExtractZ=function(x){UseMethod("ExtractZ")}
+ExtractZ=function(x, ...){UseMethod("ExtractZ")}
 
 #' @describeIn ExtractZ Method for survdiff
 
 
-ExtractZ.survdiff=function(fit){
+ExtractZ.survdiff=function(fit,...){
   if (is.matrix(fit$obs)) {
     otmp <- apply(fit$obs, 1, sum)
     etmp <- apply(fit$exp, 1, sum)
@@ -39,13 +39,19 @@ ExtractZ.survdiff=function(fit){
 
 #' @describeIn ExtractZ Method for coxph objects
 
-ExtractZ.coxph=function(fit){
- stop("Error method not yet defined") 
+ExtractZ.coxph=function(fit, armName,...){
+  Z=with(fit, coefficients/sqrt(diag(var)))
+  Z[armName]
 }
 
 
 #' @describeIn ExtractZ Method for survreg objects
 
-ExtractZ.survreg=function(fit){
-  stop("Error method not yet defined") 
+ExtractZ.survreg=function(fit,armName,...){
+  coef=fit$coefficients
+  #var includes the scale parameters
+  var=diag(fit$var)[1:length(coef)]
+  Z=coef/sqrt(var)
+  Z[armName]
+  
 }
