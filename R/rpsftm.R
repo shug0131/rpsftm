@@ -88,13 +88,18 @@ rpsftm=function(time, censor_time, rx, arm,data, adjustors=NULL,
   phiHat=ans$root
   Sstar=recensor(phiHat, time, censor_time,rx)
   fit=survival::survfit(update(fit_formula, Sstar~.), df)
+  #THis is almost copy-paste from EstEqn - maybe write a function to do it
+  fit_formula=update(fit_formula, Sstar~.)
+  functionName=get(test, asNamespace("survival"))
+  regression =  do.call(functionName, list(fit_formula,data,...) )
   
   
-  list(phi=phiHat, 
+  value=list(phi=phiHat, 
        fit=fit, 
+       regression=regression,
        Sstar=Sstar, 
        ans=ans, 
        CI=c(lower$root,upper$root),
        call=match.call())
-  
+  structure(value, class="rpsftm")
 }

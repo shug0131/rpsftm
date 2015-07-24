@@ -7,16 +7,18 @@
 \alias{ExtractZ.survreg}
 \title{Extracting the z-statistic from a survival object}
 \usage{
-ExtractZ(x)
+ExtractZ(x, ...)
 
-\method{ExtractZ}{survdiff}(fit)
+\method{ExtractZ}{survdiff}(fit, ...)
 
-\method{ExtractZ}{coxph}(fit)
+\method{ExtractZ}{coxph}(fit, armName, ...)
 
-\method{ExtractZ}{survreg}(fit)
+\method{ExtractZ}{survreg}(fit, armName, ...)
 }
 \arguments{
-\item{a}{fitted survival object : survdiff, coxph, survreg}
+\item{fit:}{a fitted survival object : survdiff, coxph, survreg}
+
+\item{armName:}{a character vector giving the name of the covariate representing the treatment arm.}
 }
 \value{
 a numeric value, the z statistic for the independence test of the treatment arm

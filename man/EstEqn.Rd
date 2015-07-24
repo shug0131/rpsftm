@@ -4,7 +4,7 @@
 \alias{EstEqn}
 \title{Estimating Equations for \code{rpsftm()}}
 \usage{
-EstEqn(phi, time, censor_time, rx, data, arm, formula, target = 0,
+EstEqn(phi, time, censor_time, rx, data, armName, formula, target = 0,
   test = "survdiff", ...)
 }
 \arguments{
@@ -18,11 +18,11 @@ EstEqn(phi, time, censor_time, rx, data, arm, formula, target = 0,
 
 \item{data}{a data.frame object containing the variables}
 
-\item{arm}{the randomisation that is independent of the recensored survival times}
-
 \item{target}{the value to subtract off from the z-statistic}
 
 \item{test}{the survival regression function to calculate the z-statistic: survdiff, coxph, survreg}
+
+\item{arm}{the randomisation that is independent of the recensored survival times}
 
 \item{adjustors}{a forumula object of covariates to adjust for: \code{~strata(A)+B*C}}
 

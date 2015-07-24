@@ -11,7 +11,11 @@ Collate:
     'recensor.R'
     'EstEqn.R'
     'ExtractZ.R'
+    'plot.rpsftm.R'
+    'print.rpsftm.R'
     'rpsftm.R'
     'utils.R'
+Depends:
+    ggplot2
 Imports:
     survival

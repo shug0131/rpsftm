@@ -44,7 +44,7 @@ a list of
 }
 }
 \description{
-Main Function used for estmating causal parameters under the Rank Preserving Sturctural Failure Time Model
+Main Function used for estmating causal parameters under the Rank Preserving Structural Failure Time Model
 }
 \author{
 Simon Bond

@@ -2,12 +2,13 @@
 #'
 #'@title Extracting the z-statistic from a survival object
 #'
-#'@param a fitted survival object : survdiff, coxph, survreg
+#'@param fit: a fitted survival object : survdiff, coxph, survreg
+#'@param armName: a character vector giving the name of the covariate representing the treatment arm.
 #'@return a numeric value, the z statistic for the independence test of the treatment arm
 #'@author Simon Bond
 
 
-## NEEDS an extra argument giving the "Arm" variable, to cope with adjustors.
+
 
 ExtractZ=function(x, ...){UseMethod("ExtractZ")}
 
