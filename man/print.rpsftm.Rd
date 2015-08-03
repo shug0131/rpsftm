@@ -13,7 +13,7 @@
 a print of the underlying test object at the point estimate
 }
 \description{
-Function used to plot the KM curves of the treatment-free transformed times
+Function used to print of the underlying test object at the point estimate of a rpsftm object
 }
 \author{
 Simon Bond

@@ -1,4 +1,4 @@
-#'Function used to plot the KM curves of the treatment-free transformed times
+#'Function used to print of the underlying test object at the point estimate of a rpsftm object
 #'
 #'@export
 #'@title Print Method
@@ -12,11 +12,11 @@
 print.rpsftm=function(x){
   obj=x$regression
   #remove the call object
+  #without this it will print the entire data set
   obj$call<-NULL
-  #print(obj$regression)
   print(obj)
   cat("\nphi:" , x$phi)
-  cat("\nExp(phi)", exp(x$phi))
+  cat("\nexp(phi):", exp(x$phi))
   invisible(x)
 }
 
