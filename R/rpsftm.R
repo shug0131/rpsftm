@@ -53,7 +53,7 @@ rpsftm=function(time, censor_time, rx, arm,data, adjustors=NULL,
   #check or handle missing data.
   
   
-  # Work out argument passing for uniroot. Why is test= different to the others???
+  #Work out argument passing for uniroot. Why is test= different to the others???
   #convert test argument into a string
   
   #Seems to be the only way to pass these as actual variables into the uniroot() function
@@ -85,13 +85,11 @@ rpsftm=function(time, censor_time, rx, arm,data, adjustors=NULL,
   
   #provide the full fitted model for print and summary methods
   regression <- EstEqn(phiHat,time,censor_time,rx, df, armName, fit_formula, target=0, test=test,...)
-  regression <- attr(regression, "fit")
-  
-  
+ 
   
   value=list(phi=phiHat, 
        fit=fit, 
-       regression=regression2,
+       regression=attr(regression, "fit"),
        #Not strictly needed but why not include it.
        Sstar=Sstar, 
        ans=ans, 
