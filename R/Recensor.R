@@ -9,6 +9,7 @@
 #' @param data a data.frame object containing the variables  
 #' @return A Surv() object with the recensoring applied
 #' @author Simon Bond
+#' @importFrom survival Surv
 
 recensor=function(phi,time,censor_time,rx){
   if( any (!(0<=rx & rx<=1))){stop("Invalid values for rx. Must be proportions in [0,1]")}
@@ -17,7 +18,7 @@ recensor=function(phi,time,censor_time,rx){
   Cstar=pmin(censor_time, censor_time*exp(phi))
   Tstar=pmin(U,Cstar)
   deltaStar=1*(U<Cstar)
-  output=survival::Surv(Tstar,deltaStar)
+  output=Surv(Tstar,deltaStar)
   return(output)
 }
   
