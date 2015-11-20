@@ -4,7 +4,7 @@ Title: Rank Preserving Structural Failure Time Models
 Version: 1.0
 Date: 2015-04-15
 Author: Simon Bond
-Maintainer: Simon Bond <simon.bond@addrenbrookes.nhs.uk>
+Maintainer: Simon Bond <simon.bond@addenbrookes.nhs.uk>
 Description: Implements methods described by the paper Robins \& Tsiatis, 1991.
 License: GPL-2
 Collate:
@@ -16,7 +16,6 @@ Collate:
     'rpsftm.R'
     'summary.rpsftm.R'
     'utils.R'
-Depends:
-    ggplot2
 Imports:
-    survival
+    survival,
+    ggplot2
