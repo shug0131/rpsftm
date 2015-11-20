@@ -17,16 +17,18 @@ NULL
 
 
 
-EstEqn=function(phi,time,censor_time,rx, data, armName, formula, target=0, test="survdiff",...){
+EstEqn <- function(phi,time,censor_time,rx, data, armName, formula, target=0, test="survdiff",...){
 
-  Sstar=recensor( phi,time,censor_time,rx)
-  data=cbind(Sstar, data)
+  Sstar <- recensor( phi,time,censor_time,rx)
+  data <- cbind(Sstar, data)
   #build a formula object,
-  fit_formula=update(formula, Sstar~.)
+  fit_formula <- update(formula, Sstar~.)
   #allow different methods to test the independence of arm
   #constrained to be from the survival package.
-  functionName=get(test, asNamespace("survival"))
-  fit=  do.call(functionName, list(fit_formula,data,...) )
-  ExtractZ(fit, armName=armName)-target
-  
+  functionName <- get(test, asNamespace("survival"))
+  fit <-   do.call(functionName, list(fit_formula,data,...) )
+  # a 'cheat' to enable this to plugged into uniroot as a function that returns a number AND store the fit object.
+  .value <- ExtractZ(fit, armName=armName)-target
+  attr(.value,"fit") <- fit
+  .value
 }

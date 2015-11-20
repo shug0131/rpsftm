@@ -37,6 +37,7 @@ rpsftm=function(time, censor_time, rx, arm,data, adjustors=NULL,
   }
   update_formula=paste("~.",substitute(arm),sep="+")
   fit_formula=update.formula(adjustors, update_formula)
+  #Need these two lines to be able to use strata and cluster
   fit_formula=as.character(fit_formula)[2]
   fit_formula=reformulate(fit_formula)
   update_formula=paste("~.",substitute(time), substitute(censor_time),substitute(rx),sep="+")
@@ -63,40 +64,35 @@ rpsftm=function(time, censor_time, rx, arm,data, adjustors=NULL,
   censor_time=df[,deparse(substitute(censor_time))]
   armName=deparse(substitute(arm))
   
-  #solve to find the value of phi wthat gives the root to z=0
-  #turn this into a function in utils, with the argument target.
-  print("estimate")
-  ans=uniroot(EstEqn, c(lowphi,hiphi), 
-              time=time, censor_time=censor_time, rx=rx, 
-              data=df, armName=armName, formula=fit_formula,target=0,test=test,...=...
-              )
-  print("lower")
-  lower=uniroot(EstEqn, c(lowphi,hiphi), 
-                time=time, censor_time=censor_time, rx=rx, armName=armName, 
-                data=df, formula=fit_formula,test=test,
-                target=qnorm(1-alpha/2),...=...)
-  print("upper")
-  #check out upper- it disagrees with stata, but not the point estimate or the lower bound?
+  #solve to find the value of phi that gives the root to z=0, and the limits of the CI.
   
-  upper=uniroot(EstEqn, c(lowphi,hiphi), 
-                time=time, censor_time=censor_time, rx=rx, armName=armName, 
-                data=df, formula=fit_formula,test=test,
-                target=qnorm(alpha/2),...=...)
+  root=function(target){
+    uniroot(EstEqn, c(lowphi,hiphi), 
+            time=time, censor_time=censor_time, rx=rx, 
+            data=df, armName=armName, formula=fit_formula,target=target,test=test,...=...)
+  }
+  ans=root(0)
+  lower=root(qnorm(1-alpha/2))
+  upper=root(qnorm(alpha/2) )
   
   
   
   phiHat=ans$root
+  
+  #Used in the plot function - simple KM curves
   Sstar=recensor(phiHat, time, censor_time,rx)
   fit=survival::survfit(update(fit_formula, Sstar~.), df)
-  #THis is almost copy-paste from EstEqn - maybe write a function to do it
-  fit_formula=update(fit_formula, Sstar~.)
-  functionName=get(test, asNamespace("survival"))
-  regression =  do.call(functionName, list(fit_formula,data,...) )
+  
+  #provide the full fitted model for print and summary methods
+  regression <- EstEqn(phiHat,time,censor_time,rx, df, armName, fit_formula, target=0, test=test,...)
+  regression <- attr(regression, "fit")
+  
   
   
   value=list(phi=phiHat, 
        fit=fit, 
-       regression=regression,
+       regression=regression2,
+       #Not strictly needed but why not include it.
        Sstar=Sstar, 
        ans=ans, 
        CI=c(lower$root,upper$root),
