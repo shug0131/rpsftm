@@ -13,9 +13,11 @@ Collate:
     'ExtractZ.R'
     'plot.rpsftm.R'
     'print.rpsftm.R'
+    'rpsftm-package.R'
     'rpsftm.R'
     'summary.rpsftm.R'
     'utils.R'
 Imports:
     survival,
     ggplot2
+RoxygenNote: 5.0.1

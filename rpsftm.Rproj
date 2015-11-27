@@ -14,8 +14,8 @@ LaTeX: pdfLaTeX
 
 BuildType: Package
 PackageUseDevtools: Yes
-PackageInstallArgs: --no-multiarch --with-keep.source -l "U:/My Documents/R/win-library/3.1"
-PackageBuildArgs: -l U:/My Documents/R/win-library/3.1
-PackageBuildBinaryArgs: -l U:/My Documents/R/win-library/3.1
-PackageCheckArgs: -l U:/My Documents/R/win-library/3.1
+PackageInstallArgs: --no-multiarch --with-keep.source -l "U:/My Documents/R/win-library/3.2"
+PackageBuildArgs: -l U:/My Documents/R/win-library/3.2
+PackageBuildBinaryArgs: -l U:/My Documents/R/win-library/3.2
+PackageCheckArgs: -l U:/My Documents/R/win-library/3.2
 PackageRoxygenize: rd,collate,namespace
