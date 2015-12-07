@@ -5,7 +5,8 @@
 \title{Rank Preserving Sturctural Failure Time Model}
 \usage{
 rpsftm(time, censor_time, rx, arm, data, adjustors = NULL, test = survdiff,
-  lowphi = -10, hiphi = 10, alpha = 0.05, ...)
+  lowphi = -10, hiphi = 10, alpha = 0.05, Recensor = TRUE,
+  Autoswitch = TRUE, ...)
 }
 \arguments{
 \item{time}{the observed failure or censoring time.}
@@ -27,6 +28,10 @@ rpsftm(time, censor_time, rx, arm, data, adjustors = NULL, test = survdiff,
 \item{hiphi}{the upper limit of the range to search for the causal paramater}
 
 \item{alpha}{the significance level used to calculate confidence intervals}
+
+\item{Recensor}{a logical to use recensoring if set to TRUE. Default is TRUE.}
+
+\item{Autoswitch}{a logical to autodetect cases of no switching. Default is TRUE}
 
 \item{target}{the value to subtract off from the z-statistic}
 

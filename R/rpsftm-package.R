@@ -10,7 +10,7 @@
 #'using rank preserving structural failure time models. 
 #'Communications in Statistics--Theory and Methods 1991; 20: 2609--2631
 #'
-#'\seealso{\code{\link[<pkg>:<pkg>-package]{survival}}}
+#'@seealso \code{\link[<pkg>:<pkg>-package]{survival}}
 #'
 #'@docType package
 #'@name rpsftm-package

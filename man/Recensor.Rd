@@ -4,7 +4,7 @@
 \alias{recensor}
 \title{Recensoring}
 \usage{
-recensor(phi, time, censor_time, rx)
+recensor(phi, time, censor_time, rx, arm, Recensor, Autoswitch)
 }
 \arguments{
 \item{phi}{the parameter that measures how more rapidly the lifetime is expended under treatment}
@@ -15,7 +15,11 @@ recensor(phi, time, censor_time, rx)
 
 \item{rx}{the proportion of time spent on treatment}
 
-\item{data}{a data.frame object containing the variables}
+\item{arm}{the indicator variable of randomised arm}
+
+\item{Recensor}{a logical to use recensoring if set to TRUE. Default is TRUE.}
+
+\item{Autoswitch}{a logical to autodetect cases of no switching. Default is TRUE}
 }
 \value{
 A Surv() object with the recensoring applied

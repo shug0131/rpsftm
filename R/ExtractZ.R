@@ -3,7 +3,7 @@
 #'@title Extracting the z-statistic from a survival object
 #'
 #'@param fit: a fitted survival object : survdiff, coxph, survreg
-#'@param armName: a character vector giving the name of the covariate representing the treatment arm.
+#'@param arm: a character vector giving the name of the covariate representing the treatment arm.
 #'@return a numeric value, the z statistic for the independence test of the treatment arm
 #'@author Simon Bond
 
@@ -40,19 +40,19 @@ ExtractZ.survdiff=function(fit,...){
 
 #' @describeIn ExtractZ Method for coxph objects
 
-ExtractZ.coxph=function(fit, armName,...){
+ExtractZ.coxph=function(fit, arm,...){
   Z=with(fit, coefficients/sqrt(diag(var)))
-  Z[armName]
+  Z[arm]
 }
 
 
 #' @describeIn ExtractZ Method for survreg objects
 
-ExtractZ.survreg=function(fit,armName,...){
+ExtractZ.survreg=function(fit,arm,...){
   coef=fit$coefficients
   #var includes the scale parameters
   var=diag(fit$var)[1:length(coef)]
   Z=coef/sqrt(var)
-  Z[armName]
+  Z[arm]
   
 }
