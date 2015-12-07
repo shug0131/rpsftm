@@ -7,7 +7,7 @@
 \method{plot}{rpsftm}(x)
 }
 \arguments{
-\item{x}{an object returned from the \code{rpsftm()} function}
+\item{x}{an object returned from the \code{\link{rpsftm}} function}
 }
 \value{
 a ggplot plot of the fitted KM curves

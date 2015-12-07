@@ -3,7 +3,7 @@
 #'@export
 #'@title Plot Method
 #'@name plot.rpsftm
-#' @param x an object returned from the \code{rpsftm()} function
+#' @param x an object returned from the \code{\link{rpsftm}} function
 #' @return a ggplot plot of the fitted KM curves 
 #' @author Simon Bond
 #' 

@@ -7,16 +7,6 @@ Author: Simon Bond
 Maintainer: Simon Bond <simon.bond@addenbrookes.nhs.uk>
 Description: Implements methods described by the paper Robins \& Tsiatis, 1991.
 License: GPL-2
-Collate:
-    'recensor.R'
-    'EstEqn.R'
-    'ExtractZ.R'
-    'plot.rpsftm.R'
-    'print.rpsftm.R'
-    'rpsftm-package.R'
-    'rpsftm.R'
-    'summary.rpsftm.R'
-    'utils.R'
 Imports:
     survival,
     ggplot2

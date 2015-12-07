@@ -7,7 +7,7 @@
 \method{print}{rpsftm}(x)
 }
 \arguments{
-\item{x}{an object returned from the \code{rpsftm()} function}
+\item{x}{an object returned from the \code{\link{rpsftm}} function}
 }
 \value{
 a print of the underlying test object at the point estimate

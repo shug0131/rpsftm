@@ -3,7 +3,7 @@
 #'@export
 #'@title Print Method
 #'@name print.rpsftm
-#' @param x an object returned from the \code{rpsftm()} function
+#' @param x an object returned from the \code{\link{rpsftm}} function
 #' @return a print of the underlying test object at the point estimate
 #' @author Simon Bond
 #' 

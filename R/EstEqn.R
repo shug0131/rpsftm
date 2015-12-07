@@ -1,6 +1,3 @@
-#' @include recensor.R
-NULL
-
 #'Calculates the Estimating Equation to be solved in RPSFTM models
 #' 
 #' @title Estimating Equations for \code{rpsftm()}
