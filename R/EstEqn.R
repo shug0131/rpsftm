@@ -15,7 +15,6 @@
 
 
 EstEqn <- function(phi,time,censor_time,rx, data, arm, formula, 
-                   #timeName=timeName,
                    target=0, test="survdiff", Recensor, Autoswitch, ...){
   Sstar <- recensor( phi,data[,time],data[,censor_time],data[,rx],data[,arm], Recensor,Autoswitch)
   data <- cbind(Sstar, data)
