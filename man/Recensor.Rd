@@ -15,7 +15,7 @@ recensor(phi, time, censor_time, rx, arm, Recensor, Autoswitch)
 
 \item{rx}{the proportion of time spent on treatment}
 
-\item{arm}{the indicator variable of randomised arm}
+\item{arm}{the randomised arm. Either a numerical indicator, with 0 as the placebo, or a factor with the lowest level as placebo.}
 
 \item{Recensor}{a logical to use recensoring if set to TRUE. Default is TRUE.}
 

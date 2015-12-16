@@ -6,7 +6,7 @@
 #' @param time the observed failure or censoring time.
 #' @param censor_time the theoretical censoring time, either observed or set after time.
 #' @param rx the proportion of time spent on treatment
-#' @param arm the indicator variable of randomised arm  
+#' @param arm the randomised arm. Either a numerical indicator, with 0 as the placebo, or a factor with the lowest level as placebo.
 #' @param Recensor a logical to use recensoring if set to TRUE. Default is TRUE.
 #' @param Autoswitch a logical to autodetect cases of no switching. Default is TRUE
 #' @return A Surv() object with the recensoring applied

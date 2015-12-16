@@ -3,19 +3,10 @@
 #'@export
 #'@title Rank Preserving Sturctural Failure Time Model
 #'@name rpsftm
-#' @param time the observed failure or censoring time.
-#' @param censor_time the theoretical censoring time, either observed or set after Time.
-#' @param rx the proportion of Time spent on treatment
-#' @param data a data.frame object containing the variables 
-#' @param arm the randomisation that is independent of the recensored survival times
-#' @param adjustors a forumula object of covariates to adjust for: \code{~strata(A)+B*C}
-#' @param target the value to subtract off from the z-statistic 
-#' @param test the survival regression function to calculate the z-statistic: survdiff, coxph, survreg
+#'@inheritParams EstEqn
 #' @param lowphi the lower limit of the range to search for the causal parameter
 #' @param hiphi the upper limit of the range to search for the causal paramater
 #' @param alpha the significance level used to calculate confidence intervals
-#' @param Recensor a logical to use recensoring if set to TRUE. Default is TRUE.
-#' @param Autoswitch a logical to autodetect cases of no switching. Default is TRUE
 #' @param \code{...} arguments to supply to the test function.
 #' @return a list of
 #' \itemize{
@@ -31,16 +22,16 @@
 
 
 rpsftm=function(time, censor_time, rx, arm,data, 
-                adjustors=NULL, test=survdiff, 
+                formula=NULL, test=survdiff, 
                 lowphi=-10,hiphi=10, alpha=0.05,
                 Recensor=TRUE,Autoswitch=TRUE, ...){
   
   #create formula for fitting, and to feed into model.frame()
-  if(is.null(adjustors)){
-    adjustors=as.formula("~1")
+  if(is.null(formula)){
+    formula=as.formula("~1")
   }
   update_formula=paste("~.",substitute(arm),sep="+")
-  fit_formula=update.formula(adjustors, update_formula)
+  fit_formula=update.formula(formula, update_formula)
   #Need these two lines to be able to use strata and cluster
   fit_formula=as.character(fit_formula)[2]
   fit_formula=reformulate(fit_formula)
