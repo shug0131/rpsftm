@@ -7,7 +7,9 @@ Author: Simon Bond
 Maintainer: Simon Bond <simon.bond@addenbrookes.nhs.uk>
 Description: Implements methods described by the paper Robins \& Tsiatis, 1991.
 License: GPL-2
-Imports:
+Imports: 
     survival,
     ggplot2
+LazyData: true
 RoxygenNote: 5.0.1
+Suggests: testthat
