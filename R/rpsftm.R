@@ -1,7 +1,7 @@
 #'Main Function used for estmating causal parameters under the Rank Preserving Structural Failure Time Model
 #'
 #'@export
-#'@title Rank Preserving Sturctural Failure Time Model
+#'@title Rank Preserving Structural Failure Time Model
 #'@name rpsftm
 #'@inheritParams EstEqn
 #' @param lowphi the lower limit of the range to search for the causal parameter
@@ -25,10 +25,12 @@ rpsftm=function(time, censor_time, rx, arm,data,
                 formula=NULL, test=survdiff, 
                 lowphi=-10,hiphi=10, alpha=0.05,
                 Recensor=TRUE,Autoswitch=TRUE, ...){
+  cl <- match.call()
   
   #create formula for fitting, and to feed into model.frame()
   if(is.null(formula)){
-    formula=as.formula("~1")
+    formula <- as.formula("~1")
+    cl$formula <-formula 
   }
   update_formula=paste("~.",substitute(arm),sep="+")
   fit_formula=update.formula(formula, update_formula)
@@ -65,6 +67,14 @@ rpsftm=function(time, censor_time, rx, arm,data,
   ans=root(0)
   lower=root(qnorm(1-alpha/2))
   upper=root(qnorm(alpha/2) )
+  #sort the ordering
+  if(upper$root<lower$root){
+    temp <- lower
+    lower <- upper
+    upper <- temp
+    rm(temp)
+  }
+  
   
   
   
@@ -86,6 +96,7 @@ rpsftm=function(time, censor_time, rx, arm,data,
        Sstar=Sstar, 
        ans=ans, 
        CI=c(lower$root,upper$root),
-       call=match.call())
+       call=cl
+       )
   structure(value, class="rpsftm")
 }
