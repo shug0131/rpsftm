@@ -26,7 +26,7 @@ arm could crossover and receive treatment. The primary endpoint was time to dise
 immdef
 }
 \description{
-Simulated data to use with the \code{\link[<pkg>:<pkg>-package]{survival}} library.
+Simulated data to use with the \code{\link[<pkg>:<pkg>-package]{rpsftm}} library.
 }
 \keyword{datasets}
 

@@ -4,21 +4,13 @@
 \alias{EstEqn}
 \title{Estimating Equations for \code{rpsftm()}}
 \usage{
-EstEqn(phi, time, censor_time, rx, data, arm, formula, target = 0,
-  test = "survdiff", Recensor, Autoswitch, ...)
+EstEqn(phi, data, formula, target = 0, test = "survdiff", Recensor,
+  Autoswitch, ...)
 }
 \arguments{
 \item{phi}{the parameter that measures how more rapidly the lifetime is expended under treatment}
 
-\item{time}{the observed failure or censoring time.}
-
-\item{censor_time}{the theoretical censoring time, either observed or set after time.}
-
-\item{rx}{the proportion of time spent on treatment}
-
-\item{data}{the data set that contains the variables.}
-
-\item{arm}{the randomised arm. Either a numerical indicator, with 0 as the placebo, or a factor with the lowest level as placebo.}
+\item{data}{the data set that contains the variables. Must contain columns named: time, censor_time,rx, arm?}
 
 \item{formula}{a forumula object of covariates to adjust for: \code{~strata(A)+B*C}}
 
