@@ -28,25 +28,22 @@ rpsftm=function(time, censor_time, rx, arm,data,
   cl <- match.call()
   
   #create formula for fitting, and to feed into model.frame()
-  if(is.null(formula)){
-    formula <- as.formula("~1")
-    cl$formula <-formula 
-  }
   #from the lm() function
   mf <- match.call(expand.dots = FALSE)
+  cl$formula <-formula 
+  mf$formula <- cl$formula
+  #so that the use of the default value works as desired
+  environment(mf$formula) <- parent.frame()
   m <- match(c("formula", "data","time", "censor_time", "rx", "arm"), names(mf), 0L)
   mf <- mf[c(1L, m)]
   mf$drop.unused.levels <- TRUE
   mf[[1L]] <- quote(stats::get_all_vars)
-  mf$formula <- cl$formula
   #this returns a data frame with all the variables in and renamed time, censor_time, rx, arm as appropriate
   df <- eval(mf, parent.frame())
-  #print(head(df))
+ 
   #update_formula=paste("~.",substitute(arm),sep="+")
   #fit_formula=update.formula(formula, update_formula)
   fit_formula=update.formula(formula, ~.+arm)
-  
-  
   #Need these two lines to be able to use strata and cluster
   #fit_formula=as.character(fit_formula)[2]
   #fit_formula=reformulate(fit_formula)
@@ -97,7 +94,9 @@ rpsftm=function(time, censor_time, rx, arm,data,
   
   #Used in the plot function - simple KM curves
   Sstar=recensor(phiHat, df[,"time"], df[,"censor_time"],df[,"rx"],df[,"arm"],Recensor,Autoswitch)
-  fit=survival::survfit(update(fit_formula, Sstar~.), df)
+  environment(fit_formula) <- environment()
+  fit_formula <- update(fit_formula, Sstar~.)
+  fit=survival::survfit(fit_formula, df)
   
   #provide the full fitted model for print and summary methods
   regression <- EstEqn(phiHat,#time,censor_time,rx, 
@@ -107,7 +106,9 @@ rpsftm=function(time, censor_time, rx, arm,data,
  
   
   value=list(phi=phiHat, 
-       fit=fit, 
+        fit=fit, 
+        #for using the update() function
+        formula=mf$formula,
        regression=attr(regression, "fit"),
        #Not strictly needed but why not include it.
        Sstar=Sstar, 
