@@ -4,12 +4,20 @@
 \alias{rpsftm}
 \title{Rank Preserving Structural Failure Time Model}
 \usage{
-rpsftm(time, censor_time, rx, arm, data, formula = NULL, test = survdiff,
+rpsftm(time, censor_time, rx, arm, data, formula = ~1, test = survdiff,
   lowphi = -10, hiphi = 10, alpha = 0.05, Recensor = TRUE,
   Autoswitch = TRUE, ...)
 }
 \arguments{
-\item{data}{the data set that contains the variables. Must contain columns named: time, censor_time,rx, arm?}
+\item{time}{the observed failure or censoring time.}
+
+\item{censor_time}{the theoretical censoring time, either observed or set after time.}
+
+\item{rx}{the proportion of time spent on treatment}
+
+\item{arm}{the randomised arm. Either a numerical indicator, with 0 as the placebo, or a factor with the lowest level as placebo.}
+
+\item{data}{an optional data frame that contains variables}
 
 \item{formula}{a forumula object of covariates to adjust for: \code{~strata(A)+B*C}}
 

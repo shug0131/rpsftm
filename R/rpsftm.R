@@ -3,7 +3,9 @@
 #'@export
 #'@title Rank Preserving Structural Failure Time Model
 #'@name rpsftm
+#'@inheritParams recensor
 #'@inheritParams EstEqn
+#'@param data an optional data frame that contains variables
 #' @param lowphi the lower limit of the range to search for the causal parameter
 #' @param hiphi the upper limit of the range to search for the causal paramater
 #' @param alpha the significance level used to calculate confidence intervals
