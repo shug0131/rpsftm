@@ -9,6 +9,8 @@
 #' @param lowphi the lower limit of the range to search for the causal parameter
 #' @param hiphi the upper limit of the range to search for the causal paramater
 #' @param alpha the significance level used to calculate confidence intervals
+#' @param treat_weight an optional parameter that phi is multiplied by on an individual observation level to give
+#' differing impact to treatment. The values are transformed by abs(.)/max(abs(.)) to ensure 1 is the largest weight.
 #' @param \code{...} arguments to supply to the test function.
 #' @return a list of
 #' \itemize{
@@ -26,6 +28,7 @@
 rpsftm=function(time, censor_time, rx, arm,data, 
                 formula=~1, test=survdiff, 
                 lowphi=-10,hiphi=10, alpha=0.05,
+                treat_weight=1,
                 Recensor=TRUE,Autoswitch=TRUE, ...){
   cl <- match.call()
   
@@ -36,7 +39,7 @@ rpsftm=function(time, censor_time, rx, arm,data,
   mf$formula <- cl$formula
   #so that the use of the default value works as desired
   environment(mf$formula) <- parent.frame()
-  m <- match(c("formula", "data","time", "censor_time", "rx", "arm"), names(mf), 0L)
+  m <- match(c("formula", "data","time", "censor_time", "rx", "arm","treat_weight"), names(mf), 0L)
   mf <- mf[c(1L, m)]
   mf$drop.unused.levels <- TRUE
   mf[[1L]] <- quote(stats::get_all_vars)
@@ -92,26 +95,38 @@ rpsftm=function(time, censor_time, rx, arm,data,
   
   
   
-  phiHat=ans$root
   
-  #Used in the plot function - simple KM curves
+  
+  #create a simple KM curve for each recensored arm. Used in the plot function - simple KM curves
+  
+  phiHat=ans$root
+  if("treat_weight" %in% names(df)){
+    treat_weight <- df[,"treat_weight"]
+    #rescale to make sure that all weights are 1 or less for interpretability
+    treat_weight <- abs(treat_weight)/max(abs(treat_weight), na.rm=TRUE)
+    phiHat <- phiHat*treat_weight
+  }
+  
   Sstar=recensor(phiHat, df[,"time"], df[,"censor_time"],df[,"rx"],df[,"arm"],Recensor,Autoswitch)
-  environment(fit_formula) <- environment()
-  fit_formula <- update(fit_formula, Sstar~.)
-  fit=survival::survfit(fit_formula, df)
+  #environment(fit_formula) <- environment()
+  #fit_formula <- update(fit_formula, Sstar~.)
+  #Ignores any covariates, strata or adjustors. On Purpose as this is too general to deal with
+  fit=survival::survfit(Sstar~arm, data=df)
   
   #provide the full fitted model for print and summary methods
-  regression <- EstEqn(phiHat,#time,censor_time,rx, 
-                       df, #arm,
-                       fit_formula, 
-                       target=0,test=test,Recensor=Recensor, Autoswitch=Autoswitch,...)
+  #regression <- EstEqn(phiHat,#time,censor_time,rx, 
+  #                     df, #arm,
+  #                     fit_formula, 
+  #                     target=0,test=test,Recensor=Recensor, Autoswitch=Autoswitch,...)
  
   
-  value=list(phi=phiHat, 
+  value=list(phi=ans$root, 
+        #for the plot function
         fit=fit, 
         #for using the update() function
         formula=mf$formula,
-       regression=attr(regression, "fit"),
+        #for the print and summary methods
+       regression=attr(ans$f.root, "fit"),
        #Not strictly needed but why not include it.
        Sstar=Sstar, 
        ans=ans, 

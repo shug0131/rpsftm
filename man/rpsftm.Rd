@@ -5,8 +5,8 @@
 \title{Rank Preserving Structural Failure Time Model}
 \usage{
 rpsftm(time, censor_time, rx, arm, data, formula = ~1, test = survdiff,
-  lowphi = -10, hiphi = 10, alpha = 0.05, Recensor = TRUE,
-  Autoswitch = TRUE, ...)
+  lowphi = -10, hiphi = 10, alpha = 0.05, treat_weight = 1,
+  Recensor = TRUE, Autoswitch = TRUE, ...)
 }
 \arguments{
 \item{time}{the observed failure or censoring time.}
@@ -28,6 +28,9 @@ rpsftm(time, censor_time, rx, arm, data, formula = ~1, test = survdiff,
 \item{hiphi}{the upper limit of the range to search for the causal paramater}
 
 \item{alpha}{the significance level used to calculate confidence intervals}
+
+\item{treat_weight}{an optional parameter that phi is multiplied by on an individual observation level to give
+differing impact to treatment. The values are transformed by abs(.)/max(abs(.)) to ensure 1 is the largest weight.}
 
 \item{Recensor}{a logical to use recensoring if set to TRUE. Default is TRUE.}
 

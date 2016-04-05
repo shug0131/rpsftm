@@ -8,7 +8,7 @@ test_that("first basict fit with mixed data sources",{
   propX <- with(immdef,1-xoyrs/progyrs)
   fit <- rpsftm(progyrs, censyrs,propX,imm,immdef,#formula=~1,
            lowphi=-1, hiphi=1)
-  
+  expect_is(fit$phi, class="numeric")
 })
 
 test_that("with no data argument at all",{
@@ -17,11 +17,18 @@ test_that("with no data argument at all",{
               lowphi=-1, hiphi=1,
               formula=~1
               )
+  expect_is(fit$phi, class="numeric")
   
 }
 )
 
-
+test_that("fit with treatment weights",{
+  propX <- with(immdef,1-xoyrs/progyrs)
+  weight <- with(immdef, ifelse(imm==1, 1, 0.5))
+  fit <- rpsftm(progyrs, censyrs,propX,imm,immdef,treat_weight=weight,
+                lowphi=-1, hiphi=1)
+  expect_is(fit$phi, class="numeric")
+})
 
 
 

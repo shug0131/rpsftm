@@ -10,7 +10,9 @@ EstEqn(phi, data, formula, target = 0, test = "survdiff", Recensor,
 \arguments{
 \item{phi}{the parameter that measures how more rapidly the lifetime is expended under treatment}
 
-\item{data}{the data set that contains the variables. Must contain columns named: time, censor_time,rx, arm.}
+\item{data}{the data set that contains the variables. 
+Must contain columns named: time, censor_time,rx, arm.
+Optionally a column named: treat_weight}
 
 \item{formula}{a forumula object of covariates to adjust for: \code{~strata(A)+B*C}}
 

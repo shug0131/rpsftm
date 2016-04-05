@@ -15,5 +15,5 @@ LaTeX: pdfLaTeX
 BuildType: Package
 PackageUseDevtools: Yes
 PackagePath: U:/My Documents/R/rpsftm/rpsftm
-PackageInstallArgs: --library="U:/My Documents/R/rpsftm/rpsftm"
+PackageInstallArgs: --library="U:/My Documents/R/win-library/3.2"
 PackageRoxygenize: rd,collate,namespace
