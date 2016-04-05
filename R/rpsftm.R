@@ -12,14 +12,16 @@
 #' @param treat_weight an optional parameter that phi is multiplied by on an individual observation level to give
 #' differing impact to treatment. The values are transformed by abs(.)/max(abs(.)) to ensure 1 is the largest weight.
 #' @param \code{...} arguments to supply to the test function.
-#' @return a list of
+#' @return a rpsftm method object that is a list of the following:
 #' \itemize{
-#' \item phi the estimated parameter
-#' \item fit the fitted survival object
-#' \item Sstar the recensored \code{Surv()} data using the estimate parameter
-#' \item ans the object return from \code{uniroot} 
-#' \item CI a vector of the confidence interval around phi
-#' \item call the R call object
+#' \item phi: the estimated parameter
+#' \item fit: a survdiff object to produce Kaplan-Meier curves of the estimated counterfactual untreated failure times for each treatment arm
+#' \item formula: a formula representing any adjustments, strata or clusters- used for the update() function
+#' \item regression: the survival regression object at the estimated value of phi
+#' \item Sstar: the recensored \code{Surv()} data using the estimate value of phi to give counterfactual untreated failure times.
+#' \item ans: the object returned from \code{uniroot} used to solve the estimating equation
+#' \item CI: a vector of the confidence interval around phi
+#' \item call: the R call object
 #' }
 #' @author Simon Bond
 #' @importFrom survival strata cluster
