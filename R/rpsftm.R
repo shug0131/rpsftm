@@ -27,8 +27,8 @@
 #' @importFrom survival strata cluster
 
 
-rpsftm=function(time, censor_time, rx, arm,data, 
-                formula=~1, test=survdiff, 
+rpsftm=function(formula,data, 
+                test=survdiff, 
                 lowphi=-10,hiphi=10, alpha=0.05,
                 treat_weight=1,
                 Recensor=TRUE,Autoswitch=TRUE, ...){
@@ -44,13 +44,53 @@ rpsftm=function(time, censor_time, rx, arm,data,
   m <- match(c("formula", "data","time", "censor_time", "rx", "arm","treat_weight"), names(mf), 0L)
   mf <- mf[c(1L, m)]
   mf$drop.unused.levels <- TRUE
-  mf[[1L]] <- quote(stats::get_all_vars)
+  mf[[1L]] <- quote(stats::model.frame)
   #this returns a data frame with all the variables in and renamed time, censor_time, rx, arm as appropriate
+  special <- c("ReCen","Instr")
+  mf$formula <- if (missing(data)) 
+    terms(formula, special)
+  else terms(formula, special, data = data)
+  #if (!is.null(attr(mf$formula, "specials")$tt)) {
+  #  coxenv <- new.env(parent = environment(formula))
+  #  assign("tt", function(x) x, env = coxenv)
+  #  environment(temp$formula) <- coxenv
+  #}
+  
+  formula_env <- new.env(parent = environment(mf$formula))
+  #  assign("tt", function(x) x, env = coxenv)
+  assign("ReCen", 
+         function(time,censor_time){cbind(time=time, censor_time=censor_time)}, 
+         env=formula_env)
+  assign("Instr",
+         function(arm, rx){cbind(arm=arm, rx=rx)},
+         env <- formula_env
+         )
+  
+  environment(mf$formula) <- formula_env
+  
   df <- eval(mf, parent.frame())
- 
+  
+  ReCen_index <- attr(mf$formula,"specials")$ReCen
+  ReCen_drops=which(attr(mf$formula,"factors")[ReCen_index,]>0)
+  if(length(ReCen_drops)>1){stop("Only one Recen term allowed")}
+  
+  Instr_index <- attr(mf$formula,"specials")$Instr
+  Instr_drops=which(attr(mf$formula,"factors")[Instr_index,]>0)
+  if(length(Instr_drops)>1){stop("Only one Instr term allowed")}
+  print(c(Instr_index,ReCen_index))
+  
+  # remedies the df being a list of lists into just 1 list
+  df <- cbind(df[,Instr_index], df[,-c(Instr_index,ReCen_index)], df[,ReCen_index])
+  print(mf$formula)
+  print(Instr_drops)
+  print(head(df))
+  fit_formula <- drop.terms( mf$formula, dropx= Instr_drops, keep.response=FALSE)
+  fit_formula <- update.formula(fit_formula, .~.+arm)
+  
+   
   #update_formula=paste("~.",substitute(arm),sep="+")
   #fit_formula=update.formula(formula, update_formula)
-  fit_formula=update.formula(formula, ~.+arm)
+  #fit_formula=update.formula(formula, ~.+arm)
   #Need these two lines to be able to use strata and cluster
   #fit_formula=as.character(fit_formula)[2]
   #fit_formula=reformulate(fit_formula)
