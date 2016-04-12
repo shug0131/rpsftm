@@ -10,6 +10,8 @@ myRC <- with(immdef, RC(imm, censyrs))
 
 RCindex <- attr(myformula,"specials")$RC
 drops=attr(myformula,"factors")[RCindex,]==0
+# this could be a way to induce "Helpful" errors to ensure there is only 1 RC() term and it
+# only turns up once, not in any interactions.
 drops <- apply(drops,2, all)
 
 mf <- model.frame(myformula, data=immdef)
