@@ -62,10 +62,24 @@ rpsftm=function(formula,data,
   else terms(formula, special, data = data)
   formula_env <- new.env(parent = environment(mf$formula))
   assign("ReCen", 
-         function(time,censor_time){cbind(time=time, censor_time=censor_time)}, 
+         function(time,censor_time){
+           cbind(time=time, censor_time=censor_time)
+           }, 
          env=formula_env)
   assign("Instr",
-         function(arm, rx){cbind(arm=arm, rx=rx)},
+         function(arm, rx){
+           if(is.numeric(arm) & any( !(arm %in% c(0,1)))){
+             warning("Auto checking of no switching needs treatment to have value 0 or 1")
+           }
+           if(is.factor(arm)) {
+             message <- paste("Auto checking of switching assumes the lowest level of arm='",
+                              levels(arm)[1], "' is the control or placebo treatment",sep="")
+             warning(message)
+             # converts the numerically coding (1,2,..), to 0 or 1.
+             arm <- as.numeric(arm)-1
+           }
+           cbind(arm=arm, rx=rx)
+         },
          env = formula_env
          )
   environment(mf$formula) <- formula_env
@@ -90,7 +104,7 @@ rpsftm=function(formula,data,
     
   #check or handle missing data.
   
-  
+ 
    test=deparse(substitute(test))
 
   #solve to find the value of phi that gives the root to z=0, and the limits of the CI.

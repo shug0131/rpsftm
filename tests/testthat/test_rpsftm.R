@@ -19,7 +19,7 @@ test_that("first basict fit with mixed data source, calculating var in-functions
 })
 
 test_that("first basict fit with the arm as a factor",{
-  myArm <- factor(immdef$imm, labels=c("Control","Exper"))
+  myArm <- factor(immdef$imm, levels=0:1,labels=c("Control","Exper"))
   fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(myArm,1-xoyrs/progyrs),immdef,#formula=~1,
                 lowphi=-1, hiphi=1)
   expect_is(fit$phi, class="numeric")

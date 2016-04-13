@@ -14,16 +14,7 @@
 #' @importFrom survival Surv
 
 recensor=function(phi,time,censor_time,rx,arm,Recensor, Autoswitch){
-  if(is.numeric(arm) & any( !(arm %in% c(0,1)))){
-    warning("Auto checking of no switching needs treatment to have value 0 or 1")
-  }
-  if(is.factor(arm)) {
-    message <- paste("Auto checking of switching assumes the lowest level of arm,",
-                     levels(arm)[1], "is the control or placebo treatment")
-    warning(message)
-    # converts the numerically coding (1,2,..), to 0 or 1.
-    arm <- as.numeric(arm)-1
-  }
+  
   
   
   
