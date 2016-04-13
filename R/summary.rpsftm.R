@@ -15,6 +15,7 @@ summary.rpsftm=function(x){
   #without this it will print the entire data set
   obj$call<-NULL
   obj.summary=summary(obj)
+  print(x$call)
   print(obj.summary)
   cat("\nphi:" , x$phi)
   cat("\nexp(phi):", exp(x$phi))

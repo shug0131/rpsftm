@@ -5,6 +5,8 @@
 #'@name rpsftm
 #'@inheritParams recensor
 #'@inheritParams EstEqn
+#'@param formula a formula with a minimal structure of ReCen(time, censor_time)~Instr(arm,rx).
+#'Further terms can be added to the right hand side to adjust for covariates and use strata or cluster arguments.
 #'@param data an optional data frame that contains variables
 #' @param lowphi the lower limit of the range to search for the causal parameter
 #' @param hiphi the upper limit of the range to search for the causal paramater
@@ -23,6 +25,18 @@
 #' \item CI: a vector of the confidence interval around phi
 #' \item call: the R call object
 #' }
+#' @details the formula object ReCen(time, censor_time)~Instr(arm,rx), identifies particular meaning to the four
+#' sets of arguments. 'ReCen()' stands for ReCensoring. 'Instr()' stands for Instrument. 
+#' \itemize{
+#' \item time: the observed failure or censoring time
+#' \item censor_time: the time at which censoring would, or has occurred. This is provided for all observations
+#' unlike standard Kaplan-Meier or Cox regression where it is only given for censored observations
+#' \item arm: the randomised treatment arm. a factor with 2 levels, or numeric variable with values 0/1.
+#' \item rx: the proportion of time on active treatment (arm=1 or the non-reference level of the factor)
+#' }
+#' Further adjustment terms can be added on the right hand side of the formula if desired, included strata()
+#' or cluster() terms. 
+#' 
 #' @author Simon Bond
 #' @importFrom survival strata cluster
 
@@ -37,69 +51,38 @@ rpsftm=function(formula,data,
   #create formula for fitting, and to feed into model.frame()
   #from the lm() function
   mf <- match.call(expand.dots = FALSE)
-  cl$formula <-formula 
-  mf$formula <- cl$formula
-  #so that the use of the default value works as desired
-  environment(mf$formula) <- parent.frame()
-  m <- match(c("formula", "data","time", "censor_time", "rx", "arm","treat_weight"), names(mf), 0L)
+  m <- match(c("formula", "data","treat_weight"), names(mf), 0L)
   mf <- mf[c(1L, m)]
   mf$drop.unused.levels <- TRUE
   mf[[1L]] <- quote(stats::model.frame)
-  #this returns a data frame with all the variables in and renamed time, censor_time, rx, arm as appropriate
+  #this ultimately returns a data frame with all the variables in and renamed time, censor_time, rx, arm as appropriate
   special <- c("ReCen","Instr")
   mf$formula <- if (missing(data)) 
     terms(formula, special)
   else terms(formula, special, data = data)
-  #if (!is.null(attr(mf$formula, "specials")$tt)) {
-  #  coxenv <- new.env(parent = environment(formula))
-  #  assign("tt", function(x) x, env = coxenv)
-  #  environment(temp$formula) <- coxenv
-  #}
-  
   formula_env <- new.env(parent = environment(mf$formula))
-  #  assign("tt", function(x) x, env = coxenv)
   assign("ReCen", 
          function(time,censor_time){cbind(time=time, censor_time=censor_time)}, 
          env=formula_env)
   assign("Instr",
          function(arm, rx){cbind(arm=arm, rx=rx)},
-         env <- formula_env
+         env = formula_env
          )
-  
   environment(mf$formula) <- formula_env
-  
   df <- eval(mf, parent.frame())
-  
   ReCen_index <- attr(mf$formula,"specials")$ReCen
   ReCen_drops=which(attr(mf$formula,"factors")[ReCen_index,]>0)
-  if(length(ReCen_drops)>1){stop("Only one Recen term allowed")}
-  
+  if(length(ReCen_index)!=1){stop("Exactly one Recen() term needed")}
+  if(length(ReCen_drops)>0){stop("Recen() term only on the LHS of the formula")}
   Instr_index <- attr(mf$formula,"specials")$Instr
   Instr_drops=which(attr(mf$formula,"factors")[Instr_index,]>0)
-  if(length(Instr_drops)>1){stop("Only one Instr term allowed")}
-  print(c(Instr_index,ReCen_index))
-  
+  if(length(Instr_drops)!=1){stop("Exactly one Instr() term allowed")}
   # remedies the df being a list of lists into just 1 list
-  df <- cbind(df[,Instr_index], df[,-c(Instr_index,ReCen_index)], df[,ReCen_index])
-  print(mf$formula)
-  print(Instr_drops)
-  print(head(df))
-  fit_formula <- drop.terms( mf$formula, dropx= Instr_drops, keep.response=FALSE)
-  fit_formula <- update.formula(fit_formula, .~.+arm)
-  
+  df <- cbind( df[,ReCen_index], df[,Instr_index], df[,-c(Instr_index,ReCen_index), drop=FALSE])
+  fit_formula <- terms( update(mf$formula , .~arm + .))
+  fit_formula <- drop.terms( fit_formula, dropx= 1+Instr_drops, keep.response=FALSE)
+ 
    
-  #update_formula=paste("~.",substitute(arm),sep="+")
-  #fit_formula=update.formula(formula, update_formula)
-  #fit_formula=update.formula(formula, ~.+arm)
-  #Need these two lines to be able to use strata and cluster
-  #fit_formula=as.character(fit_formula)[2]
-  #fit_formula=reformulate(fit_formula)
-  #update_formula=paste("~.",substitute(time), substitute(censor_time),substitute(rx),sep="+")
-  #data_formula=update.formula(fit_formula, update_formula)
-  #data_formula=update.formula(fit_formula, update_formula)
-  #df2=get_all_vars(data_formula,data=data)
-  
-  
   #Check that the number of arms is 2.
   if( length(unique(df[,"arm"]))!=2){
     stop("arm must have exactly 2 observed values")
@@ -109,17 +92,12 @@ rpsftm=function(formula,data,
   
   
    test=deparse(substitute(test))
-#  time=deparse(substitute(time))
-#  rx=deparse(substitute(rx))
-#  censor_time=deparse(substitute(censor_time))
-#  arm=deparse(substitute(arm))
-  
+
   #solve to find the value of phi that gives the root to z=0, and the limits of the CI.
   
   root=function(target){
     uniroot(EstEqn, c(lowphi,hiphi), 
-            #time=time, censor_time=censor_time, rx=rx, 
-            data=df, #arm=arm, 
+           data=df, 
             formula=fit_formula,target=target,
             test=test,Recensor=Recensor, Autoswitch=Autoswitch, ...=...)
   }
@@ -142,26 +120,17 @@ rpsftm=function(formula,data,
   #create a simple KM curve for each recensored arm. Used in the plot function - simple KM curves
   
   phiHat=ans$root
-  if("treat_weight" %in% names(df)){
-    treat_weight <- df[,"treat_weight"]
+  if("(treat_weight)" %in% names(df)){
+    treat_weight <- df[,"(treat_weight)"]
     #rescale to make sure that all weights are 1 or less for interpretability
     treat_weight <- abs(treat_weight)/max(abs(treat_weight), na.rm=TRUE)
     phiHat <- phiHat*treat_weight
   }
   
   Sstar=recensor(phiHat, df[,"time"], df[,"censor_time"],df[,"rx"],df[,"arm"],Recensor,Autoswitch)
-  #environment(fit_formula) <- environment()
-  #fit_formula <- update(fit_formula, Sstar~.)
   #Ignores any covariates, strata or adjustors. On Purpose as this is too general to deal with
   fit=survival::survfit(Sstar~arm, data=df)
-  
-  #provide the full fitted model for print and summary methods
-  #regression <- EstEqn(phiHat,#time,censor_time,rx, 
-  #                     df, #arm,
-  #                     fit_formula, 
-  #                     target=0,test=test,Recensor=Recensor, Autoswitch=Autoswitch,...)
  
-  
   value=list(phi=ans$root, 
         #for the plot function
         fit=fit, 

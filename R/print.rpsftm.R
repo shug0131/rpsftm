@@ -14,6 +14,7 @@ print.rpsftm=function(x){
   #remove the call object
   #without this it will print the entire data set
   obj$call<-NULL
+  print(x$call)
   print(obj)
   cat("\nphi:" , x$phi)
   cat("\nexp(phi):", exp(x$phi))

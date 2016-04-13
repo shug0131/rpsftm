@@ -21,8 +21,8 @@ EstEqn <- function(phi,#time,censor_time,rx,
                    formula, 
                    target=0, test="survdiff", Recensor, Autoswitch, ...){
   
-  if("treat_weight" %in% names(data)){
-    treat_weight <- data[,"treat_weight"]
+  if("(treat_weight)" %in% names(data)){
+    treat_weight <- data[,"(treat_weight)"]
     #rescale to make sure that all weights are 1 or less for interpretability
     treat_weight <- abs(treat_weight)/max(abs(treat_weight), na.rm=TRUE)
     phi <- phi*treat_weight
