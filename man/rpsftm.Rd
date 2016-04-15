@@ -9,7 +9,7 @@ rpsftm(formula, data, test = survdiff, lowphi = -10, hiphi = 10,
   ...)
 }
 \arguments{
-\item{formula}{a formula with a minimial structure of ReCen(time, censor_time)~Instr(arm,rx).
+\item{formula}{a formula with a minimal structure of \code{ReCen(time, censor_time)~Instr(arm,rx)}.
 Further terms can be added to the right hand side to adjust for covariates and use strata or cluster arguments.}
 
 \item{data}{an optional data frame that contains variables}
@@ -23,7 +23,7 @@ Further terms can be added to the right hand side to adjust for covariates and u
 \item{alpha}{the significance level used to calculate confidence intervals}
 
 \item{treat_weight}{an optional parameter that phi is multiplied by on an individual observation level to give
-differing impact to treatment. The values are transformed by abs(.)/max(abs(.)) to ensure 1 is the largest weight.}
+differing impact to treatment. The values are transformed by \code{abs(.)/max(abs(.))} to ensure 1 is the largest weight.}
 
 \item{Recensor}{a logical to use recensoring if set to TRUE. Default is TRUE.}
 
@@ -36,7 +36,7 @@ a rpsftm method object that is a list of the following:
 \itemize{
 \item phi: the estimated parameter
 \item fit: a survdiff object to produce Kaplan-Meier curves of the estimated counterfactual untreated failure times for each treatment arm
-\item formula: a formula representing any adjustments, strata or clusters- used for the update() function
+\item formula: a formula representing any adjustments, strata or clusters- used for the \code{update()} function
 \item regression: the survival regression object at the estimated value of phi
 \item Sstar: the recensored \code{Surv()} data using the estimate value of phi to give counterfactual untreated failure times.
 \item ans: the object returned from \code{uniroot} used to solve the estimating equation
@@ -48,8 +48,8 @@ a rpsftm method object that is a list of the following:
 Main Function used for estmating causal parameters under the Rank Preserving Structural Failure Time Model
 }
 \details{
-the formula object ReCen(time, censor_time)~Instr(arm,rx), identifies particular meaning to the four
-sets of arguments. 'ReCen()' stands for ReCensoring. 'Inst()' stands for Instrument. 
+the formula object \code{ReCen(time, censor_time)~Instr(arm,rx)}, identifies particular meaning to the four
+sets of arguments. \code{ReCen()} stands for ReCensoring. \code{Instr()} stands for Instrument. 
 \itemize{
 \item time: the observed failure or censoring time
 \item censor_time: the time at which censoring would, or has occurred. This is provided for all observations
@@ -57,8 +57,8 @@ unlike standard Kaplan-Meier or Cox regression where it is only given for censor
 \item arm: the randomised treatment arm. a factor with 2 levels, or numeric variable with values 0/1.
 \item rx: the proportion of time on active treatment (arm=1 or the non-reference level of the factor)
 }
-Further adjustment terms can be added on the right hand side of the formula if desired, included strata()
-or cluster() terms.
+Further adjustment terms can be added on the right hand side of the formula if desired, included \code{strata()}
+or \code{cluster()} terms.
 }
 \author{
 Simon Bond

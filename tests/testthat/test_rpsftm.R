@@ -12,6 +12,34 @@ test_that("first basict fit with mixed data sources",{
   expect_is(fit$phi, class="numeric")
 })
 
+
+
+test_that("print method",{
+  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
+                lowphi=-1, hiphi=1)
+  
+  expect_output(print(fit),"exp\\(phi\\):")
+  
+})
+
+
+test_that("summary method",{
+  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
+                lowphi=-1, hiphi=1)
+  
+  expect_output(summary(fit),"Confidence Interval")
+  
+})
+
+test_that("plot method",{
+  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
+                lowphi=-1, hiphi=1)
+  fig <- plot(fit)
+  expect_is(fig, class="ggplot")
+  
+})
+
+
 test_that("first basict fit with mixed data source, calculating var in-functions",{
   fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,#formula=~1,
                 lowphi=-1, hiphi=1)
@@ -19,12 +47,11 @@ test_that("first basict fit with mixed data source, calculating var in-functions
 })
 
 test_that("first basict fit with the arm as a factor",{
-  myArm <- factor(immdef$imm, levels=0:1,labels=c("Control","Exper"))
+  myArm <- factor(immdef$imm, labels=c("Control","Exper"))
   fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(myArm,1-xoyrs/progyrs),immdef,#formula=~1,
                 lowphi=-1, hiphi=1)
   expect_is(fit$phi, class="numeric")
 })
-
 
 
 
@@ -63,8 +90,22 @@ test_that("Values from a basic fit match up with the Stata output",
            expect_true(ciUpper)
            })
 
-
-
+test_that("Try it with Recensoring off",
+          {
+            fit  <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
+                                 lowphi=-1, hiphi=1, Recensor = FALSE)
+            expect_is(fit, class="rpsftm")
+            
+          }
+          )
+test_that("Try it with Autoswitch off",
+          {
+            fit  <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
+                           lowphi=-1, hiphi=1, Autoswitch = FALSE)
+            expect_is(fit, class="rpsftm")
+            
+          }
+)
 
 
 ##Check that swapping the definitions of arm has no effect (on point estimates), and that 1-rx reverses the estimates and CIs
@@ -74,7 +115,7 @@ test_that("swapping the definition of arm",
           fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef, 
                         lowphi=-1, hiphi=1)
             propX <- with(immdef, 1-xoyrs/progyrs)
-            fitInv <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef,test=survdiff, 
+            fitInv <- rpsftm(ReCen(progyrs, censyrs)~Instr(1-imm,propX), immdef,test=survdiff, 
                              lowphi=-1, hiphi=1)
             expect_true(  abs(fit$phi-fitInv$phi)<1e-4)}
           )
@@ -93,13 +134,12 @@ test_that("swapping the definition of arm and rx",
           fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef,
                         lowphi=-1, hiphi=1)
             propXInv <- 1-with(immdef, 1-xoyrs/progyrs)
-            fitInv3 <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propXInv), immdef,test=survdiff,
+            fitInv3 <- rpsftm(ReCen(progyrs, censyrs)~Instr(1-imm,propXInv), immdef,test=survdiff,
                               lowphi=-1, hiphi=1)
             expect_true(  abs(fit$phi+fitInv3$phi)<1e-4)
             expect_true(  abs(fit$CI[1]+fitInv3$CI[2])<1e-4)
-            #expect_true(  abs(fit$CI[2]+fitInv3$CI[1])<1e-4)
-            # Something to do with auto testing of no swapping in different arms??
-            }
+            expect_true(  abs(fit$CI[2]+fitInv3$CI[1])<1e-4)
+          }
 )
 
 test_that( "no t-test comparison avaialable",
@@ -167,21 +207,20 @@ test_that("Check that a covariate interaction adjustment fits",
 #Drill down into the component functions, maybe with individual files:
 # EstEqn
 # ExtractZ
-# plot/print/summary
 # recensor
 
-#Check up the error functions  i.e. wrong order of censoring/ events
-#rx outside of [0,1]
-# missing data handling
 
 
 
-# call data from inside the data argument and outside, to check this is ok.??
 
 
 #CHECK that each line of code has been called somehow in this testing process??
-
-
+#DONE:
+#> install.packages("covr")
+#> library(covr)
+#> cov <- package_coverage()
+#> cov
+#> zero_coverage(cov)
 
 
 

@@ -5,28 +5,28 @@
 #'@name rpsftm
 #'@inheritParams recensor
 #'@inheritParams EstEqn
-#'@param formula a formula with a minimal structure of ReCen(time, censor_time)~Instr(arm,rx).
+#'@param formula a formula with a minimal structure of \code{ReCen(time, censor_time)~Instr(arm,rx)}.
 #'Further terms can be added to the right hand side to adjust for covariates and use strata or cluster arguments.
 #'@param data an optional data frame that contains variables
 #' @param lowphi the lower limit of the range to search for the causal parameter
 #' @param hiphi the upper limit of the range to search for the causal paramater
 #' @param alpha the significance level used to calculate confidence intervals
 #' @param treat_weight an optional parameter that phi is multiplied by on an individual observation level to give
-#' differing impact to treatment. The values are transformed by abs(.)/max(abs(.)) to ensure 1 is the largest weight.
+#' differing impact to treatment. The values are transformed by \code{abs(.)/max(abs(.))} to ensure 1 is the largest weight.
 #' @param \code{...} arguments to supply to the test function.
 #' @return a rpsftm method object that is a list of the following:
 #' \itemize{
 #' \item phi: the estimated parameter
 #' \item fit: a survdiff object to produce Kaplan-Meier curves of the estimated counterfactual untreated failure times for each treatment arm
-#' \item formula: a formula representing any adjustments, strata or clusters- used for the update() function
+#' \item formula: a formula representing any adjustments, strata or clusters- used for the \code{update()} function
 #' \item regression: the survival regression object at the estimated value of phi
 #' \item Sstar: the recensored \code{Surv()} data using the estimate value of phi to give counterfactual untreated failure times.
 #' \item ans: the object returned from \code{uniroot} used to solve the estimating equation
 #' \item CI: a vector of the confidence interval around phi
 #' \item call: the R call object
 #' }
-#' @details the formula object ReCen(time, censor_time)~Instr(arm,rx), identifies particular meaning to the four
-#' sets of arguments. 'ReCen()' stands for ReCensoring. 'Instr()' stands for Instrument. 
+#' @details the formula object \code{ReCen(time, censor_time)~Instr(arm,rx)}, identifies particular meaning to the four
+#' sets of arguments. \code{ReCen()} stands for ReCensoring. \code{Instr()} stands for Instrument. 
 #' \itemize{
 #' \item time: the observed failure or censoring time
 #' \item censor_time: the time at which censoring would, or has occurred. This is provided for all observations
@@ -34,8 +34,8 @@
 #' \item arm: the randomised treatment arm. a factor with 2 levels, or numeric variable with values 0/1.
 #' \item rx: the proportion of time on active treatment (arm=1 or the non-reference level of the factor)
 #' }
-#' Further adjustment terms can be added on the right hand side of the formula if desired, included strata()
-#' or cluster() terms. 
+#' Further adjustment terms can be added on the right hand side of the formula if desired, included \code{strata()}
+#' or \code{cluster()} terms. 
 #' 
 #' @author Simon Bond
 #' @importFrom survival strata cluster
@@ -60,29 +60,29 @@ rpsftm=function(formula,data,
   mf$formula <- if (missing(data)) 
     terms(formula, special)
   else terms(formula, special, data = data)
-  formula_env <- new.env(parent = environment(mf$formula))
-  assign("ReCen", 
-         function(time,censor_time){
-           cbind(time=time, censor_time=censor_time)
-           }, 
-         env=formula_env)
-  assign("Instr",
-         function(arm, rx){
-           if(is.numeric(arm) & any( !(arm %in% c(0,1)))){
-             warning("Auto checking of no switching needs treatment to have value 0 or 1")
-           }
-           if(is.factor(arm)) {
-             message <- paste("Auto checking of switching assumes the lowest level of arm='",
-                              levels(arm)[1], "' is the control or placebo treatment",sep="")
-             warning(message)
-             # converts the numerically coding (1,2,..), to 0 or 1.
-             arm <- as.numeric(arm)-1
-           }
-           cbind(arm=arm, rx=rx)
-         },
-         env = formula_env
-         )
-  environment(mf$formula) <- formula_env
+  #formula_env <- new.env(parent = environment(mf$formula))
+  #assign("ReCen", 
+  #       function(time,censor_time){
+  #         cbind(time=time, censor_time=censor_time)
+  #         }, 
+  #       env=formula_env)
+  #assign("Instr",
+  #       function(arm, rx){
+  #         if(is.numeric(arm) & any( !(arm %in% c(0,1)))){
+  #           warning("Auto checking of no switching needs treatment to have value 0 or 1")
+  #         }
+  #         if(is.factor(arm)) {
+  #           message <- paste("Auto checking of switching assumes the lowest level of arm='",
+  #                            levels(arm)[1], "' is the control or placebo treatment",sep="")
+  #           warning(message)
+  #           # converts the numerically coding (1,2,..), to 0 or 1.
+  #           arm <- as.numeric(arm)-1
+  #         }
+  #         cbind(arm=arm, rx=rx)
+  #       },
+  #       env = formula_env
+  #       )
+  #environment(mf$formula) <- formula_env
   df <- eval(mf, parent.frame())
   ReCen_index <- attr(mf$formula,"specials")$ReCen
   ReCen_drops=which(attr(mf$formula,"factors")[ReCen_index,]>0)
@@ -106,6 +106,10 @@ rpsftm=function(formula,data,
   
  
    test=deparse(substitute(test))
+   if(is.na(match(test, c("survdiff", "coxph", "survreg")))){
+     stop("Test must be one of: survdiff, coxph, survreg")
+   }
+   
 
   #solve to find the value of phi that gives the root to z=0, and the limits of the CI.
   

@@ -3,6 +3,8 @@
 S3method(plot,rpsftm)
 S3method(print,rpsftm)
 S3method(summary,rpsftm)
+export(Instr)
+export(ReCen)
 export(rpsftm)
 importFrom(survival,Surv)
 importFrom(survival,cluster)
