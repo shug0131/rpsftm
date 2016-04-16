@@ -7,16 +7,15 @@ context("Test the rpsftm() function")
 
 test_that("first basict fit with mixed data sources",{
   propX <- with(immdef,1-xoyrs/progyrs)
-  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX),immdef,#formula=~1,
-                lowphi=-1, hiphi=1)
+  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX),immdef)
   expect_is(fit$phi, class="numeric")
 })
 
 
 
 test_that("print method",{
-  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
-                lowphi=-1, hiphi=1)
+  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef)
+
   
   expect_output(print(fit),"exp\\(phi\\):")
   

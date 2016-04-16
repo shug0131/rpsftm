@@ -34,13 +34,13 @@ test_that("Censoring before Time warning",{
                        lowphi=-1, hiphi=1), "You have observed events AFTER censoring")
 })
 
-test_that("Too Many Recen() terms",
-          {
-            expect_error( rpsftm(ReCen(progyrs, censyrs)+ReCen(censyrs,progyrs)~Instr(imm, 1-xoyrs/progyrs),immdef, 
-                                 lowphi=-1, hiphi=1), "Exactly one Recen\\(\\) term needed")
-            
-          }
-)
+#test_that("Too Many Recen() terms",
+ #         {
+  #          expect_error( rpsftm(ReCen(progyrs, censyrs)+ReCen(censyrs,progyrs)~Instr(imm, 1-xoyrs/progyrs),immdef, 
+   #                              lowphi=-1, hiphi=1), "Exactly one Recen\\(\\) term needed")
+    #        
+     #     }
+#)
 
 form <- terms(ReCen(progyrs, censyrs)+ReCen(censyrs,progyrs)~Instr(imm, 1-xoyrs/progyrs),data=immdef,
       specials=c("ReCen","Instr")

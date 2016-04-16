@@ -5,11 +5,10 @@
 #'
 #'@return matrix with two columns named either time and censor_time, or, arm and rx. These can be used in the formula argument to rpsftm()
 #'@author Simon Bond
-
-#'@describeIn Instr special function
 #'@param arm the randomised treatment arm. a factor with 2 levels, or numeric variable with values 0/1.
 #'@param rx the proportion of time on active treatment (arm=1 or the non-reference level of the factor)
-#'@export
+#'@describeIn Instr Instr function
+
 Instr <- function(arm, rx){
   if(is.numeric(arm) & any( !(arm %in% c(0,1)))){
     warning("Auto checking of no switching needs treatment to have value 0 or 1")
@@ -24,11 +23,11 @@ Instr <- function(arm, rx){
   cbind(arm=arm, rx=rx)
 }
 
-#'@describeIn ReCen special function
+#'@describeIn Instr ReCen function
 #'@param time the observed failure or censoring time
 #'@param censor_time the time at which censoring would, or has occurred. This is provided for all observations
 #' unlike standard Kaplan-Meier or Cox regression where it is only given for censored observations
-#'@export
+
 ReCen <- function(time,censor_time){
   cbind(time=time, censor_time=censor_time)
 }

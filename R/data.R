@@ -1,6 +1,6 @@
 #' immdef
 #'
-#' Simulated data to use with the \code{\link[<pkg>:<pkg>-package]{rpsftm}} library.
+#' Simulated data to use with the \code{\link{rpsftm}} function.
 #'
 #' @format A data frame with 13 variables and 1000 observations represent a study where participants 
 #' were randomly assigned to receive treatment immediately or deferred. Participants in the deferred 
@@ -14,6 +14,7 @@
 #'    \item{xoyrs}{the time at which crossover happened, or 0 for participants in the Immediate arm}
 #'    \item{prog}{an indicator of disease progression (1), or censoring (0)}
 #'    \item{progyrs}{time of disease progression or censoring}
+#'    \item{entry}{Not sure what this is maybe a baseline Covariate}
 #'    \item{X_st}{a constant of value 1. Maybe we should drop this?}
 #'    \item{X_d}{equal to prog. Maybe we should drop this?}
 #'    \item{X_t}{equal to progyrs. Maybe we shoudl drop this?}

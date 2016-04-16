@@ -29,7 +29,7 @@ differing impact to treatment. The values are transformed by \code{abs(.)/max(ab
 
 \item{Autoswitch}{a logical to autodetect cases of no switching. Default is TRUE}
 
-\item{\code{...}}{arguments to supply to the test function.}
+\item{...}{arguments to supply to the test function.}
 }
 \value{
 a rpsftm method object that is a list of the following:
@@ -59,6 +59,15 @@ unlike standard Kaplan-Meier or Cox regression where it is only given for censor
 }
 Further adjustment terms can be added on the right hand side of the formula if desired, included \code{strata()}
 or \code{cluster()} terms.
+}
+\examples{
+library(rpsftm)
+?immdef
+fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef)
+print(fit)
+summary(fit)
+plot(fit)
+
 }
 \author{
 Simon Bond

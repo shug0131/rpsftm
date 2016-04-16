@@ -16,6 +16,7 @@ arm could crossover and receive treatment. The primary endpoint was time to dise
    \item{xoyrs}{the time at which crossover happened, or 0 for participants in the Immediate arm}
    \item{prog}{an indicator of disease progression (1), or censoring (0)}
    \item{progyrs}{time of disease progression or censoring}
+   \item{entry}{Not sure what this is maybe a baseline Covariate}
    \item{X_st}{a constant of value 1. Maybe we should drop this?}
    \item{X_d}{equal to prog. Maybe we should drop this?}
    \item{X_t}{equal to progyrs. Maybe we shoudl drop this?}
@@ -26,7 +27,7 @@ arm could crossover and receive treatment. The primary endpoint was time to dise
 immdef
 }
 \description{
-Simulated data to use with the \code{\link[<pkg>:<pkg>-package]{rpsftm}} library.
+Simulated data to use with the \code{\link{rpsftm}} function.
 }
 \keyword{datasets}
 

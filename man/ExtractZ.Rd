@@ -16,9 +16,13 @@ ExtractZ(x, ...)
 \method{ExtractZ}{survreg}(fit, arm, ...)
 }
 \arguments{
-\item{fit:}{a fitted survival object : survdiff, coxph, survreg}
+\item{x}{an R object}
 
-\item{arm:}{a character vector giving the name of the covariate representing the treatment arm.}
+\item{...}{extendible arguments to the S3 method}
+
+\item{fit}{a fitted survival object : survdiff, coxph, survreg}
+
+\item{arm}{a character vector giving the name of the covariate representing the treatment arm.}
 }
 \value{
 a numeric value, the z statistic for the independence test of the treatment arm

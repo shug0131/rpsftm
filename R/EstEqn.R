@@ -9,9 +9,9 @@
 #' @param formula a forumula object of covariates to adjust for: \code{~strata(A)+B*C}
 #' @param target the value to subtract off from the z-statistic 
 #' @param test the survival regression function to calculate the z-statistic: survdiff, coxph, survreg
-#' @param \code{...} arguments to supply to the test function.
+#' @param ... arguments to supply to the test function.
 #' @return A scalar value of the estimating equation: the z-statistics from a test minus a target value
-#' @seealso recensor
+#' @seealso \code{\link{recensor}}
 #' @author Simon Bond
 
 

@@ -13,7 +13,6 @@
 #' @param alpha the significance level used to calculate confidence intervals
 #' @param treat_weight an optional parameter that phi is multiplied by on an individual observation level to give
 #' differing impact to treatment. The values are transformed by \code{abs(.)/max(abs(.))} to ensure 1 is the largest weight.
-#' @param \code{...} arguments to supply to the test function.
 #' @return a rpsftm method object that is a list of the following:
 #' \itemize{
 #' \item phi: the estimated parameter
@@ -36,6 +35,14 @@
 #' }
 #' Further adjustment terms can be added on the right hand side of the formula if desired, included \code{strata()}
 #' or \code{cluster()} terms. 
+#' 
+#' @examples 
+#' library(rpsftm)
+#' ?immdef
+#' fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef)
+#' print(fit)
+#' summary(fit)
+#' plot(fit)
 #' 
 #' @author Simon Bond
 #' @importFrom survival strata cluster
@@ -60,29 +67,10 @@ rpsftm=function(formula,data,
   mf$formula <- if (missing(data)) 
     terms(formula, special)
   else terms(formula, special, data = data)
-  #formula_env <- new.env(parent = environment(mf$formula))
-  #assign("ReCen", 
-  #       function(time,censor_time){
-  #         cbind(time=time, censor_time=censor_time)
-  #         }, 
-  #       env=formula_env)
-  #assign("Instr",
-  #       function(arm, rx){
-  #         if(is.numeric(arm) & any( !(arm %in% c(0,1)))){
-  #           warning("Auto checking of no switching needs treatment to have value 0 or 1")
-  #         }
-  #         if(is.factor(arm)) {
-  #           message <- paste("Auto checking of switching assumes the lowest level of arm='",
-  #                            levels(arm)[1], "' is the control or placebo treatment",sep="")
-  #           warning(message)
-  #           # converts the numerically coding (1,2,..), to 0 or 1.
-  #           arm <- as.numeric(arm)-1
-  #         }
-  #         cbind(arm=arm, rx=rx)
-  #       },
-  #       env = formula_env
-  #       )
-  #environment(mf$formula) <- formula_env
+  formula_env <- new.env(parent = environment(mf$formula))
+  assign("ReCen", ReCen,envir=formula_env)
+  assign("Instr", Instr, envir=formula_env)
+  environment(mf$formula) <- formula_env
   df <- eval(mf, parent.frame())
   ReCen_index <- attr(mf$formula,"specials")$ReCen
   ReCen_drops=which(attr(mf$formula,"factors")[ReCen_index,]>0)

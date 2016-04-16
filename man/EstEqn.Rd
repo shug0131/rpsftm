@@ -24,7 +24,7 @@ Optionally a column named: treat_weight}
 
 \item{Autoswitch}{a logical to autodetect cases of no switching. Default is TRUE}
 
-\item{\code{...}}{arguments to supply to the test function.}
+\item{...}{arguments to supply to the test function.}
 }
 \value{
 A scalar value of the estimating equation: the z-statistics from a test minus a target value
@@ -36,6 +36,6 @@ Calculates the Estimating Equation to be solved in RPSFTM models
 Simon Bond
 }
 \seealso{
-recensor
+\code{\link{recensor}}
 }
 
