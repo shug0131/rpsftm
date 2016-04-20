@@ -34,17 +34,69 @@ test_that("Censoring before Time warning",{
                        lowphi=-1, hiphi=1), "You have observed events AFTER censoring")
 })
 
-#test_that("Too Many Recen() terms",
- #         {
-  #          expect_error( rpsftm(ReCen(progyrs, censyrs)+ReCen(censyrs,progyrs)~Instr(imm, 1-xoyrs/progyrs),immdef, 
-   #                              lowphi=-1, hiphi=1), "Exactly one Recen\\(\\) term needed")
-    #        
-     #     }
-#)
+test_that("Too Many Recen() terms",
+         {
+          expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(imm, 1-xoyrs/progyrs)+ReCen(censyrs,progyrs),immdef, 
+                              lowphi=-1, hiphi=1), "Recen\\(\\) term only on the LHS of the formula")
+        
+     }
+)
 
-form <- terms(ReCen(progyrs, censyrs)+ReCen(censyrs,progyrs)~Instr(imm, 1-xoyrs/progyrs),data=immdef,
+test_that("No Instr() terms",
+          {
+            expect_error( rpsftm(ReCen(progyrs, censyrs)~imm,immdef, 
+                                 lowphi=-1, hiphi=1), "Exactly one Instr\\(\\) term allowed")
+            
+          }
+)
+
+test_that("Too many Instr() terms",
+          {
+            expect_error( rpsftm(ReCen(progyrs, censyrs)~def*Instr(imm, 1-xoyrs/progyrs),immdef, 
+                                 lowphi=-1, hiphi=1), "Exactly one Instr\\(\\) term allowed")
+            
+          }
+)
+
+test_that("Instr() interaction",
+          {
+            expect_error( rpsftm(ReCen(progyrs, censyrs)~def/Instr(imm, 1-xoyrs/progyrs),immdef, 
+                                 lowphi=-1, hiphi=1), "Instr\\(\\) term must not be in any interactions")
+            
+          }
+)
+
+
+
+test_that("More than 2 arms",
+          {
+            myarm <- factor(rep(1:4,250))
+            
+            expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(myarm, 1-xoyrs/progyrs),immdef, 
+                                 lowphi=-1, hiphi=1), "arm must have exactly 2 observed values")
+          }
+)
+
+test_that("less than 2 arms",
+          {
+            
+            
+            expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(1, 1-xoyrs/progyrs),immdef, 
+                                 lowphi=-1, hiphi=1), "arm must have exactly 2 observed values")
+          }
+)
+
+rpsftm(ReCen(progyrs, censyrs)~as.factor(immdef$def)/Instr(imm, 1-xoyrs/progyrs),immdef, 
+       lowphi=-1, hiphi=1)
+form <- terms(ReCen(progyrs, censyrs)~as.factor(immdef$def==1)/Instr(imm, 1-xoyrs/progyrs),data=immdef,
       specials=c("ReCen","Instr")
       )
+Instr_index <- attr(form,"specials")$Instr
+Instr_drops=which(attr(form,"factors")[Instr_index,]>0)
+
+head(model.matrix(terms(progyrs~as.factor(def)/xoyrs, data=immdef),data=immdef)
+
+
 head(model.frame(form,data=immdef))
 
 

@@ -74,11 +74,14 @@ rpsftm=function(formula,data,
   df <- eval(mf, parent.frame())
   ReCen_index <- attr(mf$formula,"specials")$ReCen
   ReCen_drops=which(attr(mf$formula,"factors")[ReCen_index,]>0)
-  if(length(ReCen_index)!=1){stop("Exactly one Recen() term needed")}
+  #if(length(ReCen_index)!=1){stop("Exactly one Recen() term needed")}
   if(length(ReCen_drops)>0){stop("Recen() term only on the LHS of the formula")}
   Instr_index <- attr(mf$formula,"specials")$Instr
   Instr_drops=which(attr(mf$formula,"factors")[Instr_index,]>0)
   if(length(Instr_drops)!=1){stop("Exactly one Instr() term allowed")}
+  Instr_column=attr(mf$formula,"factors")[,Instr_drops]
+  if( sum(Instr_column>0)>1){stop("Instr() term must not be in any interactions")}
+  
   # remedies the df being a list of lists into just 1 list
   df <- cbind( df[,ReCen_index], df[,Instr_index], df[,-c(Instr_index,ReCen_index), drop=FALSE])
   fit_formula <- terms( update(mf$formula , .~arm + .))
