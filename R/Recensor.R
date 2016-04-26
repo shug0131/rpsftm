@@ -2,7 +2,7 @@
 #' 
 #' @title Recensoring 
 #' @name recensor
-#' @param phi the parameter that measures how more rapidly the lifetime is expended under treatment
+#' @param psi the parameter that measures how more rapidly the lifetime is expended under treatment
 #' @param time the observed failure or censoring time.
 #' @param censor_time the theoretical censoring time, either observed or set after time.
 #' @param rx the proportion of time spent on treatment
@@ -13,7 +13,7 @@
 #' @author Simon Bond
 #' @importFrom survival Surv
 
-recensor=function(phi,time,censor_time,rx,arm,Recensor, Autoswitch){
+recensor=function(psi,time,censor_time,rx,arm,Recensor, Autoswitch){
   
   
   
@@ -21,7 +21,7 @@ recensor=function(phi,time,censor_time,rx,arm,Recensor, Autoswitch){
   
   if( any (!(0<=rx & rx<=1))){stop("Invalid values for rx. Must be proportions in [0,1]")}
   if( any(censor_time<time)){warning("You have observed events AFTER censoring. These are handled as censored")}
-  U=time*((1-rx)+rx*exp(phi))
+  U=time*((1-rx)+rx*exp(psi))
   if(!Recensor){
     scenario <- 1
   }else{
@@ -34,9 +34,9 @@ recensor=function(phi,time,censor_time,rx,arm,Recensor, Autoswitch){
  
   Cstar <- switch(scenario,
                   censor_time,
-                  pmin(censor_time, censor_time*exp(phi)),
-                  arm*censor_time*exp(phi)+(1-arm)*pmin(censor_time, censor_time*exp(phi)),
-                  arm*pmin(censor_time, censor_time*exp(phi))+(1-arm)*censor_time
+                  pmin(censor_time, censor_time*exp(psi)),
+                  arm*censor_time*exp(psi)+(1-arm)*pmin(censor_time, censor_time*exp(psi)),
+                  arm*pmin(censor_time, censor_time*exp(psi))+(1-arm)*censor_time
   )
   Tstar=pmin(U,Cstar)
   deltaStar=1*(U<Cstar)

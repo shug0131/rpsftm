@@ -16,8 +16,8 @@ print.rpsftm=function(x){
   obj$call<-NULL
   print(x$call)
   print(obj)
-  cat("\nphi:" , x$phi)
-  cat("\nexp(phi):", exp(x$phi))
+  cat("\npsi:" , x$psi)
+  cat("\nexp(psi):", exp(x$psi))
   invisible(x)
 }
 

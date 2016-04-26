@@ -4,11 +4,11 @@
 \alias{EstEqn}
 \title{Estimating Equations for \code{rpsftm()}}
 \usage{
-EstEqn(phi, data, formula, target = 0, test = "survdiff", Recensor,
+EstEqn(psi, data, formula, target = 0, test = "survdiff", Recensor,
   Autoswitch, ...)
 }
 \arguments{
-\item{phi}{the parameter that measures how more rapidly the lifetime is expended under treatment}
+\item{psi}{the parameter that measures how more rapidly the lifetime is expended under treatment}
 
 \item{data}{the data set that contains the variables. 
 Must contain columns named: time, censor_time,rx, arm.

@@ -17,11 +17,11 @@ summary.rpsftm=function(x){
   obj.summary=summary(obj)
   print(x$call)
   print(obj.summary)
-  cat("\nphi:" , x$phi)
-  cat("\nexp(phi):", exp(x$phi))
-  cat("\nConfidence Interval, phi", x$CI)
-  cat("\nConfidence Interval, exp(phi) ", exp(x$CI))
-  #Have not added stuff to the obj.summary- the return object about Phi, and CI
+  cat("\npsi:" , x$psi)
+  cat("\nexp(psi):", exp(x$psi))
+  cat("\nConfidence Interval, psi", x$CI)
+  cat("\nConfidence Interval, exp(psi) ", exp(x$CI))
+  #Have not added stuff to the obj.summary- the return object about psi, and CI
   #it does vary between the different tests so would be hard to generalise.
   invisible(obj.summary)
 }

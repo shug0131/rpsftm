@@ -4,9 +4,9 @@
 \alias{rpsftm}
 \title{Rank Preserving Structural Failure Time Model}
 \usage{
-rpsftm(formula, data, test = survdiff, lowphi = -10, hiphi = 10,
-  alpha = 0.05, treat_weight = 1, Recensor = TRUE, Autoswitch = TRUE,
-  ...)
+rpsftm(formula, data, subset, na.action, test = survdiff, lowpsi = -1,
+  hipsi = 1, alpha = 0.05, treat_weight = 1, Recensor = TRUE,
+  Autoswitch = TRUE, ...)
 }
 \arguments{
 \item{formula}{a formula with a minimal structure of \code{ReCen(time, censor_time)~Instr(arm,rx)}.
@@ -14,15 +14,23 @@ Further terms can be added to the right hand side to adjust for covariates and u
 
 \item{data}{an optional data frame that contains variables}
 
+\item{subset}{expression indicating which subset of the rows of data should be used in the fit. 
+This can be a logical vector (which is replicated to have length equal to the number of observations)
+, a numeric vector indicating which observation numbers are to be included (or excluded if negative), 
+or a character vector of row names to be included. All observations are included by default.}
+
+\item{na.action}{a missing-data filter function. This is applied to the model.frame after any subset 
+argument has been used. Default is options()$na.action.}
+
 \item{test}{the survival regression function to calculate the z-statistic: survdiff, coxph, survreg}
 
-\item{lowphi}{the lower limit of the range to search for the causal parameter}
+\item{lowpsi}{the lower limit of the range to search for the causal parameter}
 
-\item{hiphi}{the upper limit of the range to search for the causal paramater}
+\item{hipsi}{the upper limit of the range to search for the causal paramater}
 
 \item{alpha}{the significance level used to calculate confidence intervals}
 
-\item{treat_weight}{an optional parameter that phi is multiplied by on an individual observation level to give
+\item{treat_weight}{an optional parameter that psi is multiplied by on an individual observation level to give
 differing impact to treatment. The values are transformed by \code{abs(.)/max(abs(.))} to ensure 1 is the largest weight.}
 
 \item{Recensor}{a logical to use recensoring if set to TRUE. Default is TRUE.}
@@ -34,13 +42,13 @@ differing impact to treatment. The values are transformed by \code{abs(.)/max(ab
 \value{
 a rpsftm method object that is a list of the following:
 \itemize{
-\item phi: the estimated parameter
+\item psi: the estimated parameter
 \item fit: a survdiff object to produce Kaplan-Meier curves of the estimated counterfactual untreated failure times for each treatment arm
 \item formula: a formula representing any adjustments, strata or clusters- used for the \code{update()} function
-\item regression: the survival regression object at the estimated value of phi
-\item Sstar: the recensored \code{Surv()} data using the estimate value of phi to give counterfactual untreated failure times.
+\item regression: the survival regression object at the estimated value of psi
+\item Sstar: the recensored \code{Surv()} data using the estimate value of psi to give counterfactual untreated failure times.
 \item ans: the object returned from \code{uniroot} used to solve the estimating equation
-\item CI: a vector of the confidence interval around phi
+\item CI: a vector of the confidence interval around psi
 \item call: the R call object
 }
 }

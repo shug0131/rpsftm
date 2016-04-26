@@ -4,10 +4,10 @@
 \alias{recensor}
 \title{Recensoring}
 \usage{
-recensor(phi, time, censor_time, rx, arm, Recensor, Autoswitch)
+recensor(psi, time, censor_time, rx, arm, Recensor, Autoswitch)
 }
 \arguments{
-\item{phi}{the parameter that measures how more rapidly the lifetime is expended under treatment}
+\item{psi}{the parameter that measures how more rapidly the lifetime is expended under treatment}
 
 \item{time}{the observed failure or censoring time.}
 

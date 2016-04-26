@@ -16,8 +16,8 @@
 
 
 
-EstEqn <- function(phi,#time,censor_time,rx, 
-                   data,# arm, 
+EstEqn <- function(psi,
+                   data, 
                    formula, 
                    target=0, test="survdiff", Recensor, Autoswitch, ...){
   
@@ -25,10 +25,10 @@ EstEqn <- function(phi,#time,censor_time,rx,
     treat_weight <- data[,"(treat_weight)"]
     #rescale to make sure that all weights are 1 or less for interpretability
     treat_weight <- abs(treat_weight)/max(abs(treat_weight), na.rm=TRUE)
-    phi <- phi*treat_weight
+    psi <- psi*treat_weight
   }
   
-  Sstar <- recensor( phi,data[,"time"],data[,"censor_time"],data[,"rx"],data[,"arm"], Recensor,Autoswitch)
+  Sstar <- recensor( psi,data[,"time"],data[,"censor_time"],data[,"rx"],data[,"arm"], Recensor,Autoswitch)
   data <- cbind(Sstar, data)
   #build a formula object,
   fit_formula <- update(formula, Sstar~.)
