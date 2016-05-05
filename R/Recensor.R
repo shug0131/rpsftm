@@ -31,7 +31,7 @@ recensor=function(psi,time,censor_time,rx,arm,Recensor, Autoswitch){
       if( any(0<rx[arm==0]) & any(rx[arm==1]<1) ){scenario <- 2}
       if( any(0<rx[arm==0]) & all(rx[arm==1]==1)){scenario <- 3}
       if( any(rx[arm==1]<1) & all(rx[arm==0]==0)){scenario <- 4}
-      if( all(rx==arm)){scenario <- 1}
+      if( all(rx==arm)){scenario <- 5}
     }
     
   }
@@ -40,7 +40,8 @@ recensor=function(psi,time,censor_time,rx,arm,Recensor, Autoswitch){
                   censor_time,
                   pmin(censor_time, censor_time*exp(psi)),
                   arm*censor_time*exp(psi)+(1-arm)*pmin(censor_time, censor_time*exp(psi)),
-                  arm*pmin(censor_time, censor_time*exp(psi))+(1-arm)*censor_time
+                  arm*pmin(censor_time, censor_time*exp(psi))+(1-arm)*censor_time,
+                  arm*censor_time*exp(psi)+(1-arm)*censor_time
   )
   Tstar=pmin(U,Cstar)
   deltaStar=1*(U<Cstar)
