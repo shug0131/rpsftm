@@ -3,8 +3,8 @@
 #'@export
 #'@title Rank Preserving Structural Failure Time Model
 #'@name rpsftm
-#'@inheritParams recensor
-#'@inheritParams EstEqn
+#'@inheritParams untreated
+#'@inheritParams est_eqn
 #'@param formula a formula with a minimal structure of \code{ReCen(time, censor_time)~Instr(arm,rx)}.
 #'Further terms can be added to the right hand side to adjust for covariates and use strata or cluster arguments.
 #'@param data an optional data frame that contains variables
@@ -14,10 +14,10 @@
 #'or a character vector of row names to be included. All observations are included by default.
 #'@param na.action a missing-data filter function. This is applied to the model.frame after any subset 
 #'argument has been used. Default is options()$na.action.
-#' @param lowpsi the lower limit of the range to search for the causal parameter
-#' @param hipsi the upper limit of the range to search for the causal paramater
+#' @param low_psi the lower limit of the range to search for the causal parameter
+#' @param hi_psi the upper limit of the range to search for the causal paramater
 #' @param alpha the significance level used to calculate confidence intervals
-#' @param treat_weight an optional parameter that psi is multiplied by on an individual observation level to give
+#' @param treat_modifier an optional parameter that psi is multiplied by on an individual observation level to give
 #' differing impact to treatment. The values are transformed by \code{abs(.)/max(abs(.))} to ensure 1 is the largest weight.
 #' @return a rpsftm method object that is a list of the following:
 #' \itemize{
@@ -31,7 +31,7 @@
 #' \item call: the R call object
 #' }
 #' @details the formula object \code{ReCen(time, censor_time)~Instr(arm,rx)}, identifies particular meaning to the four
-#' sets of arguments. \code{ReCen()} stands for ReCensoring. \code{Instr()} stands for Instrument. 
+#' sets of arguments. \code{ReCen()} stands for recensoring. \code{Instr()} stands for Instrument. 
 #' \itemize{
 #' \item time: the observed failure or censoring time
 #' \item censor_time: the time at which censoring would, or has occurred. This is provided for all observations
@@ -54,111 +54,118 @@
 #' @importFrom survival strata cluster
 
 
-rpsftm=function(formula,data, subset, na.action, 
-                test=survdiff, 
-                lowpsi=-1,hipsi=1, alpha=0.05,
-                treat_weight=1,
-                Recensor=TRUE,Autoswitch=TRUE, ...){
+rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = -1, 
+                   hi_psi = 1, alpha = 0.05, treat_modifier = 1, recensor = TRUE, autoswitch = TRUE, 
+                   ...) {
   cl <- match.call()
   
-  #create formula for fitting, and to feed into model.frame()
-  #from the lm() function
+  # create formula for fitting, and to feed into model.frame() from the
+  # lm() function
   mf <- match.call(expand.dots = FALSE)
-  m <- match(c("formula", "data","treat_weight","subset","na.action"), names(mf), 0L)
+  m <- match(c("formula", "data", "treat_modifier", "subset", "na.action"), 
+             names(mf), 0L)
   mf <- mf[c(1L, m)]
   mf$drop.unused.levels <- TRUE
   mf[[1L]] <- quote(stats::model.frame)
-  #this ultimately returns a data frame with all the variables in and renamed time, censor_time, rx, arm as appropriate
-  special <- c("ReCen","Instr")
-  mf$formula <- if (missing(data)) 
+  # this ultimately returns a data frame with all the variables in and
+  # renamed time, censor_time, rx, arm as appropriate
+  special <- c("ReCen", "Instr")
+  mf$formula <- if (missing(data)) {
     terms(formula, special)
-  else terms(formula, special, data = data)
+  } else {
+    terms(formula, special, data = data)
+  }
   formula_env <- new.env(parent = environment(mf$formula))
-  assign("ReCen", ReCen,envir=formula_env)
-  assign("Instr", Instr, envir=formula_env)
+  assign("ReCen", ReCen, envir = formula_env)
+  assign("Instr", Instr, envir = formula_env)
   environment(mf$formula) <- formula_env
   df <- eval(mf, parent.frame())
   na.action <- attr(df, "na.action")
-  ReCen_index <- attr(mf$formula,"specials")$ReCen
-  ReCen_drops=which(attr(mf$formula,"factors")[ReCen_index,]>0)
-  #if(length(ReCen_index)!=1){stop("Exactly one Recen() term needed")}
-  if(length(ReCen_drops)>0){stop("Recen() term only on the LHS of the formula")}
-  Instr_index <- attr(mf$formula,"specials")$Instr
-  Instr_drops=which(attr(mf$formula,"factors")[Instr_index,]>0)
-  if(length(Instr_drops)!=1){stop("Exactly one Instr() term allowed")}
-  Instr_column=attr(mf$formula,"factors")[,Instr_drops]
-  if( sum(Instr_column>0)>1){stop("Instr() term must not be in any interactions")}
+  ReCen_index <- attr(mf$formula, "specials")$ReCen
+  ReCen_drops <- which(attr(mf$formula, "factors")[ReCen_index, ] > 0)
+  # if(length(ReCen_index)!=1){stop('Exactly one Recen() term needed')}
+  if (length(ReCen_drops) > 0) {
+    stop("Recen() term only on the LHS of the formula")
+  }
+  Instr_index <- attr(mf$formula, "specials")$Instr
+  Instr_drops <- which(attr(mf$formula, "factors")[Instr_index, ] > 0)
+  if (length(Instr_drops) != 1) {
+    stop("Exactly one Instr() term allowed")
+  }
+  Instr_column <- attr(mf$formula, "factors")[, Instr_drops]
+  if (sum(Instr_column > 0) > 1) {
+    stop("Instr() term must not be in any interactions")
+  }
   
   # remedies the df being a list of lists into just 1 list
-  df <- cbind( df[,ReCen_index], df[,Instr_index], df[,-c(Instr_index,ReCen_index), drop=FALSE])
-  fit_formula <- terms( update(mf$formula , .~arm + .))
-  fit_formula <- drop.terms( fit_formula, dropx= 1+Instr_drops, keep.response=FALSE)
- 
-   
-  #Check that the number of arms is 2.
-  if( length(unique(df[,"arm"]))!=2){
+  df <- cbind(df[, ReCen_index], df[, Instr_index], df[, -c(Instr_index, 
+                                                            ReCen_index), drop = FALSE])
+  fit_formula <- terms(update(mf$formula, . ~ arm + .))
+  fit_formula <- drop.terms(fit_formula, dropx = 1 + Instr_drops, keep.response = FALSE)
+  
+  
+  # Check that the number of arms is 2.
+  if (length(unique(df[, "arm"])) != 2) {
     stop("arm must have exactly 2 observed values")
   }
-    
-
   
- 
-   test=deparse(substitute(test))
-   if(is.na(match(test, c("survdiff", "coxph", "survreg")))){
-     stop("Test must be one of: survdiff, coxph, survreg")
-   }
-
-  #Preliminary check of lowpsi and hipsi with a meaningful warning
-   
-  EstEqn.low <- EstEqn( lowpsi,data=df, 
-                        formula=fit_formula,target=0,
-                        test=test,Recensor=Recensor, Autoswitch=Autoswitch, ...=...)
-  EstEqn.hi <- EstEqn( hipsi,data=df, 
-                       formula=fit_formula,target=0,
-                       test=test,Recensor=Recensor, Autoswitch=Autoswitch, ...=...)
-  if( EstEqn.low*EstEqn.hi>0){
-    message <- paste("The starting interval (",lowpsi,", ",hipsi,") to search for a solution for psi gives",
-                     " values of the same sign (", signif(EstEqn.low,3),", ", signif(EstEqn.hi,3), "). Try a wider interval ?",
-                     sep=""
-                     )
+  
+  
+  
+  test <- deparse(substitute(test))
+  if (is.na(match(test, c("survdiff", "coxph", "survreg")))) {
+    stop("Test must be one of: survdiff, coxph, survreg")
+  }
+  
+  # Preliminary check of low_psi and hi_psi with a meaningful warning
+  
+  est_eqn_low <- est_eqn(low_psi, data = df, formula = fit_formula, target = 0, 
+                         test = test, recensor = recensor, autoswitch = autoswitch, ... = ...)
+  est_eqn_hi <- est_eqn(hi_psi, data = df, formula = fit_formula, target = 0, 
+                        test = test, recensor = recensor, autoswitch = autoswitch, ... = ...)
+  if (est_eqn_low * est_eqn_hi > 0) {
+    message <- paste("The starting interval (", low_psi, ", ", hi_psi, 
+                     ") to search for a solution for psi gives", " values of the same sign (", 
+                     signif(est_eqn_low, 3), ", ", signif(est_eqn_hi, 3), "). Try a wider interval ?", 
+                     sep = "")
     stop(message)
-  }    
-  
-  #solve to find the value of psi that gives the root to z=0, and the limits of the CI.
-  
-  root=function(target){
-    uniroot(EstEqn, c(lowpsi,hipsi), 
-           data=df, 
-            formula=fit_formula,target=target,
-            test=test,Recensor=Recensor, Autoswitch=Autoswitch, ...=...)
   }
-  ans=try(root(0),silent=TRUE)
-  lower=try(root(qnorm(1-alpha/2)),silent=TRUE)
-  upper=try(root(qnorm(alpha/2) ),silent=TRUE)
   
-  #handle errors in root and CI finding
+  # solve to find the value of psi that gives the root to z=0, and the
+  # limits of the CI.
   
-  ans.error <- class(ans)=="try-error"
-  lower.error <- class(lower)=="try-error"
-  upper.error <- class(upper)=="try-error"
-  if( ans.error){
-    warning("Evaluation of the estimated values of psi failed. It is set to 0")
-    ans <- list(root=0)
-    }
-  if( lower.error){
-    warning("Evaluation of a limit of the Confidence Interval failed.  It is set to 0")
-    lower <- list(root=0)
+  root <- function(target) {
+    uniroot(est_eqn, c(low_psi, hi_psi), data = df, formula = fit_formula, 
+            target = target, test = test, recensor = recensor, autoswitch = autoswitch, 
+            ... = ...)
   }
-  if( upper.error){
-    warning("Evaluation of a limit of the Confidence Interval failed.  It is set to 0")
-    upper <- list(root=0)
+  ans <- try(root(0), silent = TRUE)
+  lower <- try(root(qnorm(1 - alpha/2)), silent = TRUE)
+  upper <- try(root(qnorm(alpha/2)), silent = TRUE)
+  
+  # handle errors in root and CI finding
+  
+  ans.error <- class(ans) == "try-error"
+  lower.error <- class(lower) == "try-error"
+  upper.error <- class(upper) == "try-error"
+  if (ans.error) {
+    warning("Evaluation of the estimated values of psi failed. It is set to NA")
+    ans <- list(root = NA)
   }
-
+  if (lower.error) {
+    warning("Evaluation of a limit of the Confidence Interval failed.  It is set to NA")
+    lower <- list(root = NA)
+  }
+  if (upper.error) {
+    warning("Evaluation of a limit of the Confidence Interval failed.  It is set to NA")
+    upper <- list(root = NA)
+  }
   
   
   
-  #sort the ordering
-  if(upper$root<lower$root){
+  
+  # sort the ordering
+  if (!is.na(upper$root) & !is.na(lower$root) & upper$root < lower$root) {
     temp <- lower
     lower <- upper
     upper <- temp
@@ -170,20 +177,31 @@ rpsftm=function(formula,data, subset, na.action,
   
   
   
-  #create a simple KM curve for each recensored arm. Used in the plot function - simple KM curves
+  # create a simple KM curve for each recensored arm. Used in the plot
+  # function - simple KM curves
   
-  psiHat=ans$root
-  if("(treat_weight)" %in% names(df)){
-    treat_weight <- df[,"(treat_weight)"]
-    #rescale to make sure that all weights are 1 or less for interpretability
-    treat_weight <- abs(treat_weight)/max(abs(treat_weight), na.rm=TRUE)
-    psiHat <- psiHat*treat_weight
+  
+  if (!is.na(ans$root)) {
+    psiHat <- ans$root
+    if ("(treat_modifier)" %in% names(df)) {
+      treat_modifier <- df[, "(treat_modifier)"]
+      # rescale to make sure that all weights are 1 or less for
+      # interpretability
+      treat_modifier <- abs(treat_modifier)/max(abs(treat_modifier), 
+                                                na.rm = TRUE)
+      psiHat <- psiHat * treat_modifier
+    }
+    
+    
+    Sstar <- untreated(psiHat, df[, "time"], df[, "censor_time"], df[, 
+                                                                     "rx"], df[, "arm"], recensor, autoswitch)
+    # Ignores any covariates, strata or adjustors. On Purpose as this is
+    # too general to deal with
+    fit <- survival::survfit(Sstar ~ arm, data = df)
+  } else {
+    fit <- NULL
+    Sstar <- NULL
   }
-  
-  Sstar=recensor(psiHat, df[,"time"], df[,"censor_time"],df[,"rx"],df[,"arm"],Recensor,Autoswitch)
-  #Ignores any covariates, strata or adjustors. On Purpose as this is too general to deal with
-  fit=survival::survfit(Sstar~arm, data=df)
- 
   value=list(psi=ans$root, 
         #for the plot function
         fit=fit, 

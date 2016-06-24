@@ -9,18 +9,18 @@
 #'@param rx the proportion of time on active treatment (arm=1 or the non-reference level of the factor)
 #'@describeIn Instr Instr function
 
-Instr <- function(arm, rx){
-  if(is.numeric(arm) & any( !(arm %in% c(0,1)))){
+Instr <- function(arm, rx) {
+  if (is.numeric(arm) & any(!(arm %in% c(0, 1)))) {
     warning("Auto checking of no switching needs treatment to have value 0 or 1")
   }
-  if(is.factor(arm)) {
-    message <- paste("Auto checking of switching assumes the lowest level of arm='",
-                     levels(arm)[1], "' is the control or placebo treatment",sep="")
+  if (is.factor(arm)) {
+    message <- paste("Auto checking of switching assumes the lowest level of arm='", 
+                     levels(arm)[1], "' is the control or placebo treatment", sep = "")
     warning(message)
     # converts the numerically coding (1,2,..), to 0 or 1.
-    arm <- as.numeric(arm)-1
+    arm <- as.numeric(arm) - 1
   }
-  cbind(arm=arm, rx=rx)
+  cbind(arm = arm, rx = rx)
 }
 
 #'@describeIn Instr ReCen function
@@ -28,6 +28,6 @@ Instr <- function(arm, rx){
 #'@param censor_time the time at which censoring would, or has occurred. This is provided for all observations
 #' unlike standard Kaplan-Meier or Cox regression where it is only given for censored observations
 
-ReCen <- function(time,censor_time){
-  cbind(time=time, censor_time=censor_time)
+ReCen <- function(time, censor_time) {
+  cbind(time = time, censor_time = censor_time)
 }

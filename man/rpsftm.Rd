@@ -4,9 +4,9 @@
 \alias{rpsftm}
 \title{Rank Preserving Structural Failure Time Model}
 \usage{
-rpsftm(formula, data, subset, na.action, test = survdiff, lowpsi = -1,
-  hipsi = 1, alpha = 0.05, treat_weight = 1, Recensor = TRUE,
-  Autoswitch = TRUE, ...)
+rpsftm(formula, data, subset, na.action, test = survdiff, low_psi = -1,
+  hi_psi = 1, alpha = 0.05, treat_modifier = 1, recensor = TRUE,
+  autoswitch = TRUE, ...)
 }
 \arguments{
 \item{formula}{a formula with a minimal structure of \code{ReCen(time, censor_time)~Instr(arm,rx)}.
@@ -24,18 +24,24 @@ argument has been used. Default is options()$na.action.}
 
 \item{test}{the survival regression function to calculate the z-statistic: survdiff, coxph, survreg}
 
-\item{lowpsi}{the lower limit of the range to search for the causal parameter}
+\item{low_psi}{the lower limit of the range to search for the causal parameter}
 
-\item{hipsi}{the upper limit of the range to search for the causal paramater}
+\item{hi_psi}{the upper limit of the range to search for the causal paramater}
 
 \item{alpha}{the significance level used to calculate confidence intervals}
 
-\item{treat_weight}{an optional parameter that psi is multiplied by on an individual observation level to give
+\item{treat_modifier}{an optional parameter that psi is multiplied by on an individual observation level to give
 differing impact to treatment. The values are transformed by \code{abs(.)/max(abs(.))} to ensure 1 is the largest weight.}
 
-\item{Recensor}{a logical to use recensoring if set to TRUE. Default is TRUE.}
+\item{recensor}{a logical to use recensoring if set to TRUE. Default is TRUE. If FALSE then
+the status of censoring or event is unchanged, but the time and censor_time values are both transformed according
+to the proportion of time on treatment. If FALSE then recensoring is applied at the earliest of either 
+a transformed or untransformed censor_time. recensoring avoids the bias induced by 
+informative censoring on the transformed scale.}
 
-\item{Autoswitch}{a logical to autodetect cases of no switching. Default is TRUE}
+\item{autoswitch}{a logical to autodetect cases of no switching. Default is TRUE. If all observations in an arm
+have perfect compliance then recensoring is not applied in that arm. If FALSE the recensoring is applied
+regardless of perfect compliance.}
 
 \item{...}{arguments to supply to the test function.}
 }
@@ -57,7 +63,7 @@ Main Function used for estmating causal parameters under the Rank Preserving Str
 }
 \details{
 the formula object \code{ReCen(time, censor_time)~Instr(arm,rx)}, identifies particular meaning to the four
-sets of arguments. \code{ReCen()} stands for ReCensoring. \code{Instr()} stands for Instrument. 
+sets of arguments. \code{ReCen()} stands for recensoring. \code{Instr()} stands for Instrument. 
 \itemize{
 \item time: the observed failure or censoring time
 \item censor_time: the time at which censoring would, or has occurred. This is provided for all observations

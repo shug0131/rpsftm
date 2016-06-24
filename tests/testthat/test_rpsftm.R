@@ -24,7 +24,7 @@ test_that("print method",{
 
 test_that("summary method",{
   fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
-                lowpsi=-1, hipsi=1)
+                low_psi=-1, hi_psi=1)
   
   expect_output(summary(fit),"Confidence Interval")
   
@@ -32,7 +32,7 @@ test_that("summary method",{
 
 test_that("plot method",{
   fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
-                lowpsi=-1, hipsi=1)
+                low_psi=-1, hi_psi=1)
   fig <- plot(fit)
   expect_is(fig, class="ggplot")
   
@@ -47,7 +47,7 @@ test_that("first basic fit with mixed data source, calculating var in-functions"
 test_that("first basic fit with the arm as a factor",{
   myArm <- factor(immdef$imm, labels=c("Control","Exper"))
   fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(myArm,1-xoyrs/progyrs),immdef,#formula=~1,
-                lowpsi=-1, hipsi=1)
+                low_psi=-1, hi_psi=1)
   expect_is(fit$psi, class="numeric")
 })
 
@@ -56,7 +56,7 @@ test_that("first basic fit with the arm as a factor",{
 test_that("with no data argument at all",{
   propX <- with(immdef, 1-xoyrs/progyrs)
   fit <- rpsftm(ReCen(immdef$progyrs, immdef$censyrs)~Instr(immdef$imm, propX),
-              lowpsi=-1, hipsi=1
+              low_psi=-1, hi_psi=1
               )
   expect_is(fit$psi, class="numeric")
   
@@ -67,8 +67,8 @@ test_that("with no data argument at all",{
 test_that("fit with treatment weights",{
   propX <- with(immdef,1-xoyrs/progyrs)
   weight <- with(immdef, ifelse(imm==1, 1, 0.5))
-  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX),immdef,treat_weight=weight,
-                lowpsi=-1, hipsi=1)
+  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX),immdef,treat_modifier=weight,
+                low_psi=-1, hi_psi=1)
   expect_is(fit$psi, class="numeric")
 })
 
@@ -79,7 +79,7 @@ test_that("Values from a basic fit match up with the Stata output",
           {
             propX <- with(immdef, 1-xoyrs/progyrs)
             fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef ,
-                          lowpsi=-1, hipsi=1)
+                          low_psi=-1, hi_psi=1)
             psivalue <-  -0.1816406 <=fit$psi & fit$psi<= -.1806641 
             ciLower <- -0.3505859<=fit$CI[1] & fit$CI[1]<= -0.3496094
             ciUpper <- 0.0019531<=fit$CI[2] & fit$CI[2]<= 0.0029297
@@ -88,18 +88,18 @@ test_that("Values from a basic fit match up with the Stata output",
            expect_true(ciUpper)
            })
 
-test_that("Try it with Recensoring off",
+test_that("Try it with recensoring off",
           {
             fit  <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
-                                 lowpsi=-1, hipsi=1, Recensor = FALSE)
+                                 low_psi=-1, hi_psi=1, recensor = FALSE)
             expect_is(fit, class="rpsftm")
             
           }
           )
-test_that("Try it with Autoswitch off",
+test_that("Try it with autoswitch off",
           {
             fit  <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
-                           lowpsi=-1, hipsi=1, Autoswitch = FALSE)
+                           low_psi=-1, hi_psi=1, autoswitch = FALSE)
             expect_is(fit, class="rpsftm")
             
           }
@@ -111,29 +111,29 @@ test_that("Try it with Autoswitch off",
 test_that("swapping the definition of arm",
           { propX <- with(immdef, 1-xoyrs/progyrs)
           fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef, 
-                        lowpsi=-1, hipsi=1)
+                        low_psi=-1, hi_psi=1)
             propX <- with(immdef, 1-xoyrs/progyrs)
             fitInv <- rpsftm(ReCen(progyrs, censyrs)~Instr(1-imm,propX), immdef,test=survdiff, 
-                             lowpsi=-1, hipsi=1)
+                             low_psi=-1, hi_psi=1)
             expect_true(  abs(fit$psi-fitInv$psi)<1e-4)}
           )
 test_that("swapping the definition of rx",
           { propX <- with(immdef, 1-xoyrs/progyrs)
           fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef,
-                        lowpsi=-1, hipsi=1)
+                        low_psi=-1, hi_psi=1)
           propXInv <- 1-with(immdef, 1-xoyrs/progyrs)
           fitInv2 <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propXInv), immdef,test=survdiff,
-                            lowpsi=-1, hipsi=1)
+                            low_psi=-1, hi_psi=1)
             expect_true(  abs(fit$psi+fitInv2$psi)<1e-4)}
 )
 
 test_that("swapping the definition of arm and rx",
           { propX <- with(immdef, 1-xoyrs/progyrs)
           fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef,
-                        lowpsi=-1, hipsi=1)
+                        low_psi=-1, hi_psi=1)
             propXInv <- 1-with(immdef, 1-xoyrs/progyrs)
             fitInv3 <- rpsftm(ReCen(progyrs, censyrs)~Instr(1-imm,propXInv), immdef,test=survdiff,
-                              lowpsi=-1, hipsi=1)
+                              low_psi=-1, hi_psi=1)
             expect_true(  abs(fit$psi+fitInv3$psi)<1e-4)
             expect_true(  abs(fit$CI[1]+fitInv3$CI[2])<1e-4)
             expect_true(  abs(fit$CI[2]+fitInv3$CI[1])<1e-4)
@@ -143,7 +143,7 @@ test_that("swapping the definition of arm and rx",
 test_that( "no t-test comparison avaialable",
            {propX <- with(immdef,1-xoyrs/progyrs)
            fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef,
-                         lowpsi=-1, hipsi=1)
+                         low_psi=-1, hi_psi=1)
            expect_error( update(fit, test=t.test))}
 )
 
@@ -152,7 +152,7 @@ test_that( "no t-test comparison avaialable",
 test_that( "check variants on fitting",
            {propX <- with(immdef,1-xoyrs/progyrs)
            fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef,
-                         lowpsi=-1, hipsi=1)
+                         low_psi=-1, hi_psi=1)
            
            f0 <- fit
            f1 <- update(fit, test=coxph)
@@ -180,7 +180,7 @@ test_that("Check that a strata and cluster fits",
           {
             propX <- with(immdef,1-xoyrs/progyrs)
             f0 <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef,
-                          lowpsi=-1, hipsi=1
+                          low_psi=-1, hi_psi=1
                 #formula=~1
                          )
             category <- rep(c("A","B","C","D"),rep(250,4))

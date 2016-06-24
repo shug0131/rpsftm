@@ -9,14 +9,13 @@
 #' 
 
 
-print.rpsftm=function(x){
-  obj=x$regression
-  #remove the call object
-  #without this it will print the entire data set
-  obj$call<-NULL
+print.rpsftm <- function(x) {
+  obj <- x$regression
+  # remove the call object without this it will print the entire data set
+  obj$call <- NULL
   print(x$call)
   print(obj)
-  cat("\npsi:" , x$psi)
+  cat("\npsi:", x$psi)
   cat("\nexp(psi):", exp(x$psi))
   invisible(x)
 }

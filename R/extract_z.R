@@ -10,50 +10,50 @@
 
 
 
-ExtractZ=function(x, ...){UseMethod("ExtractZ")}
+extract_z <- function(x, ...) {
+  UseMethod("extract_z")
+}
 
-#' @describeIn ExtractZ Method for survdiff
+#' @describeIn extract_z Method for survdiff
 #'@param fit a fitted survival object : survdiff, coxph, survreg
 
-ExtractZ.survdiff=function(fit,...){
+extract_z.survdiff <- function(fit, ...) {
   if (is.matrix(fit$obs)) {
     otmp <- apply(fit$obs, 1, sum)
     etmp <- apply(fit$exp, 1, sum)
-  }
-  else {
+  } else {
     otmp <- fit$obs
     etmp <- fit$exp
   }
   df <- (etmp > 0)
   if (sum(df) < 2) 
-    z <- 0
-  else {
-    temp2 <- ((otmp - etmp)[df])[-1]
-    vv <- (fit$var[df, df])[-1, -1, drop = FALSE]
-    #chi <- sum(solve(vv, temp2) * temp2)
-    z<- temp2/sqrt(vv)
-  }
-
+    z <- 0 else {
+      temp2 <- ((otmp - etmp)[df])[-1]
+      vv <- (fit$var[df, df])[-1, -1, drop = FALSE]
+      # chi <- sum(solve(vv, temp2) * temp2)
+      z <- temp2/sqrt(vv)
+    }
+  
   z
 }
 
 
-#' @describeIn ExtractZ Method for coxph objects
+#' @describeIn extract_z Method for coxph objects
 #'@param arm a character vector giving the name of the covariate representing the treatment arm.
 #'
-ExtractZ.coxph=function(fit, arm,...){
-  Z=with(fit, coefficients/sqrt(diag(var)))
+extract_z.coxph <- function(fit, arm, ...) {
+  Z <- with(fit, coefficients/sqrt(diag(var)))
   Z[arm]
 }
 
 
-#' @describeIn ExtractZ Method for survreg objects
+#' @describeIn extract_z Method for survreg objects
 
-ExtractZ.survreg=function(fit,arm,...){
-  coef=fit$coefficients
-  #var includes the scale parameters
-  var=diag(fit$var)[1:length(coef)]
-  Z=coef/sqrt(var)
+extract_z.survreg <- function(fit, arm, ...) {
+  coef <- fit$coefficients
+  # var includes the scale parameters
+  var <- diag(fit$var)[1:length(coef)]
+  Z <- coef/sqrt(var)
   Z[arm]
   
 }
