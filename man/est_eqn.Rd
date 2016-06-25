@@ -42,6 +42,6 @@ Calculates the Estimating Equation to be solved in RPSFTM models
 Simon Bond
 }
 \seealso{
-\code{\link{recensor}}
+\code{\link{untreated}}
 }
 

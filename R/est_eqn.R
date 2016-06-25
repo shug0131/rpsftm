@@ -11,7 +11,7 @@
 #' @param test the survival regression function to calculate the z-statistic: survdiff, coxph, survreg
 #' @param ... arguments to supply to the test function.
 #' @return A scalar value of the estimating equation: the z-statistics from a test minus a target value
-#' @seealso \code{\link{recensor}}
+#' @seealso \code{\link{untreated}}
 #' @author Simon Bond
 
 

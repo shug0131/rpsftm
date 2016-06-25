@@ -124,9 +124,9 @@ rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = 
   est_eqn_hi <- est_eqn(hi_psi, data = df, formula = fit_formula, target = 0, 
                         test = test, recensor = recensor, autoswitch = autoswitch, ... = ...)
   if (est_eqn_low * est_eqn_hi > 0) {
-    message <- paste("The starting interval (", low_psi, ", ", hi_psi, 
-                     ") to search for a solution for psi gives", " values of the same sign (", 
-                     signif(est_eqn_low, 3), ", ", signif(est_eqn_hi, 3), "). Try a wider interval ?", 
+    message <- paste("\nThe starting interval (", low_psi, ", ", hi_psi, 
+                     ") to search for a solution for psi\ngives values of the same sign (", 
+                     signif(est_eqn_low, 3), ", ", signif(est_eqn_hi, 3), ").\nTry a wider interval?", 
                      sep = "")
     stop(message)
   }

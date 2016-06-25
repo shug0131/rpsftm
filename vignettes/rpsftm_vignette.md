@@ -1,28 +1,10 @@
----
-title: 'rpsftm: rank-preserving structural failure time models for survival data'
-output:   
-  rmarkdown::html_vignette:
-    fig_width: 6
-    fig_height: 4
-    keep_md: TRUE
-  pdf_document: 
-    toc: FALSE
-author: "Simon Bond, Annabel Allison"
-date: "`r Sys.Date()`"
-vignette: >
-  %\VignetteIndexEntry{rpsftm: rank-preserving structural failure time models for survival data}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
+# rpsftm: rank-preserving structural failure time models for survival data
+Simon Bond, Annabel Allison  
+`r Sys.Date()`  
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-```
 
-```{r set-options, echo=FALSE, cache=FALSE}
-options(width = 75)
-```
+
+
 
 
 ## Summary 
@@ -99,35 +81,46 @@ The `immdef` data frame has 1000 observations and 8 variables:
 The first six entries are:
 
 
-```{r}
+
+```r
 library(rpsftm)
 head(immdef)
+#>   id def imm censyrs xo    xoyrs prog  progyrs entry
+#> 1  1   0   1       3  0 0.000000    0 3.000000     0
+#> 2  2   1   0       3  1 2.652797    0 3.000000     0
+#> 3  3   0   1       3  0 0.000000    1 1.737838     0
+#> 4  4   0   1       3  0 0.000000    1 2.166291     0
+#> 5  5   1   0       3  1 2.122100    1 2.884646     0
+#> 6  6   1   0       3  1 0.557392    0 3.000000     0
 ```
 
 For example, subject 2 was randomised to the deferred arm, started treatment at 2.65 years and was censored at 3 years (the end of the study). Subject 3 was randomised to the immediate treatment arm and progressed (observed the event) at 1.74 years. Subject 5 was randomised to the deferred treatment arm, started treatment at 2.12 years and progressed at 2.88 years. The trial lasted 3 years with staggered entry over the first 1.5 years. The variable __censyrs__ gives the time from entry to the end of the trial. The table below shows summary statistics for the `immdef` data:
 
 
-```{r}
+
+```r
 library(tableone)
 vars       <- c("def", "imm", "censyrs", "xo", "xoyrs", "prog", "progyrs", "entry")
 factorVars <- c("def", "imm", "xo", "prog") 
 CreateTableOne(vars=vars, data=immdef, factorVars=factorVars, includeNA=FALSE, test=FALSE)
+#>                      
+#>                       Overall     
+#>   n                   1000        
+#>   def = 1 (%)          500 (50.0) 
+#>   imm = 1 (%)          500 (50.0) 
+#>   censyrs (mean (sd)) 2.25 (0.45) 
+#>   xo = 1 (%)           189 (18.9) 
+#>   xoyrs (mean (sd))   0.78 (0.93) 
+#>   prog = 1 (%)         312 (31.2) 
+#>   progyrs (mean (sd)) 1.93 (0.66) 
+#>   entry (mean (sd))   0.75 (0.45)
 ```
 
 
 
 ## Fitting the RPSFTM
 
-```{r, echo=FALSE}
-rx <- with(immdef, 
-                  ifelse(imm == 1 & xo == 0,
-                         1,
-                         ifelse(imm == 1 & xo == 1,
-                                xoyrs/progyrs,
-                                ifelse(imm == 0 & xo == 1,
-                                       (progyrs-xoyrs)/progyrs,
-                                        0))))
-```
+
 
 The main function used in model fitting is `rpsftm` which takes the arguments:
 
@@ -150,21 +143,22 @@ The main function used in model fitting is `rpsftm` which takes the arguments:
 * __outoswitch__ a logical to autodetect cases of no switching. Default is TRUE. 
 
 The `rpsftm` function first evaluates $Z(\psi)$ at $\psi$ = `low_psi` and `hi_psi`. If they have the same sign, the procedure is stopped and the following error message is produced
-```{r, error=TRUE, purl = FALSE, echo=FALSE}
-rpsftm(formula=ReCen(progyrs, censyrs) ~ Instr(imm, rx), 
-       data=immdef,
-       low_psi=1, 
-       hi_psi=2)
+
+```
+#> Error in rpsftm(formula = ReCen(progyrs, censyrs) ~ Instr(imm, rx), data = immdef, : 
+#> The starting interval (1, 2) to search for a solution for psi
+#> gives values of the same sign (-8.95, -12.3).
+#> Try a wider interval?
 ```
 
 
 This suggests widening the search interval via trial and error until the values of $Z(\psi)$ at `lowpsi` and `hipsi` are of opposite sign. Otherwise, `rpsftm` next uses `uniroot` to search the interval for $\hat{\psi}$ and the $100(1-\alpha)\%$ confidence interval by using the target values 0, $z_{1-\alpha/2}$ and $z_{\alpha/2}$. If the function fails to find $\hat{\psi}$ or either limit of the confidence interval, it will set the value to NA and produce a warning message, for example,
 
-```{r, echo=FALSE}
-rpsftm_fit <- rpsftm(formula=ReCen(progyrs, censyrs) ~ Instr(imm, rx),
-                     data=immdef,
-                     low_psi=-1, 
-                     hi_psi=0)
+
+```
+#> Warning in rpsftm(formula = ReCen(progyrs, censyrs) ~ Instr(imm, rx), data
+#> = immdef, : Evaluation of a limit of the Confidence Interval failed. It is
+#> set to NA
 ```
 
 Investigation of a plot of $Z(\psi)$ against $\psi$ (example shown below) for a range of values of $\psi$ could show why the functions fails to find a root. In this case, the search interval used in `rpsftm` was not be wide enough to find the upper confidence limit. 
@@ -172,9 +166,7 @@ Investigation of a plot of $Z(\psi)$ against $\psi$ (example shown below) for a 
 <!--
 ![Plot of $z(\psi)$ against ($\psi$) for $\psi \in [-1, 0]$.](zpsiplot.png)
 -->
-```{r, fig.width = 6,  fig.retina = NULL, echo=FALSE}
-knitr::include_graphics("zpsiplot.png", auto_pdf=FALSE, dpi=120)
-```
+![](zpsiplot.png)<!-- -->
 
 Recensoring is performed by default unless `recensor=FALSE` is specified in the function parameters. After finding $\hat{\psi}$, `rpsftm` refits the model at $\hat{\psi}$ and produces a `survdiff` object of the counter-factual event times to be used in plotting Kaplan-Meier curves. The function returns 
 
@@ -191,7 +183,8 @@ Recensoring is performed by default unless `recensor=FALSE` is specified in the 
 
 We now show how to use `rpsftm` with the `immdef` data. First, a variable __rx__ for the proportion of time spent on treatment must be created:
 
-```{r}
+
+```r
 rx <- with(immdef, 
            ifelse(imm == 1 & xo == 0,
                   1,
@@ -205,48 +198,107 @@ rx <- with(immdef,
 
 This sets __rx__ to 1 in the immediate treatment arm (since no patients could switch to the deferred arm), 0 in the deferred arm patients that did not receive treatment and __(progyrs - xoyrs)/progyrs__ in the deferred arm patients that did receive treatment. Using the default options, the fitted model is
 
-```{r}
+
+```r
 rpsftm_fit_lr <- rpsftm(formula=ReCen(progyrs, censyrs) ~ Instr(imm, rx), 
                         data=immdef)
 ```
 
-The above formula fits a RPSFTM where `progyrs` is the observed event time, `censyrs` is the real or theoretical censoring time, `imm` is the randomised group indicator and `rx` is the proportion of time spent on treatment. The log rank test is used in finding the point estimate of $\psi$. The point estimate and 95% confidence interval can be returned using `rpsftm_fit_lr$psi` and `rpsftm_fit_lr$CI` which gives $\hat{\psi} = `r signif(rpsftm_fit_lr$psi, 3)`$ (`r signif(rpsftm_fit_lr$CI, 3)`). The function `plot()` produces Kaplan-Meier curves of the counter-factual event times in each group and can be used to check that the distributions are indeed the same at $\hat{\psi}$.
+The above formula fits a RPSFTM where `progyrs` is the observed event time, `censyrs` is the real or theoretical censoring time, `imm` is the randomised group indicator and `rx` is the proportion of time spent on treatment. The log rank test is used in finding the point estimate of $\psi$. The point estimate and 95% confidence interval can be returned using `rpsftm_fit_lr$psi` and `rpsftm_fit_lr$CI` which gives $\hat{\psi} = -0.181$ (-0.35, 0.00199). The function `plot()` produces Kaplan-Meier curves of the counter-factual event times in each group and can be used to check that the distributions are indeed the same at $\hat{\psi}$.
 
-```{r}
+
+```r
 plot(rpsftm_fit_lr)
 ```
+
+![](rpsftm_vignette_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 <!-- COXPH-->
 To use the Wald test from a Cox regression model in place of the log rank test, we specify `test=coxph` in the function parameters. Covariates can also be included in the estimation procedure by adding them to the right hand side of the formula. For example, baseline covariates that are included in the intention-to-treat analysis may also be incorporated into the estimation procedure of the RPSFTM. In the following example we add entry time as a covariate and use `summary()` to find the value of $\hat{\psi}$ and its 95% confidence interval:
 
-```{r}
+
+```r
 rpsftm_fit_cph <- rpsftm(formula=ReCen(progyrs, censyrs) ~ Instr(imm, rx) + entry, 
                          data=immdef,
                          test=coxph)
 summary(rpsftm_fit_cph)
+#> rpsftm(formula = ReCen(progyrs, censyrs) ~ Instr(imm, rx) + entry, 
+#>     data = immdef, test = coxph)
+#>   n= 1000, number of events= 286 
+#> 
+#>            coef exp(coef)  se(coef)      z Pr(>|z|)
+#> arm   -0.002135  0.997867  0.118300 -0.018    0.986
+#> entry  0.123541  1.131496  0.148719  0.831    0.406
+#> 
+#>       exp(coef) exp(-coef) lower .95 upper .95
+#> arm      0.9979     1.0021    0.7914     1.258
+#> entry    1.1315     0.8838    0.8454     1.514
+#> 
+#> Concordance= 0.514  (se = 0.018 )
+#> Rsquare= 0.001   (max possible= 0.976 )
+#> Likelihood ratio test= 0.69  on 2 df,   p=0.7075
+#> Wald test            = 0.69  on 2 df,   p=0.7079
+#> Score (logrank) test = 0.69  on 2 df,   p=0.7077
+#> 
+#> 
+#> psi: -0.1811515
+#> exp(psi): 0.834309
+#> Confidence Interval, psi -0.3497117 0.00330558
+#> Confidence Interval, exp(psi)  0.7048913 1.003311
 ```
 
-From the output we get $\hat{\psi} = `r signif(rpsftm_fit_cph$psi, 3)`$ (`r signif(rpsftm_fit_cph$CI, 3)`). Again, we can plot the Kaplan-Meier curves of the counter-factual event times in each group:
+From the output we get $\hat{\psi} = -0.181$ (-0.35, 0.00331). Again, we can plot the Kaplan-Meier curves of the counter-factual event times in each group:
 
-```{r}
+
+```r
 plot(rpsftm_fit_cph)
 ```
+
+![](rpsftm_vignette_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 <!--SURVREG-->
 Similary, for the Weibull model we have:
 
-```{r}
+
+```r
 rpsftm_fit_wb <- rpsftm(formula=ReCen(progyrs, censyrs) ~ Instr(imm, rx) + entry, 
                         data=immdef,
                         test=survreg)
 summary(rpsftm_fit_wb)
+#> rpsftm(formula = ReCen(progyrs, censyrs) ~ Instr(imm, rx) + entry, 
+#>     data = immdef, test = survreg)
+#> 
+#> Call:
+#> NULL
+#>                 Value Std. Error       z        p
+#> (Intercept)  1.388057     0.0857 16.1963 5.35e-59
+#> arm         -0.000461     0.0780 -0.0059 9.95e-01
+#> entry       -0.058172     0.0906 -0.6419 5.21e-01
+#> Log(scale)  -0.417603     0.0568 -7.3495 1.99e-13
+#> 
+#> Scale= 0.659 
+#> 
+#> Weibull distribution
+#> Loglik(model)= -759.7   Loglik(intercept only)= -760
+#> 	Chisq= 0.4 on 2 degrees of freedom, p= 0.82 
+#> Number of Newton-Raphson Iterations: 6 
+#> n= 1000 
+#> 
+#> 
+#> psi: -0.181231
+#> exp(psi): 0.8342427
+#> Confidence Interval, psi -0.3501386 0.005173062
+#> Confidence Interval, exp(psi)  0.7045904 1.005186
 ```
 
-```{r}
+
+```r
 plot(rpsftm_fit_wb)
 ```
 
-The output shows that $\hat{\psi} = `r signif(rpsftm_fit_wb$psi, 3)`$ (`r signif(rpsftm_fit_wb$CI, 3)`). In all three cases, the point estimate and 95% confidence interval of $\psi$ are similar.
+![](rpsftm_vignette_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+
+The output shows that $\hat{\psi} = -0.181$ (-0.35, 0.00517). In all three cases, the point estimate and 95% confidence interval of $\psi$ are similar.
 
 ## Limitations
 
