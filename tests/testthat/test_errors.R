@@ -115,15 +115,14 @@ test_that("na actions",
           )
 
 test_that("error for poor initial starting values",{
-    expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
+    expect_warning( rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
                low_psi=-1, hi_psi=-0.9),
                "The starting interval"
     )
 })
 
 test_that("warning for non-convergencevalues",{
-  expect_warning( fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs)+entry,immdef),
-                "It is set to NA"
-  )
-  expect_equal(is.na(fit$psi),TRUE)
+  expect_error( fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs)+entry,immdef)
+                  )
+#  expect_equal(is.na(fit$psi),TRUE)
 })

@@ -19,6 +19,8 @@
 #' @param alpha the significance level used to calculate confidence intervals
 #' @param treat_modifier an optional parameter that psi is multiplied by on an individual observation level to give
 #' differing impact to treatment. The values are transformed by \code{abs(.)/max(abs(.))} to ensure 1 is the largest weight.
+#' @param n_eval_z: The number of points between hi_psi and low_psi at which to evaluate the Z-statistics
+#' in the estimating equation. Default  is 100.
 #' @return a rpsftm method object that is a list of the following:
 #' \itemize{
 #' \item psi: the estimated parameter
@@ -29,6 +31,9 @@
 #' \item ans: the object returned from \code{uniroot} used to solve the estimating equation
 #' \item CI: a vector of the confidence interval around psi
 #' \item call: the R call object
+#' \item eval_z: a data frame with the Z-statistics from the estimating equation evaluated at
+#' a sequence of values of psi. Used to plot and check if the range of values to search for solution
+#' and limits of confidence intervals need to be modified.
 #' }
 #' @details the formula object \code{ReCen(time, censor_time)~Instr(arm,rx)}, identifies particular meaning to the four
 #' sets of arguments. \code{ReCen()} stands for recensoring. \code{Instr()} stands for Instrument. 
@@ -56,7 +61,7 @@
 
 rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = -1, 
                    hi_psi = 1, alpha = 0.05, treat_modifier = 1, recensor = TRUE, autoswitch = TRUE, 
-                   ...) {
+                   n_eval_z=100, ...) {
   cl <- match.call()
   
   # create formula for fitting, and to feed into model.frame() from the
@@ -117,6 +122,29 @@ rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = 
     stop("Test must be one of: survdiff, coxph, survreg")
   }
   
+  #check the format of n_eval_z is an single integer >=2
+  if (!is.numeric(n_eval_z)| length(n_eval_z)>1 | n_eval_z<2) {stop ("invalid value of n_eval_z")}
+  #create values of psi to evaluate in a data frame
+  eval_z <- data.frame( psi= seq(low_psi, hi_psi, length=n_eval_z))
+  # evaluate them
+  
+  #need to wrap est_eqn in try() to cope with non-convergent fits
+  
+  fn_eval_z <- function(psi){
+    answer <- try( est_eqn(psi,data = df, formula = fit_formula, target = 0, 
+                           test = test, recensor = recensor, 
+                           autoswitch = autoswitch, ... = ... ),
+                   silent = TRUE
+                   )
+    if (class(answer) == "try-error"){ 
+      return(NA)
+    } else {
+      return(answer)
+    }
+  }
+  
+  eval_z$Z <- apply(eval_z,1, fn_eval_z)
+  
   # Preliminary check of low_psi and hi_psi with a meaningful warning
   
   est_eqn_low <- est_eqn(low_psi, data = df, formula = fit_formula, target = 0, 
@@ -126,9 +154,9 @@ rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = 
   if (est_eqn_low * est_eqn_hi > 0) {
     message <- paste("\nThe starting interval (", low_psi, ", ", hi_psi, 
                      ") to search for a solution for psi\ngives values of the same sign (", 
-                     signif(est_eqn_low, 3), ", ", signif(est_eqn_hi, 3), ").\nTry a wider interval?", 
+                     signif(est_eqn_low, 3), ", ", signif(est_eqn_hi, 3), ").\nTry a wider interval. plot(obj$eval_z, type=\"s\"), where obj is the output of rpsftm()", 
                      sep = "")
-    stop(message)
+    warning(message)
   }
   
   # solve to find the value of psi that gives the root to z=0, and the
@@ -213,7 +241,8 @@ rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = 
        Sstar=Sstar, 
        ans=ans, 
        CI=c(lower$root,upper$root),
-       call=cl
+       call=cl,
+       eval_z=eval_z
        )
 
   if (length(na.action)){ value$na.action <- na.action }
