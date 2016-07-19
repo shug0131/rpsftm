@@ -32,34 +32,51 @@ untreated <- function(psi, time, censor_time, rx, arm, recensor, autoswitch) {
     warning("You have observed events AFTER censoring. These are handled as censored")
   }
   u <- time * ((1 - rx) + rx * exp(psi))
-  if (!recensor) {
-    scenario <- 1
-  } else {
-    if (!autoswitch) {
-      scenario <- 2
-    } else {
-      if (any(0 < rx[arm == 0]) & any(rx[arm == 1] < 1)) {
-        scenario <- 2
-      }
-      if (any(0 < rx[arm == 0]) & all(rx[arm == 1] == 1)) {
-        scenario <- 3
-      }
-      if (any(rx[arm == 1] < 1) & all(rx[arm == 0] == 0)) {
-        scenario <- 4
-      }
-      if (all(rx == arm)) {
-        scenario <- 1
-      }
-    }
-    
+  # calculate original status. Might be removed with revised syntax
+  delta <- 1*( time < censor_time)
+  
+  #make use of setting censor_time=Inf to avoid recensoring, and implimenting Autoswitch
+  c_star <- pmin( censor_time , censor_time * exp(psi) )
+  if( autoswitch){
+    if( all(rx[arm==1]==1)){ c_star <- ifelse(arm==1, Inf, c_star)}
+    if( all(rx[arm==0]==0)){ c_star <- ifelse(arm==0, Inf, c_star)}
   }
   
-  c_star <- switch(scenario, censor_time * ((1 - rx) + rx * exp(psi)), 
-                   pmin(censor_time, censor_time * exp(psi)), arm * censor_time * 
-                     exp(psi) + (1 - arm) * pmin(censor_time, censor_time * exp(psi)), 
-                   arm * pmin(censor_time, censor_time * exp(psi)) + (1 - arm) * censor_time)
+  #might be removed with revised syntax
+  if( !recensor){ c_star <- Inf}
+  
+  #if (!recensor) {
+  #  scenario <- 1
+  #} else {
+  #  if (!autoswitch) {
+  #    scenario <- 2
+  #  } else {
+  #    if (any(0 < rx[arm == 0]) & any(rx[arm == 1] < 1)) {
+  #      scenario <- 2
+  #    }
+  #    if (any(0 < rx[arm == 0]) & all(rx[arm == 1] == 1)) {
+  #      scenario <- 3
+  #    }
+  #    if (any(rx[arm == 1] < 1) & all(rx[arm == 0] == 0)) {
+  #      scenario <- 4
+   #   }
+  #    if (all(rx == arm)) {
+  #      scenario <- 1
+  #    }
+  #  }
+    
+  #}
+  
+  #c_star <- switch(scenario, 
+  #                 censor_time * ((1 - rx) + rx * exp(psi)), 
+  #                 pmin(censor_time, censor_time * exp(psi)), 
+  #                 arm * censor_time * exp(psi) + (1 - arm) * pmin(censor_time, censor_time * exp(psi)), 
+  #                 arm * pmin(censor_time, censor_time * exp(psi)) + (1 - arm) * censor_time)
+  
   t_star <- pmin(u, c_star)
-  delta_star <- 1 * (u < c_star)
+  #delta_star <- 1 * (u < c_star)
+  #only change delta if necessary
+  delta_star <-  ifelse( c_star < u, 0, delta)
   output <- Surv(t_star, delta_star)
   return(output)
 }

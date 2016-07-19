@@ -61,7 +61,7 @@
 
 rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = -1, 
                    hi_psi = 1, alpha = 0.05, treat_modifier = 1, recensor = TRUE, autoswitch = TRUE, 
-                   n_eval_z=100, ...) {
+                   n_eval_z = 100, ...) {
   cl <- match.call()
   
   # create formula for fitting, and to feed into model.frame() from the
@@ -125,7 +125,7 @@ rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = 
   #check the format of n_eval_z is an single integer >=2
   if (!is.numeric(n_eval_z)|| length(n_eval_z)>1 || n_eval_z<2) {stop ("invalid value of n_eval_z")}
   #create values of psi to evaluate in a data frame
-  eval_z <- data.frame( psi= seq(low_psi, hi_psi, length=n_eval_z))
+  eval_z <- data.frame( psi = seq(low_psi, hi_psi, length=n_eval_z))
   # evaluate them
   
   #need to wrap est_eqn in try() to cope with non-convergent fits
