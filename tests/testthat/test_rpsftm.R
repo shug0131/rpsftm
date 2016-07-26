@@ -7,14 +7,14 @@ context("Test the rpsftm() function")
 
 test_that("first basict fit with mixed data sources",{
   propX <- with(immdef,1-xoyrs/progyrs)
-  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX),immdef)
+  fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,propX),immdef)
   expect_is(fit$psi, class="numeric")
 })
 
 
 
 test_that("print method",{
-  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef)
+  fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),immdef)
 
   
   expect_output(print(fit),"exp\\(psi\\):")
@@ -23,7 +23,7 @@ test_that("print method",{
 
 
 test_that("summary method",{
-  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
+  fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),immdef,
                 low_psi=-1, hi_psi=1)
   
   expect_output(summary(fit),"Confidence Interval")
@@ -31,7 +31,7 @@ test_that("summary method",{
 })
 
 test_that("plot method",{
-  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
+  fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),immdef,
                 low_psi=-1, hi_psi=1)
   fig <- plot(fit)
   expect_is(fig, class="ggplot")
@@ -40,13 +40,13 @@ test_that("plot method",{
 
 
 test_that("first basic fit with mixed data source, calculating var in-functions",{
-  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef)
+  fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),immdef)
   expect_is(fit$psi, class="numeric")
 })
 
 test_that("first basic fit with the arm as a factor",{
   myArm <- factor(immdef$imm, labels=c("Control","Exper"))
-  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(myArm,1-xoyrs/progyrs),immdef,#formula=~1,
+  fit <- rpsftm(ReCen(progyrs, censyrs)~rand(myArm,1-xoyrs/progyrs),immdef,#formula=~1,
                 low_psi=-1, hi_psi=1)
   expect_is(fit$psi, class="numeric")
 })
@@ -55,7 +55,7 @@ test_that("first basic fit with the arm as a factor",{
 
 test_that("with no data argument at all",{
   propX <- with(immdef, 1-xoyrs/progyrs)
-  fit <- rpsftm(ReCen(immdef$progyrs, immdef$censyrs)~Instr(immdef$imm, propX),
+  fit <- rpsftm(ReCen(immdef$progyrs, immdef$censyrs)~rand(immdef$imm, propX),
               low_psi=-1, hi_psi=1
               )
   expect_is(fit$psi, class="numeric")
@@ -67,7 +67,7 @@ test_that("with no data argument at all",{
 test_that("fit with treatment weights",{
   propX <- with(immdef,1-xoyrs/progyrs)
   weight <- with(immdef, ifelse(imm==1, 1, 0.5))
-  fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX),immdef,treat_modifier=weight,
+  fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,propX),immdef,treat_modifier=weight,
                 low_psi=-1, hi_psi=1)
   expect_is(fit$psi, class="numeric")
 })
@@ -78,7 +78,7 @@ test_that("fit with treatment weights",{
 test_that("Values from a basic fit match up with the Stata output",
           {
             propX <- with(immdef, 1-xoyrs/progyrs)
-            fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef ,
+            fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,propX), immdef ,
                           low_psi=-1, hi_psi=1)
             psivalue <-  -0.1816406 <=fit$psi & fit$psi<= -.1806641 
             ciLower <- -0.3505859<=fit$CI[1] & fit$CI[1]<= -0.3496094
@@ -90,7 +90,7 @@ test_that("Values from a basic fit match up with the Stata output",
 
 test_that("Try it with recensoring off",
           {
-            fit  <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
+            fit  <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),immdef,
                                  low_psi=-1, hi_psi=1, recensor = FALSE)
             expect_is(fit, class="rpsftm")
             
@@ -98,7 +98,7 @@ test_that("Try it with recensoring off",
           )
 test_that("Try it with autoswitch off",
           {
-            fit  <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
+            fit  <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),immdef,
                            low_psi=-1, hi_psi=1, autoswitch = FALSE)
             expect_is(fit, class="rpsftm")
             
@@ -110,29 +110,29 @@ test_that("Try it with autoswitch off",
 
 test_that("swapping the definition of arm",
           { propX <- with(immdef, 1-xoyrs/progyrs)
-          fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef, 
+          fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,propX), immdef, 
                         low_psi=-1, hi_psi=1)
             propX <- with(immdef, 1-xoyrs/progyrs)
-            fitInv <- rpsftm(ReCen(progyrs, censyrs)~Instr(1-imm,propX), immdef,test=survdiff, 
+            fitInv <- rpsftm(ReCen(progyrs, censyrs)~rand(1-imm,propX), immdef,test=survdiff, 
                              low_psi=-1, hi_psi=1)
             expect_true(  abs(fit$psi-fitInv$psi)<1e-4)}
           )
 test_that("swapping the definition of rx",
           { propX <- with(immdef, 1-xoyrs/progyrs)
-          fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef,
+          fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,propX), immdef,
                         low_psi=-1, hi_psi=1)
           propXInv <- 1-with(immdef, 1-xoyrs/progyrs)
-          fitInv2 <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propXInv), immdef,test=survdiff,
+          fitInv2 <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,propXInv), immdef,test=survdiff,
                             low_psi=-1, hi_psi=1)
             expect_true(  abs(fit$psi+fitInv2$psi)<1e-4)}
 )
 
 test_that("swapping the definition of arm and rx",
           { propX <- with(immdef, 1-xoyrs/progyrs)
-          fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef,
+          fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,propX), immdef,
                         low_psi=-1, hi_psi=1)
             propXInv <- 1-with(immdef, 1-xoyrs/progyrs)
-            fitInv3 <- rpsftm(ReCen(progyrs, censyrs)~Instr(1-imm,propXInv), immdef,test=survdiff,
+            fitInv3 <- rpsftm(ReCen(progyrs, censyrs)~rand(1-imm,propXInv), immdef,test=survdiff,
                               low_psi=-1, hi_psi=1)
             expect_true(  abs(fit$psi+fitInv3$psi)<1e-4)
             expect_true(  abs(fit$CI[1]+fitInv3$CI[2])<1e-4)
@@ -142,7 +142,7 @@ test_that("swapping the definition of arm and rx",
 
 test_that( "no t-test comparison avaialable",
            {propX <- with(immdef,1-xoyrs/progyrs)
-           fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef,
+           fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,propX), immdef,
                          low_psi=-1, hi_psi=1)
            expect_error( update(fit, test=t.test))}
 )
@@ -151,7 +151,7 @@ test_that( "no t-test comparison avaialable",
 
 test_that( "check variants on fitting",
            {propX <- with(immdef,1-xoyrs/progyrs)
-           fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef,
+           fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,propX), immdef,
                          low_psi=-1, hi_psi=1)
            
            f0 <- fit
@@ -179,7 +179,7 @@ test_that( "check variants on fitting",
 test_that("Check that a strata and cluster fits",
           {
             propX <- with(immdef,1-xoyrs/progyrs)
-            f0 <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,propX), immdef,
+            f0 <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,propX), immdef,
                           low_psi=-1, hi_psi=1
                 #formula=~1
                          )
@@ -198,14 +198,14 @@ test_that("Check that a strata and cluster fits",
 
 
 test_that("subset argument check",
-         {fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef, entry<1)
+         {fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),immdef, entry<1)
           expect_is(fit$psi, class="numeric")
          }
           
 )
 
 test_that("subset update check",
-          {fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef, entry<1)
+          {fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),immdef, entry<1)
           fit <- update(fit, .~., subset=NULL)
           expect_is(fit$psi, class="numeric")
           }
@@ -214,7 +214,7 @@ test_that("subset update check",
 
 test_that("updating of data argument",
           {
-            fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),subset(immdef, entry<1))
+            fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),subset(immdef, entry<1))
             fit <- update(fit, data= subset(immdef, entry>=1))
             expect_is(fit$psi, class="numeric")
           }
@@ -223,14 +223,14 @@ test_that("updating of data argument",
 
 test_that("eval_z output",
           {
-            fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),
+            fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),
                           data=immdef, n_eval_z=40)
             expect_equal(dim(fit$eval_z)[1],40)
           }
 )
 
 test_that("check it works when arm=rx",
-          {fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm, imm), immdef)
+          {fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm, imm), immdef)
           expect_is(fit$psi, class="numeric")
             }
           )

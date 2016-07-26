@@ -9,7 +9,7 @@ rpsftm(formula, data, subset, na.action, test = survdiff, low_psi = -1,
   autoswitch = TRUE, n_eval_z = 100, ...)
 }
 \arguments{
-\item{formula}{a formula with a minimal structure of \code{ReCen(time, censor_time)~Instr(arm,rx)}.
+\item{formula}{a formula with a minimal structure of \code{ReCen(time, censor_time)~rand(arm,rx)}.
 Further terms can be added to the right hand side to adjust for covariates and use strata or cluster arguments.}
 
 \item{data}{an optional data frame that contains variables}
@@ -68,8 +68,8 @@ and limits of confidence intervals need to be modified.
 Main Function used for estmating causal parameters under the Rank Preserving Structural Failure Time Model
 }
 \details{
-the formula object \code{ReCen(time, censor_time)~Instr(arm,rx)}, identifies particular meaning to the four
-sets of arguments. \code{ReCen()} stands for recensoring. \code{Instr()} stands for Instrument. 
+the formula object \code{ReCen(time, censor_time)~rand(arm,rx)}, identifies particular meaning to the four
+sets of arguments. \code{ReCen()} stands for recensoring. \code{rand()} stands for randomistion, both the randomly assigned and actual observed treatment. 
 \itemize{
 \item time: the observed failure or censoring time
 \item censor_time: the time at which censoring would, or has occurred. This is provided for all observations
@@ -83,7 +83,7 @@ or \code{cluster()} terms.
 \examples{
 library(rpsftm)
 ?immdef
-fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef)
+fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),immdef)
 print(fit)
 summary(fit)
 plot(fit)

@@ -5,7 +5,7 @@
 #'@name rpsftm
 #'@inheritParams untreated
 #'@inheritParams est_eqn
-#'@param formula a formula with a minimal structure of \code{ReCen(time, censor_time)~Instr(arm,rx)}.
+#'@param formula a formula with a minimal structure of \code{ReCen(time, censor_time)~rand(arm,rx)}.
 #'Further terms can be added to the right hand side to adjust for covariates and use strata or cluster arguments.
 #'@param data an optional data frame that contains variables
 #'@param subset expression indicating which subset of the rows of data should be used in the fit. 
@@ -35,8 +35,8 @@
 #' a sequence of values of psi. Used to plot and check if the range of values to search for solution
 #' and limits of confidence intervals need to be modified.
 #' }
-#' @details the formula object \code{ReCen(time, censor_time)~Instr(arm,rx)}, identifies particular meaning to the four
-#' sets of arguments. \code{ReCen()} stands for recensoring. \code{Instr()} stands for Instrument. 
+#' @details the formula object \code{ReCen(time, censor_time)~rand(arm,rx)}, identifies particular meaning to the four
+#' sets of arguments. \code{ReCen()} stands for recensoring. \code{rand()} stands for randomistion, both the randomly assigned and actual observed treatment. 
 #' \itemize{
 #' \item time: the observed failure or censoring time
 #' \item censor_time: the time at which censoring would, or has occurred. This is provided for all observations
@@ -50,7 +50,7 @@
 #' @examples 
 #' library(rpsftm)
 #' ?immdef
-#' fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef)
+#' fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),immdef)
 #' print(fit)
 #' summary(fit)
 #' plot(fit)
@@ -74,7 +74,7 @@ rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = 
   mf[[1L]] <- quote(stats::model.frame)
   # this ultimately returns a data frame with all the variables in and
   # renamed time, censor_time, rx, arm as appropriate
-  special <- c("ReCen", "Instr")
+  special <- c("ReCen", "rand")
   mf$formula <- if (missing(data)) {
     terms(formula, special)
   } else {
@@ -82,7 +82,7 @@ rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = 
   }
   formula_env <- new.env(parent = environment(mf$formula))
   assign("ReCen", ReCen, envir = formula_env)
-  assign("Instr", Instr, envir = formula_env)
+  assign("rand", rand, envir = formula_env)
   environment(mf$formula) <- formula_env
   df <- eval(mf, parent.frame())
   na.action <- attr(df, "na.action")
@@ -92,21 +92,21 @@ rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = 
   if (length(ReCen_drops) > 0) {
     stop("Recen() term only on the LHS of the formula")
   }
-  Instr_index <- attr(mf$formula, "specials")$Instr
-  Instr_drops <- which(attr(mf$formula, "factors")[Instr_index, ] > 0)
-  if (length(Instr_drops) != 1) {
-    stop("Exactly one Instr() term allowed")
+  rand_index <- attr(mf$formula, "specials")$rand
+  rand_drops <- which(attr(mf$formula, "factors")[rand_index, ] > 0)
+  if (length(rand_drops) != 1) {
+    stop("Exactly one rand() term allowed")
   }
-  Instr_column <- attr(mf$formula, "factors")[, Instr_drops]
-  if (sum(Instr_column > 0) > 1) {
-    stop("Instr() term must not be in any interactions")
+  rand_column <- attr(mf$formula, "factors")[, rand_drops]
+  if (sum(rand_column > 0) > 1) {
+    stop("rand() term must not be in any interactions")
   }
   
   # remedies the df being a list of lists into just 1 list
-  df <- cbind(df[, ReCen_index], df[, Instr_index], df[, -c(Instr_index, 
+  df <- cbind(df[, ReCen_index], df[, rand_index], df[, -c(rand_index, 
                                                             ReCen_index), drop = FALSE])
   fit_formula <- terms(update(mf$formula, . ~ arm + .))
-  fit_formula <- drop.terms(fit_formula, dropx = 1 + Instr_drops, keep.response = FALSE)
+  fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)
   
   
   # Check that the number of arms is 2.

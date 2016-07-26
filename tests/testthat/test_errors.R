@@ -4,7 +4,7 @@ context("Test for desired errors in rpsftm")
 immdef$propX <- with(immdef, 1-xoyrs/progyrs)
 
 test_that("Errors in test argument",{
-expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(imm, propX),test=mantelhaen.test,immdef, 
+expect_error( rpsftm(ReCen(progyrs, censyrs)~rand(imm, propX),test=mantelhaen.test,immdef, 
               low_psi=-1, hi_psi=1), "Test must be one of: survdiff, coxph, survreg")
 })
 
@@ -14,54 +14,54 @@ expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(imm, propX),test=mantelhaen.t
 #Check up the error functions  i.e. wrong order of censoring/ events
 #rx outside of [0,1]
 test_that("Errors in arm >1",{
-  expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(imm, propX+1),immdef, 
+  expect_error( rpsftm(ReCen(progyrs, censyrs)~rand(imm, propX+1),immdef, 
                        low_psi=-1, hi_psi=1), "Invalid values for rx")
 })
 
 test_that("Errors in arm <1",{
-  expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(imm, propX-1),immdef, 
+  expect_error( rpsftm(ReCen(progyrs, censyrs)~rand(imm, propX-1),immdef, 
                        low_psi=-1, hi_psi=1), "Invalid values for rx")
 })
 
 test_that("Errors in randomisation out of {0,1}",{
-  expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(imm+0.5, propX-1),immdef, 
+  expect_error( rpsftm(ReCen(progyrs, censyrs)~rand(imm+0.5, propX-1),immdef, 
                        low_psi=-1, hi_psi=1), "Invalid values for rx")
 })
 
 
 test_that("Censoring before Time warning",{
-  expect_warning( rpsftm(ReCen(progyrs, censyrs*0.5)~Instr(imm, propX),immdef, 
+  expect_warning( rpsftm(ReCen(progyrs, censyrs*0.5)~rand(imm, propX),immdef, 
                        low_psi=-1, hi_psi=1), "You have observed events AFTER censoring")
 })
 
 test_that("Too Many Recen() terms",
          {
-          expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(imm, 1-xoyrs/progyrs)+ReCen(censyrs,progyrs),immdef, 
+          expect_error( rpsftm(ReCen(progyrs, censyrs)~rand(imm, 1-xoyrs/progyrs)+ReCen(censyrs,progyrs),immdef, 
                               low_psi=-1, hi_psi=1), "Recen\\(\\) term only on the LHS of the formula")
         
      }
 )
 
-test_that("No Instr() terms",
+test_that("No rand() terms",
           {
             expect_error( rpsftm(ReCen(progyrs, censyrs)~imm,immdef, 
-                                 low_psi=-1, hi_psi=1), "Exactly one Instr\\(\\) term allowed")
+                                 low_psi=-1, hi_psi=1), "Exactly one rand\\(\\) term allowed")
             
           }
 )
 
-test_that("Too many Instr() terms",
+test_that("Too many rand() terms",
           {
-            expect_error( rpsftm(ReCen(progyrs, censyrs)~def*Instr(imm, 1-xoyrs/progyrs),immdef, 
-                                 low_psi=-1, hi_psi=1), "Exactly one Instr\\(\\) term allowed")
+            expect_error( rpsftm(ReCen(progyrs, censyrs)~def*rand(imm, 1-xoyrs/progyrs),immdef, 
+                                 low_psi=-1, hi_psi=1), "Exactly one rand\\(\\) term allowed")
             
           }
 )
 
-test_that("Instr() interaction",
+test_that("rand() interaction",
           {
-            expect_error( rpsftm(ReCen(progyrs, censyrs)~def/Instr(imm, 1-xoyrs/progyrs),immdef, 
-                                 low_psi=-1, hi_psi=1), "Instr\\(\\) term must not be in any interactions")
+            expect_error( rpsftm(ReCen(progyrs, censyrs)~def/rand(imm, 1-xoyrs/progyrs),immdef, 
+                                 low_psi=-1, hi_psi=1), "rand\\(\\) term must not be in any interactions")
             
           }
 )
@@ -72,7 +72,7 @@ test_that("More than 2 arms",
           {
             myarm <- factor(rep(1:4,250))
             
-            expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(myarm, 1-xoyrs/progyrs),immdef, 
+            expect_error( rpsftm(ReCen(progyrs, censyrs)~rand(myarm, 1-xoyrs/progyrs),immdef, 
                                  low_psi=-1, hi_psi=1), "arm must have exactly 2 observed values")
           }
 )
@@ -81,7 +81,7 @@ test_that("less than 2 arms",
           {
             
             
-            expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(1, 1-xoyrs/progyrs),immdef, 
+            expect_error( rpsftm(ReCen(progyrs, censyrs)~rand(1, 1-xoyrs/progyrs),immdef, 
                                  low_psi=-1, hi_psi=1), "arm must have exactly 2 observed values")
           }
 )
@@ -97,17 +97,17 @@ test_that("na actions",
           myarm <- immdef$imm
           myarm[index] <- NA
           
-          fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm, 1-xoyrs/progyrs),immdef, na.action=na.fail,
+          fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm, 1-xoyrs/progyrs),immdef, na.action=na.fail,
                         low_psi=-1, hi_psi=1)
           expect_is(fit$psi, class="numeric")
           
           
-          fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(myarm, 1-xoyrs/progyrs),immdef, na.action=na.omit,
+          fit <- rpsftm(ReCen(progyrs, censyrs)~rand(myarm, 1-xoyrs/progyrs),immdef, na.action=na.omit,
                  low_psi=-1, hi_psi=1)
           expect_is(fit$psi, class="numeric")
           expect_is(fit$na.action, class="omit")
           
-          expect_error(rpsftm(ReCen(progyrs, censyrs)~Instr(myarm, 1-xoyrs/progyrs),immdef, na.action=na.fail,
+          expect_error(rpsftm(ReCen(progyrs, censyrs)~rand(myarm, 1-xoyrs/progyrs),immdef, na.action=na.fail,
                         low_psi=-1, hi_psi=1),
                        "Error in na.fail.default")
           }
@@ -115,14 +115,14 @@ test_that("na actions",
           )
 
 test_that("error for poor initial starting values",{
-    expect_warning( rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef,
+    expect_warning( rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),immdef,
                low_psi=-1, hi_psi=-0.9),
                "The starting interval"
     )
 })
 
 test_that("warning for non-convergencevalues",{
-  expect_error( fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs)+entry,immdef)
+  expect_error( fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs)+entry,immdef)
                   )
 #  expect_equal(is.na(fit$psi),TRUE)
 })
@@ -130,7 +130,7 @@ test_that("warning for non-convergencevalues",{
 
 test_that("eval_z incorrect input - too small a number",
           {
-            expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),
+            expect_error( rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),
                           data=immdef, n_eval_z=1),
                           "invalid value of n_eval_z"             
             )
@@ -141,7 +141,7 @@ test_that("eval_z incorrect input - too small a number",
 
 test_that("eval_z incorrect input - vector input",
           {
-            expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),
+            expect_error( rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),
                                  data=immdef, n_eval_z=2:10),
                           "invalid value of n_eval_z"             
             )
@@ -153,7 +153,7 @@ test_that("eval_z incorrect input - vector input",
 
 test_that("eval_z incorrect input - non-numeric input",
           {
-            expect_error( rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),
+            expect_error( rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),
                                  data=immdef, n_eval_z="hello"),
                           "invalid value of n_eval_z"             
             )
