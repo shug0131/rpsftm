@@ -78,7 +78,7 @@ or \code{cluster()} terms.
 \examples{
 library(rpsftm)
 ?immdef
-fit <- rpsftm(Surv(progyrs, status)~rand(imm,1-xoyrs/progyrs),immdef)
+fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censyrs)
 print(fit)
 summary(fit)
 plot(fit)

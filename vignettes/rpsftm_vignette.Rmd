@@ -161,7 +161,7 @@ rpsftm(formula=Surv(progyrs, prog) ~ rand(imm, rx),
 This suggests widening the search interval via trial and error until the values of $Z(\psi)$ at `lowpsi` and `hipsi` are of opposite sign. Otherwise, `rpsftm` next uses `uniroot` to search the interval for $\hat{\psi}$ and the $100(1-\alpha)\%$ confidence interval by using the target values 0, $z_{1-\alpha/2}$ and $z_{\alpha/2}$. If the function fails to find $\hat{\psi}$ or either limit of the confidence interval, it will set the value to NA and produce a warning message, for example,
 
 ```{r, echo=FALSE}
-#library(rpsftm)
+
 rpsftm_fit <- rpsftm(formula=Surv(progyrs, prog) ~ rand(imm, rx),
                      data=immdef, censor_time = censyrs,
                      low_psi=-1, 

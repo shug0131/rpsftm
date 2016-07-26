@@ -50,7 +50,7 @@
 #' @examples 
 #' library(rpsftm)
 #' ?immdef
-#' fit <- rpsftm(Surv(progyrs, status)~rand(imm,1-xoyrs/progyrs),immdef)
+#' fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censyrs)
 #' print(fit)
 #' summary(fit)
 #' plot(fit)
@@ -82,6 +82,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   }
   formula_env <- new.env(parent = environment(mf$formula))
   assign("rand", rand, envir = formula_env)
+  assign("Surv", Surv, envir = formula_env)
   environment(mf$formula) <- formula_env
   df <- eval(mf, parent.frame())
   na.action <- attr(df, "na.action")
