@@ -1,7 +1,7 @@
 ---
 title: "README"
 author: "Simon Bond"
-date: "25 June 2016"
+date: "26 July 2016"
 output:
   md_document:
     variant: markdown_github
@@ -25,7 +25,7 @@ As an example:
 ```{r}
 library(rpsftm)
 ?immdef
-fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef)
+fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs), data = immdef, censor_time = censyrs)
 summary(fit)
 plot(fit)
 ```

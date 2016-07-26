@@ -4,8 +4,8 @@
 \alias{rpsftm}
 \title{Rank Preserving Structural Failure Time Model}
 \usage{
-rpsftm(formula, data, subset, na.action, test = survdiff, low_psi = -1,
-  hi_psi = 1, alpha = 0.05, treat_modifier = 1, recensor = TRUE,
+rpsftm(formula, data, censor_time, subset, na.action, test = survdiff,
+  low_psi = -1, hi_psi = 1, alpha = 0.05, treat_modifier = 1,
   autoswitch = TRUE, n_eval_z = 100, ...)
 }
 \arguments{
@@ -13,6 +13,10 @@ rpsftm(formula, data, subset, na.action, test = survdiff, low_psi = -1,
 Further terms can be added to the right hand side to adjust for covariates and use strata or cluster arguments.}
 
 \item{data}{an optional data frame that contains variables}
+
+\item{censor_time}{the time at which censoring would, or has occurred. This is provided for all observations
+unlike standard Kaplan-Meier or Cox regression where it is only given for censored observations. 
+If no value is given then recensoring is not applied.}
 
 \item{subset}{expression indicating which subset of the rows of data should be used in the fit. 
 This can be a logical vector (which is replicated to have length equal to the number of observations)
@@ -31,13 +35,7 @@ argument has been used. Default is options()$na.action.}
 \item{alpha}{the significance level used to calculate confidence intervals}
 
 \item{treat_modifier}{an optional parameter that psi is multiplied by on an individual observation level to give
-differing impact to treatment. The values are transformed by \code{abs(.)/max(abs(.))} to ensure 1 is the largest weight.}
-
-\item{recensor}{a logical to use recensoring if set to TRUE. Default is TRUE. If FALSE then
-the status of censoring or event is unchanged, but the time and censor_time values are both transformed according
-to the proportion of time on treatment. If FALSE then recensoring is applied at the earliest of either 
-a transformed or untransformed censor_time. recensoring avoids the bias induced by 
-informative censoring on the transformed scale.}
+differing impact to treatment.}
 
 \item{autoswitch}{a logical to autodetect cases of no switching. Default is TRUE. If all observations in an arm
 have perfect compliance then recensoring is not applied in that arm. If FALSE the recensoring is applied
@@ -68,14 +66,11 @@ and limits of confidence intervals need to be modified.
 Main Function used for estmating causal parameters under the Rank Preserving Structural Failure Time Model
 }
 \details{
-the formula object \code{ReCen(time, censor_time)~rand(arm,rx)}, identifies particular meaning to the four
-sets of arguments. \code{ReCen()} stands for recensoring. \code{rand()} stands for randomistion, both the randomly assigned and actual observed treatment. 
+the formula object \code{Surv(time, status)~rand(arm,rx)}. \code{rand()} stands 
+for randomistion, both the randomly assigned and actual observed treatment. 
 \itemize{
-\item time: the observed failure or censoring time
-\item censor_time: the time at which censoring would, or has occurred. This is provided for all observations
-unlike standard Kaplan-Meier or Cox regression where it is only given for censored observations
-\item arm: the randomised treatment arm. a factor with 2 levels, or numeric variable with values 0/1.
-\item rx: the proportion of time on active treatment (arm=1 or the non-reference level of the factor)
+  \item arm: the randomised treatment arm. a factor with 2 levels, or numeric variable with values 0/1.
+ \item rx: the proportion of time on active treatment (arm=1 or the non-reference level of the factor)
 }
 Further adjustment terms can be added on the right hand side of the formula if desired, included \code{strata()}
 or \code{cluster()} terms.
@@ -83,7 +78,7 @@ or \code{cluster()} terms.
 \examples{
 library(rpsftm)
 ?immdef
-fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),immdef)
+fit <- rpsftm(Surv(progyrs, status)~rand(imm,1-xoyrs/progyrs),immdef)
 print(fit)
 summary(fit)
 plot(fit)

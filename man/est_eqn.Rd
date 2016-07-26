@@ -4,8 +4,7 @@
 \alias{est_eqn}
 \title{Estimating Equations for \code{rpsftm()}}
 \usage{
-est_eqn(psi, data, formula, target = 0, test = "survdiff", recensor,
-  autoswitch, ...)
+est_eqn(psi, data, formula, target = 0, test = "survdiff", autoswitch, ...)
 }
 \arguments{
 \item{psi}{the parameter that measures how more rapidly the lifetime is expended under treatment}
@@ -19,12 +18,6 @@ Optionally a column named: treat_modifier}
 \item{target}{the value to subtract off from the z-statistic}
 
 \item{test}{the survival regression function to calculate the z-statistic: survdiff, coxph, survreg}
-
-\item{recensor}{a logical to use recensoring if set to TRUE. Default is TRUE. If FALSE then
-the status of censoring or event is unchanged, but the time and censor_time values are both transformed according
-to the proportion of time on treatment. If FALSE then recensoring is applied at the earliest of either 
-a transformed or untransformed censor_time. recensoring avoids the bias induced by 
-informative censoring on the transformed scale.}
 
 \item{autoswitch}{a logical to autodetect cases of no switching. Default is TRUE. If all observations in an arm
 have perfect compliance then recensoring is not applied in that arm. If FALSE the recensoring is applied

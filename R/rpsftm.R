@@ -8,6 +8,9 @@
 #'@param formula a formula with a minimal structure of \code{ReCen(time, censor_time)~rand(arm,rx)}.
 #'Further terms can be added to the right hand side to adjust for covariates and use strata or cluster arguments.
 #'@param data an optional data frame that contains variables
+#'@param censor_time the time at which censoring would, or has occurred. This is provided for all observations
+#' unlike standard Kaplan-Meier or Cox regression where it is only given for censored observations. 
+#'If no value is given then recensoring is not applied.
 #'@param subset expression indicating which subset of the rows of data should be used in the fit. 
 #'This can be a logical vector (which is replicated to have length equal to the number of observations)
 #', a numeric vector indicating which observation numbers are to be included (or excluded if negative), 
@@ -18,7 +21,7 @@
 #' @param hi_psi the upper limit of the range to search for the causal paramater
 #' @param alpha the significance level used to calculate confidence intervals
 #' @param treat_modifier an optional parameter that psi is multiplied by on an individual observation level to give
-#' differing impact to treatment. The values are transformed by \code{abs(.)/max(abs(.))} to ensure 1 is the largest weight.
+#' differing impact to treatment.
 #' @param n_eval_z: The number of points between hi_psi and low_psi at which to evaluate the Z-statistics
 #' in the estimating equation. Default  is 100.
 #' @return a rpsftm method object that is a list of the following:
@@ -35,14 +38,11 @@
 #' a sequence of values of psi. Used to plot and check if the range of values to search for solution
 #' and limits of confidence intervals need to be modified.
 #' }
-#' @details the formula object \code{ReCen(time, censor_time)~rand(arm,rx)}, identifies particular meaning to the four
-#' sets of arguments. \code{ReCen()} stands for recensoring. \code{rand()} stands for randomistion, both the randomly assigned and actual observed treatment. 
+#' @details the formula object \code{Surv(time, status)~rand(arm,rx)}. \code{rand()} stands 
+#' for randomistion, both the randomly assigned and actual observed treatment. 
 #' \itemize{
-#' \item time: the observed failure or censoring time
-#' \item censor_time: the time at which censoring would, or has occurred. This is provided for all observations
-#' unlike standard Kaplan-Meier or Cox regression where it is only given for censored observations
-#' \item arm: the randomised treatment arm. a factor with 2 levels, or numeric variable with values 0/1.
-#' \item rx: the proportion of time on active treatment (arm=1 or the non-reference level of the factor)
+#'   \item arm: the randomised treatment arm. a factor with 2 levels, or numeric variable with values 0/1.
+#'  \item rx: the proportion of time on active treatment (arm=1 or the non-reference level of the factor)
 #' }
 #' Further adjustment terms can be added on the right hand side of the formula if desired, included \code{strata()}
 #' or \code{cluster()} terms. 
@@ -50,48 +50,60 @@
 #' @examples 
 #' library(rpsftm)
 #' ?immdef
-#' fit <- rpsftm(ReCen(progyrs, censyrs)~rand(imm,1-xoyrs/progyrs),immdef)
+#' fit <- rpsftm(Surv(progyrs, status)~rand(imm,1-xoyrs/progyrs),immdef)
 #' print(fit)
 #' summary(fit)
 #' plot(fit)
 #' 
 #' @author Simon Bond
-#' @importFrom survival strata cluster
+#' @importFrom survival Surv strata cluster
 
 
-rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = -1, 
-                   hi_psi = 1, alpha = 0.05, treat_modifier = 1, recensor = TRUE, autoswitch = TRUE, 
+rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdiff, low_psi = -1, 
+                   hi_psi = 1, alpha = 0.05, treat_modifier = 1, autoswitch = TRUE, 
                    n_eval_z = 100, ...) {
   cl <- match.call()
   
   # create formula for fitting, and to feed into model.frame() from the
   # lm() function
   mf <- match.call(expand.dots = FALSE)
-  m <- match(c("formula", "data", "treat_modifier", "subset", "na.action"), 
+  m <- match(c("formula", "data", "censor_time", "treat_modifier", "subset", "na.action"), 
              names(mf), 0L)
   mf <- mf[c(1L, m)]
   mf$drop.unused.levels <- TRUE
   mf[[1L]] <- quote(stats::model.frame)
   # this ultimately returns a data frame with all the variables in and
   # renamed time, censor_time, rx, arm as appropriate
-  special <- c("ReCen", "rand")
+  special <- c("rand")
   mf$formula <- if (missing(data)) {
     terms(formula, special)
   } else {
     terms(formula, special, data = data)
   }
   formula_env <- new.env(parent = environment(mf$formula))
-  assign("ReCen", ReCen, envir = formula_env)
   assign("rand", rand, envir = formula_env)
   environment(mf$formula) <- formula_env
   df <- eval(mf, parent.frame())
   na.action <- attr(df, "na.action")
-  ReCen_index <- attr(mf$formula, "specials")$ReCen
-  ReCen_drops <- which(attr(mf$formula, "factors")[ReCen_index, ] > 0)
-  # if(length(ReCen_index)!=1){stop('Exactly one Recen() term needed')}
-  if (length(ReCen_drops) > 0) {
-    stop("Recen() term only on the LHS of the formula")
+ #adapted from coxph()   
+  Y <- model.extract(df, "response")
+  if (!inherits(Y, "Surv")) 
+    stop("Response must be a survival object")
+  type <- attr(Y, "type")
+  if (type != "right" ) 
+    stop(paste("rpsftm doesn't support \"", type, "\" survival data", 
+               sep = ""))
+  response_index <-  attr(mf$formula, "response")
+  
+  if(length(formula>2)){
+    ytemp <- terms.inner(formula[[2]])
+    xtemp <- terms.inner(formula[[3]])
+    if (any(!is.na(match(xtemp, ytemp)))) 
+      warning("a variable appears on both the left and right sides of the formula")
   }
+  
+  
+  
   rand_index <- attr(mf$formula, "specials")$rand
   rand_drops <- which(attr(mf$formula, "factors")[rand_index, ] > 0)
   if (length(rand_drops) != 1) {
@@ -103,8 +115,13 @@ rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = 
   }
   
   # remedies the df being a list of lists into just 1 list
-  df <- cbind(df[, ReCen_index], df[, rand_index], df[, -c(rand_index, 
-                                                            ReCen_index), drop = FALSE])
+  df <- cbind(time=df[,response_index][,"time"], status=df[,response_index][,"status"], 
+              df[, rand_index], df[, -c(response_index, rand_index), drop = FALSE])
+  #force the default value to be included in df if needed.
+  if( !( "(censor_time)" %in% names(df))){
+    df <- cbind(df, "(censor_time)" = Inf)
+  }
+ 
   fit_formula <- terms(update(mf$formula, . ~ arm + .))
   fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)
   
@@ -132,7 +149,7 @@ rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = 
   
   fn_eval_z <- function(psi){
     answer <- try( est_eqn(psi,data = df, formula = fit_formula, target = 0, 
-                           test = test, recensor = recensor, 
+                           test = test, 
                            autoswitch = autoswitch, ... = ... ),
                    silent = TRUE
                    )
@@ -148,9 +165,9 @@ rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = 
   # Preliminary check of low_psi and hi_psi with a meaningful warning
   
   est_eqn_low <- est_eqn(low_psi, data = df, formula = fit_formula, target = 0, 
-                         test = test, recensor = recensor, autoswitch = autoswitch, ... = ...)
+                         test = test,  autoswitch = autoswitch, ... = ...)
   est_eqn_hi <- est_eqn(hi_psi, data = df, formula = fit_formula, target = 0, 
-                        test = test, recensor = recensor, autoswitch = autoswitch, ... = ...)
+                        test = test, autoswitch = autoswitch, ... = ...)
   if (est_eqn_low * est_eqn_hi > 0) {
     message <- paste("\nThe starting interval (", low_psi, ", ", hi_psi, 
                      ") to search for a solution for psi\ngives values of the same sign (", 
@@ -164,7 +181,7 @@ rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = 
   
   root <- function(target) {
     uniroot(est_eqn, c(low_psi, hi_psi), data = df, formula = fit_formula, 
-            target = target, test = test, recensor = recensor, autoswitch = autoswitch, 
+            target = target, test = test, autoswitch = autoswitch, 
             ... = ...)
   }
   ans <- try(root(0), silent = TRUE)
@@ -212,17 +229,12 @@ rpsftm <- function(formula, data, subset, na.action, test = survdiff, low_psi = 
   if (!is.na(ans$root)) {
     psiHat <- ans$root
     if ("(treat_modifier)" %in% names(df)) {
-      treat_modifier <- df[, "(treat_modifier)"]
-      # rescale to make sure that all weights are 1 or less for
-      # interpretability
-      treat_modifier <- abs(treat_modifier)/max(abs(treat_modifier), 
-                                                na.rm = TRUE)
-      psiHat <- psiHat * treat_modifier
+      psiHat <- psiHat * df[, "(treat_modifier)"]
     }
     
     
-    Sstar <- untreated(psiHat, df[, "time"], df[, "censor_time"], df[, 
-                                                                     "rx"], df[, "arm"], recensor, autoswitch)
+    Sstar <- untreated(psiHat, df[, "time"], df[, "status"], 
+                       df[,"(censor_time)"],df[, "rx"], df[, "arm"], autoswitch)
     # Ignores any covariates, strata or adjustors. On Purpose as this is
     # too general to deal with
     fit <- survival::survfit(Sstar ~ arm, data = df)

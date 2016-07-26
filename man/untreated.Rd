@@ -4,24 +4,20 @@
 \alias{untreated}
 \title{Untreated Event Time}
 \usage{
-untreated(psi, time, censor_time, rx, arm, recensor, autoswitch)
+untreated(psi, time, delta, censor_time, rx, arm, autoswitch)
 }
 \arguments{
 \item{psi}{the parameter that measures how more rapidly the lifetime is expended under treatment}
 
 \item{time}{the observed failure or censoring time.}
 
-\item{censor_time}{the theoretical censoring time, either observed or set after time.}
+\item{delta}{the status of the time: 1 = observed, 0 = censored.}
+
+\item{censor_time}{the theoretical censoring time, either observed or set after time. Set to Inf to ignore recensoring.}
 
 \item{rx}{the proportion of time spent on treatment}
 
 \item{arm}{the randomised arm. Either a numerical indicator, with 0 as the placebo, or a factor with the lowest level as placebo.}
-
-\item{recensor}{a logical to use recensoring if set to TRUE. Default is TRUE. If FALSE then
-the status of censoring or event is unchanged, but the time and censor_time values are both transformed according
-to the proportion of time on treatment. If FALSE then recensoring is applied at the earliest of either 
-a transformed or untransformed censor_time. recensoring avoids the bias induced by 
-informative censoring on the transformed scale.}
 
 \item{autoswitch}{a logical to autodetect cases of no switching. Default is TRUE. If all observations in an arm
 have perfect compliance then recensoring is not applied in that arm. If FALSE the recensoring is applied

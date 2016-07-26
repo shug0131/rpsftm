@@ -131,7 +131,7 @@ rx <- with(immdef,
 
 The main function used in model fitting is `rpsftm` which takes the arguments:
 
-* __formula__ a formula with a minimal structure of `ReCen(time, censor_time)~rand(arm, rx)` where 
+* __formula__ a formula with a minimal structure of `Surv(time, censor_time)~rand(arm, rx)` where 
     * `time` is the observed event time, 
     * `censor_time` is the real or theoretical censoring time, 
     * `arm` is the randomised treatment arm, and 
@@ -152,8 +152,8 @@ The main function used in model fitting is `rpsftm` which takes the arguments:
 
 The `rpsftm` function first evaluates $Z(\psi)$ at $\psi$ = `low_psi` and `hi_psi`. If they have the same sign,  the following warning message is produced
 ```{r, error=TRUE, purl = FALSE, echo=FALSE}
-rpsftm(formula=ReCen(progyrs, censyrs) ~ rand(imm, rx), 
-       data=immdef,
+rpsftm(formula=Surv(progyrs, prog) ~ rand(imm, rx), 
+       data=immdef, censor_time = censyrs,
        low_psi=1, 
        hi_psi=2)
 ```
@@ -162,8 +162,8 @@ rpsftm(formula=ReCen(progyrs, censyrs) ~ rand(imm, rx),
 This suggests widening the search interval via trial and error until the values of $Z(\psi)$ at `lowpsi` and `hipsi` are of opposite sign. Otherwise, `rpsftm` next uses `uniroot` to search the interval for $\hat{\psi}$ and the $100(1-\alpha)\%$ confidence interval by using the target values 0, $z_{1-\alpha/2}$ and $z_{\alpha/2}$. If the function fails to find $\hat{\psi}$ or either limit of the confidence interval, it will set the value to NA and produce a warning message, for example,
 
 ```{r, echo=FALSE}
-rpsftm_fit <- rpsftm(formula=ReCen(progyrs, censyrs) ~ rand(imm, rx),
-                     data=immdef,
+rpsftm_fit <- rpsftm(formula=Surv(progyrs, prog) ~ rand(imm, rx),
+                     data=immdef, censor_time = censyrs,
                      low_psi=-1, 
                      hi_psi=0)
 ```
@@ -209,8 +209,8 @@ rx <- with(immdef,
 This sets __rx__ to 1 in the immediate treatment arm (since no patients could switch to the deferred arm), 0 in the deferred arm patients that did not receive treatment and __(progyrs - xoyrs)/progyrs__ in the deferred arm patients that did receive treatment. Using the default options, the fitted model is
 
 ```{r}
-rpsftm_fit_lr <- rpsftm(formula=ReCen(progyrs, censyrs) ~ rand(imm, rx), 
-                        data=immdef)
+rpsftm_fit_lr <- rpsftm(formula=Surv(progyrs, prog) ~ rand(imm, rx), 
+                        data=immdef, censor_time = censyrs)
 ```
 
 The above formula fits a RPSFTM where `progyrs` is the observed event time, `censyrs` is the real or theoretical censoring time, `imm` is the randomised group indicator and `rx` is the proportion of time spent on treatment. The log rank test is used in finding the point estimate of $\psi$. The point estimate and 95% confidence interval can be returned using `rpsftm_fit_lr$psi` and `rpsftm_fit_lr$CI` which gives $\hat{\psi} = `r signif(rpsftm_fit_lr$psi, 3)`$ (`r signif(rpsftm_fit_lr$CI, 3)`). The function `plot()` produces Kaplan-Meier curves of the counter-factual event times in each group and can be used to check that the distributions are indeed the same at $\hat{\psi}$.
@@ -223,8 +223,8 @@ plot(rpsftm_fit_lr)
 To use the Wald test from a Cox regression model in place of the log rank test, we specify `test=coxph` in the function parameters. Covariates can also be included in the estimation procedure by adding them to the right hand side of the formula. For example, baseline covariates that are included in the intention-to-treat analysis may also be incorporated into the estimation procedure of the RPSFTM. In the following example we add entry time as a covariate and use `summary()` to find the value of $\hat{\psi}$ and its 95% confidence interval:
 
 ```{r}
-rpsftm_fit_cph <- rpsftm(formula=ReCen(progyrs, censyrs) ~ rand(imm, rx) + entry, 
-                         data=immdef,
+rpsftm_fit_cph <- rpsftm(formula=Surv(progyrs, prog) ~ rand(imm, rx) + entry, 
+                         data=immdef, censor_time = censyrs,
                          test=coxph)
 summary(rpsftm_fit_cph)
 ```
@@ -239,8 +239,8 @@ plot(rpsftm_fit_cph)
 Similary, for the Weibull model we have:
 
 ```{r}
-rpsftm_fit_wb <- rpsftm(formula=ReCen(progyrs, censyrs) ~ rand(imm, rx) + entry, 
-                        data=immdef,
+rpsftm_fit_wb <- rpsftm(formula=Surv(progyrs, prog) ~ rand(imm, rx) + entry, 
+                        data=immdef, censor_time = censyrs,
                         test=survreg)
 summary(rpsftm_fit_wb)
 ```

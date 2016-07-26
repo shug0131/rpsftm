@@ -17,19 +17,14 @@
 
 
 est_eqn <- function(psi, data, formula, target = 0, test = "survdiff", 
-                    recensor, autoswitch, ...) {
+                   autoswitch, ...) {
   
   if ("(treat_modifier)" %in% names(data)) {
-    treat_modifier <- data[, "(treat_modifier)"]
-    # rescale to make sure that all weights are 1 or less for
-    # interpretability
-    treat_modifier <- abs(treat_modifier)/max(abs(treat_modifier), 
-                                              na.rm = TRUE)
-    psi <- psi * treat_modifier
+      psi <- psi * data[, "(treat_modifier)"]
   }
   
-  Sstar <- untreated(psi, data[, "time"], data[, "censor_time"], 
-                     data[,"rx"], data[, "arm"], recensor, autoswitch)
+  Sstar <- untreated(psi, data[, "time"], data[, "status"], data[,"(censor_time)"],
+                     data[,"rx"], data[, "arm"],  autoswitch)
   data <- cbind(Sstar, data)
   # build a formula object,
   fit_formula <- update(formula, Sstar ~ .)
