@@ -69,12 +69,14 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   mf <- match.call(expand.dots = FALSE)
   m <- match(c("formula", "data", "censor_time", "treat_modifier", "subset", "na.action"), 
              names(mf), 0L)
+ 
   mf <- mf[c(1L, m)]
+ 
   mf$drop.unused.levels <- TRUE
-  mf[[1L]] <- as.name("model.frame")
-  # this ultimately returns a data frame with all the variables in and
-  # renamed time, censor_time, rx, arm as appropriate
-  special <- c("rand")
+  
+  # this ultimately returns a data frame, df, with all the variables in and
+  # renamed time, status, censor_time, rx, arm as appropriate
+  special <- c("rand","strata","cluster")
   mf$formula <- if (missing(data)) {
     terms(formula, special)
   } else {
@@ -83,8 +85,17 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   formula_env <- new.env(parent = environment(mf$formula))
   assign("rand", rand, envir = formula_env)
   assign("Surv", Surv, envir = formula_env)
+  assign("cluster", cluster, envir = formula_env)
+  assign("strata", strata, envir = formula_env)
+  
+  
   environment(mf$formula) <- formula_env
+  
+  
+  mf[[1L]] <- as.name("model.frame")
   df <- eval(mf, parent.frame())
+  print(head(df))
+  
   na.action <- attr(df, "na.action")
  #adapted from coxph()   
   Y <- model.extract(df, "response")
@@ -116,15 +127,31 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   }
   
   # remedies the df being a list of lists into just 1 list
+  fit_formula <- terms(update(mf$formula, . ~ arm + .))
+  fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)
+  clean_formula <- drop.terms(fit_formula, dropx = 1 , keep.response = FALSE)
+  
+  
+  #this pulls out the core variables, rather than strata(var), say
+  print(terms(clean_formula))
+  print(lapply( attr(terms(clean_formula),"variables"), terms.inner))
+  
+  new_names <- unlist(lapply( attr(terms(clean_formula),"variables"), terms.inner)[-1])
+ print(names(df)[-c(response_index,rand_index)][1:length(new_names)] )
+  names(df)[-c(response_index,rand_index)][1:length(new_names)] <- new_names
+  print(names(df))
   df <- cbind(time=df[,response_index][,"time"], status=df[,response_index][,"status"], 
-              df[, rand_index], df[, -c(response_index, rand_index), drop = FALSE])
+              arm=df[, rand_index][,"arm"], rx=df[,rand_index][,"rx"],
+              df[,-c(response_index,rand_index)])
   #force the default value to be included in df if needed.
   if( !( "(censor_time)" %in% names(df))){
     df <- cbind(df, "(censor_time)" = Inf)
   }
  
-  fit_formula <- terms(update(mf$formula, . ~ arm + .))
-  fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)
+
+  
+  #fit_formula <- terms(update(mf$formula, . ~ arm + .))
+  #fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)
   
   
   # Check that the number of arms is 2.

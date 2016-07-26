@@ -57,13 +57,7 @@ test_that("Variables on left and right terms",
      }
 )
 
-test_that("Too Many Surv() terms",
-          {
-            expect_error( rpsftm(Surv(progyrs, prog)~rand(imm, 1-xoyrs/progyrs)+Surv(progyrs,prog),immdef, censor_time = censyrs, 
-                                   low_psi=-1, hi_psi=1, test=coxph))
-            
-          }
-)
+
 
 
 test_that("No rand() terms",
