@@ -6,10 +6,10 @@ As an example:
 ``` r
 library(rpsftm)
 ?immdef
-fit <- rpsftm(ReCen(progyrs, censyrs)~Instr(imm,1-xoyrs/progyrs),immdef)
+fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs), data = immdef, censor_time = censyrs)
 summary(fit)
-#> rpsftm(formula = ReCen(progyrs, censyrs) ~ Instr(imm, 1 - xoyrs/progyrs), 
-#>     data = immdef)
+#> rpsftm(formula = Surv(progyrs, prog) ~ rand(imm, 1 - xoyrs/progyrs), 
+#>     data = immdef, censor_time = censyrs)
 #>       Length Class  Mode   
 #> n     2      table  numeric
 #> obs   2      -none- numeric
