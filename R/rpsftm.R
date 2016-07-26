@@ -22,7 +22,7 @@
 #' @param alpha the significance level used to calculate confidence intervals
 #' @param treat_modifier an optional parameter that psi is multiplied by on an individual observation level to give
 #' differing impact to treatment.
-#' @param n_eval_z: The number of points between hi_psi and low_psi at which to evaluate the Z-statistics
+#' @param n_eval_z The number of points between hi_psi and low_psi at which to evaluate the Z-statistics
 #' in the estimating equation. Default  is 100.
 #' @return a rpsftm method object that is a list of the following:
 #' \itemize{
@@ -94,8 +94,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   
   mf[[1L]] <- as.name("model.frame")
   df <- eval(mf, parent.frame())
-  print(head(df))
-  
+
   na.action <- attr(df, "na.action")
  #adapted from coxph()   
   Y <- model.extract(df, "response")
@@ -129,26 +128,25 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   # remedies the df being a list of lists into just 1 list
   fit_formula <- terms(update(mf$formula, . ~ arm + .))
   fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)
-  clean_formula <- drop.terms(fit_formula, dropx = 1 , keep.response = FALSE)
   
   
-  #this pulls out the core variables, rather than strata(var), say
-  print(terms(clean_formula))
-  print(lapply( attr(terms(clean_formula),"variables"), terms.inner))
+  df_basic <- data.frame(time=df[,response_index][,"time"], status=df[,response_index][,"status"], 
+              arm=df[, rand_index][,"arm"], rx=df[,rand_index][,"rx"])
+  df_clean <- df[,-c(response_index,rand_index), drop = FALSE]
+  if( length( attr(fit_formula,"variables"))>2){
+    #this pulls out the core variables, rather than strata(var), say
+    clean_formula <- drop.terms(mf$formula, dropx =rand_drops , keep.response = FALSE)
+    new_names <- unlist(lapply( attr(terms(clean_formula),"variables"), terms.inner)[-1])
+    names(df_clean)[1:(length(new_names))] <- new_names
+  }
+  df <- cbind(df_basic,  df_clean)
   
-  new_names <- unlist(lapply( attr(terms(clean_formula),"variables"), terms.inner)[-1])
- print(names(df)[-c(response_index,rand_index)][1:length(new_names)] )
-  names(df)[-c(response_index,rand_index)][1:length(new_names)] <- new_names
-  print(names(df))
-  df <- cbind(time=df[,response_index][,"time"], status=df[,response_index][,"status"], 
-              arm=df[, rand_index][,"arm"], rx=df[,rand_index][,"rx"],
-              df[,-c(response_index,rand_index)])
+
   #force the default value to be included in df if needed.
   if( !( "(censor_time)" %in% names(df))){
     df <- cbind(df, "(censor_time)" = Inf)
   }
  
-
   
   #fit_formula <- terms(update(mf$formula, . ~ arm + .))
   #fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)

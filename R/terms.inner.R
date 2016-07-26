@@ -25,19 +25,3 @@ terms.inner <- function (x)
   else (deparse(x))
 }
 
-
-terms.inner.firstArg <- function (x) 
-{
-  if (class(x) == "formula") 
-    c(terms.inner(x[[2]]), terms.inner(x[[3]]))
-  else if (class(x) == "call" && (x[[1]] != as.name("$") && 
-                                  x[[1]] != as.name("["))) {
-    if (x[[1]] == "+" || x[[1]] == "*" || x[[1]] == "-") {
-      c(terms.inner(x[[2]]), terms.inner(x[[3]]))
-    }
-    else if (x[[1]] == as.name("Surv") ) 
-      unlist(lapply(x[-1], terms.inner))
-    else terms.inner(x[[2]])
-  }
-  else (deparse(x))
-}
