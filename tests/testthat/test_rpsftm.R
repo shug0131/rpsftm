@@ -242,7 +242,7 @@ test_that("check it works when arm=rx",
 
 #CHECK that each line of code has been called somehow in this testing process??
 #DONE:
-#> install.packages("covr")
+#> #install.packages("covr")
 #> library(covr)
 #> cov <- package_coverage()
 #> cov

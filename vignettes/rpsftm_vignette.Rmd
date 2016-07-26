@@ -131,14 +131,14 @@ rx <- with(immdef,
 
 The main function used in model fitting is `rpsftm` which takes the arguments:
 
-* __formula__ a formula with a minimal structure of `Surv(time, censor_time)~rand(arm, rx)` where 
-    * `time` is the observed event time, 
-    * `censor_time` is the real or theoretical censoring time, 
+* __formula__ a formula with a minimal structure of `Surv(time, status)~rand(arm, rx)` where 
+ 
     * `arm` is the randomised treatment arm, and 
     * `rx` is the proportion of time spent on treatment, taking values in [0, 1].
 
     Further terms can be added to the right hand side to adjust for covariates. 
 * __data__ an optional data frame containing the variables.
+* __censor_time__ the time at which censoring would, or has occurred. This is provided for all observations unlike standard Kaplan-Meier or Cox regression where it is only given for censored observations. If no value is given then recensoring is not applied.
 * __subset__ an expression indicating which subset of the rows of data should be used in the fit. This can be a logical vector, a numeric vector indicating which observation numbers are to be included, or a character vector of row names to be included. All observations are included by default.
 * __na.action__ a missing-data filter function. This is applied to the `model.frame` after any subset argument has been used. Default is `options()$na.action`.
 * __test__ one of `survdiff`, `coxph` or `survreg`. Describes the test to be used in the estimating equation. Default is `survdiff`.
@@ -146,7 +146,6 @@ The main function used in model fitting is `rpsftm` which takes the arguments:
 * __hi_psi__ the upper limit of the range to search for the causal parameter. Default is 1. 
 * __alpha__ the significance level used to calculate the confidence intervals. Default is 0.05. 
 * __treat_modifier__ an optional parameter that $\psi$ is multiplied by on an individual observation level to give differing impact to treatment. The values are transformed by `abs(.)/max(abs(.))` to ensure 1 is the largest weight. Default is 1.
-* __recensor__ a logical to use recensoring if set to TRUE. Default is TRUE. If FALSE then the status of censoring or event is unchanged, but the time and censor_time values are both transformed according to the proportion of time on treatment. If FALSE then recensoring is applied at the earliest of either a transformed or untransformed censor_time. Recensoring avoids the bias induced by informative censoring on the transformed scale.
 * __autoswitch__ a logical to autodetect cases of no switching. Default is TRUE. If all observations in an arm have perfect compliance then recensoring is not applied in that arm. If FALSE the recensoring is applied regardless of perfect compliance.
 * __n_eval_z__ The number of points between hi_psi and low_psi at which to evaluate the Z-statistics in the estimating equation. Default is 100.
 
@@ -162,23 +161,24 @@ rpsftm(formula=Surv(progyrs, prog) ~ rand(imm, rx),
 This suggests widening the search interval via trial and error until the values of $Z(\psi)$ at `lowpsi` and `hipsi` are of opposite sign. Otherwise, `rpsftm` next uses `uniroot` to search the interval for $\hat{\psi}$ and the $100(1-\alpha)\%$ confidence interval by using the target values 0, $z_{1-\alpha/2}$ and $z_{\alpha/2}$. If the function fails to find $\hat{\psi}$ or either limit of the confidence interval, it will set the value to NA and produce a warning message, for example,
 
 ```{r, echo=FALSE}
+#library(rpsftm)
 rpsftm_fit <- rpsftm(formula=Surv(progyrs, prog) ~ rand(imm, rx),
                      data=immdef, censor_time = censyrs,
                      low_psi=-1, 
-                     hi_psi=0)
+                     hi_psi=-0.1)
 ```
 
 Investigation of a plot of $Z(\psi)$ against $\psi$ (example shown below) for a range of values of $\psi$ could show why the functions fails to find a root. In this case, the search interval used in `rpsftm` was not be wide enough to find the upper confidence limit. The fitted object returns a data frame with values of the Z-statistic evaluated at 100 points between the limits of the search interval. It is straightforward to plot this
 
 ```{r}
-plot(rpsftm_fit$eval_z, type="s")
+plot(rpsftm_fit$eval_z, type="s", ylim=c(-2,6))
 abline(h=qnorm(c(0.025,0.5,0.975)))
 abline(v=rpsftm_fit$psi)
 abline(v=rpsftm_fit$CI)
 ```
 
 
-Recensoring is performed by default unless `recensor=FALSE` is specified in the function parameters. After finding $\hat{\psi}$, `rpsftm` refits the model at $\hat{\psi}$ and produces a `survdiff` object of the counter-factual event times to be used in plotting Kaplan-Meier curves. The function returns 
+Recensoring is performed if `censor_time` is specified in the function parameters; otherwise recensoring is ignored. After finding $\hat{\psi}$, `rpsftm` refits the model at $\hat{\psi}$ and produces a `survdiff` object of the counter-factual event times to be used in plotting Kaplan-Meier curves. The function returns 
 
 * __psi__ the estimated parameter
 * __fit__ a `survdiff` object to produce Kaplan-Meier curves of the estimated        counter-factual event times in each treatment arm using `plot()`
@@ -255,9 +255,9 @@ The output shows that $\hat{\psi} = `r signif(rpsftm_fit_wb$psi, 3)`$ (`r signif
 
 There are a few cases where we may encounter problems with root finding:
 
-1. The interval (`lowpsi`, `hipsi`) may not be wide enough to find one or both of the confidence limits. This can be easily be rectified by extending the range. 
+1. The interval (`low_psi`, `hi_psi`) may not be wide enough to find one or both of the confidence limits. This can be easily be rectified by extending the range. 
 2. No confidence limits may exist (i.e. they tail off to $\pm \infty$). In this case they should be reported as $\pm \infty$. 
-3. There may be multiple solutions to $Z(\psi)=0$ within the interval (`lowpsi`, `hipsi`). `uniroot` will return one value even if this is the case. 
+3. There may be multiple solutions to $Z(\psi)=0$ within the interval (`low_psi`, `hi_psi`). `uniroot` will return one value even if this is the case. 
 
 For all of the above a graph of $Z(\psi)$ against $\psi$ would highlight the issue. Another possibility is for the `coxph` function to fail to converge. This occurs when the maximum likelihood estimate of a coefficient is infinity, e.g. if one of the treatment groups has no events. The `coxph` documentation states that the Wald statistic should be ignored in this case and therefore the `rpsftm` output should be taken with caution. 
 

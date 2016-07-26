@@ -71,7 +71,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
              names(mf), 0L)
   mf <- mf[c(1L, m)]
   mf$drop.unused.levels <- TRUE
-  mf[[1L]] <- quote(stats::model.frame)
+  mf[[1L]] <- as.name("model.frame")
   # this ultimately returns a data frame with all the variables in and
   # renamed time, censor_time, rx, arm as appropriate
   special <- c("rand")

@@ -8,6 +8,21 @@ expect_error( rpsftm(Surv(progyrs, prog)~rand(imm, propX),test=mantelhaen.test,i
               low_psi=-1, hi_psi=1), "Test must be one of: survdiff, coxph, survreg")
 })
 
+test_that("No Surv object as a response",
+          {
+            expect_error( 
+              rpsftm(progyrs~rand(imm, propX),immdef, censor_time = censyrs),
+              "Response must be a survival object")
+            
+          })
+
+test_that("Wrong type of Survival object",
+          {
+            expect_error( 
+              rpsftm(Surv(progyrs, prog, type="left")~rand(imm, propX),immdef, censor_time = censyrs),
+              "rpsftm doesn't support \"left\" survival data")
+            
+          })
 
 
 
