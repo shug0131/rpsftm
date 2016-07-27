@@ -82,13 +82,13 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   } else {
     terms(formula, special, data = data)
   }
+  
+  
   formula_env <- new.env(parent = environment(mf$formula))
   assign("rand", rand, envir = formula_env)
   assign("Surv", Surv, envir = formula_env)
   assign("cluster", cluster, envir = formula_env)
   assign("strata", strata, envir = formula_env)
-  
-  
   environment(mf$formula) <- formula_env
   
   
@@ -125,21 +125,23 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     stop("rand() term must not be in any interactions")
   }
   
-  # remedies the df being a list of lists into just 1 list
+  
   fit_formula <- terms(update(mf$formula, . ~ arm + .))
   fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)
   
   
-  df_basic <- data.frame(time=df[,response_index][,"time"], status=df[,response_index][,"status"], 
-              arm=df[, rand_index][,"arm"], rx=df[,rand_index][,"rx"])
-  df_clean <- df[,-c(response_index,rand_index), drop = FALSE]
-  if( length( attr(fit_formula,"variables"))>2){
+  df_basic <- data.frame( time=df[,response_index][,"time"], 
+                          status=df[,response_index][,"status"], 
+                          arm=df[, rand_index][,"arm"], 
+                          rx=df[,rand_index][,"rx"])
+  df_adjustor <- df[,-c( response_index, rand_index), drop = FALSE]
+  if( length( attr( fit_formula, "variables")) > 2){
     #this pulls out the core variables, rather than strata(var), say
-    clean_formula <- drop.terms(mf$formula, dropx =rand_drops , keep.response = FALSE)
-    new_names <- unlist(lapply( attr(terms(clean_formula),"variables"), terms.inner)[-1])
-    names(df_clean)[1:(length(new_names))] <- new_names
+    adjustor_formula <- drop.terms( mf$formula, dropx = rand_drops , keep.response = FALSE)
+    adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), terms.inner)[-1])
+    names( df_adjustor)[ 1:( length( adjustor_names))] <- adjustor_names
   }
-  df <- cbind(df_basic,  df_clean)
+  df <- cbind( df_basic,  df_adjustor)
   
 
   #force the default value to be included in df if needed.
@@ -147,9 +149,6 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     df <- cbind(df, "(censor_time)" = Inf)
   }
  
-  
-  #fit_formula <- terms(update(mf$formula, . ~ arm + .))
-  #fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)
   
   
   # Check that the number of arms is 2.

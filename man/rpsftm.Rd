@@ -41,10 +41,10 @@ differing impact to treatment.}
 have perfect compliance then recensoring is not applied in that arm. If FALSE the recensoring is applied
 regardless of perfect compliance.}
 
-\item{...}{arguments to supply to the test function.}
-
-\item{n_eval_z:}{The number of points between hi_psi and low_psi at which to evaluate the Z-statistics
+\item{n_eval_z}{The number of points between hi_psi and low_psi at which to evaluate the Z-statistics
 in the estimating equation. Default  is 100.}
+
+\item{...}{arguments to supply to the test function.}
 }
 \value{
 a rpsftm method object that is a list of the following:
