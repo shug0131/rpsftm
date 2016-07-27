@@ -91,6 +91,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   assign("strata", strata, envir = formula_env)
   environment(mf$formula) <- formula_env
   
+  return_formula <- mf$formula
   
   mf[[1L]] <- as.name("model.frame")
   df <- eval(mf, parent.frame())
@@ -142,11 +143,14 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     adjustor_formula <- drop.terms( mf$formula, dropx = rand_drops , keep.response = FALSE)
     adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), terms.inner)[-1])
     mf$formula <- reformulate(adjustor_names)
+    
     mf$formula <- if (missing(data)) {
       terms(mf$formula)
     } else {
       terms(mf$formula, data = data)
     }
+    #to evaluate out of this internal loop
+    environment(mf$formula) <- formula_env
     df_adjustor <- eval(mf,parent.frame())
   }
   df <- cbind( df_basic,  df_adjustor)
@@ -279,7 +283,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
         #for the plot function
         fit=fit, 
         #for using the update() function
-        formula=mf$formula,
+        formula=return_formula,
         #for the print and summary methods
        regression=attr(ans$f.root, "fit"),
        #Not strictly needed but why not include it.

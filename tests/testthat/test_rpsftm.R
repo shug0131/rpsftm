@@ -54,7 +54,7 @@ test_that("first basic fit with the arm as a factor",{
 
 test_that("with no data argument at all",{
   propX <- with(immdef, 1-xoyrs/progyrs)
-  fit <- rpsftm(Surv(immdef$progyrs, immdef$prog)~rand(immdef$imm, propX),censor_time = immdef$censyrs,
+  fit <- rpsftm(Surv(immdef$progyrs, immdef$prog)~rand(immdef$imm, propX)+immdef$entry,censor_time = immdef$censyrs,
               low_psi=-1, hi_psi=1
               )
   expect_is(fit$psi, class="numeric")
@@ -236,9 +236,25 @@ test_that("check it works when arm=rx",
             }
           )
 
+test_that("symbolic covariates",
+{immdef$sqrent <-  with(immdef, sqrt(entry))
+ fit1 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+sqrent, 
+       data=immdef, censor_time=censyrs, test=coxph)
+ fit2 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+sqrt(entry), 
+              data=immdef, censor_time=censyrs, test=coxph)
+ expect_equal(fit1$psi,fit2$psi)
+}
+)
 
-
-
+test_that("symbolic covariates log transform",
+{immdef$logentr <- with(immdef, log(entry+1))
+fit1 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+logentr, 
+       data=immdef, censor_time=censyrs, test=coxph)
+fit2 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+log(entry+1), 
+            data=immdef,censyrs, test=coxph)
+expect_equal(fit1$psi, fit2$psi)
+}
+)
 #CHECK that each line of code has been called somehow in this testing process??
 #DONE:
 #> #install.packages("covr")
