@@ -134,12 +134,20 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
                           status=df[,response_index][,"status"], 
                           arm=df[, rand_index][,"arm"], 
                           rx=df[,rand_index][,"rx"])
+  
+  
   df_adjustor <- df[,-c( response_index, rand_index), drop = FALSE]
   if( length( attr( fit_formula, "variables")) > 2){
     #this pulls out the core variables, rather than strata(var), say
     adjustor_formula <- drop.terms( mf$formula, dropx = rand_drops , keep.response = FALSE)
     adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), terms.inner)[-1])
-    names( df_adjustor)[ 1:( length( adjustor_names))] <- adjustor_names
+    mf$formula <- reformulate(adjustor_names)
+    mf$formula <- if (missing(data)) {
+      terms(mf$formula)
+    } else {
+      terms(mf$formula, data = data)
+    }
+    df_adjustor <- eval(mf,parent.frame())
   }
   df <- cbind( df_basic,  df_adjustor)
   
