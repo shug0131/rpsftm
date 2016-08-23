@@ -9,7 +9,7 @@ rpsftm(formula, data, censor_time, subset, na.action, test = survdiff,
   autoswitch = TRUE, n_eval_z = 100, ...)
 }
 \arguments{
-\item{formula}{a formula with a minimal structure of \code{ReCen(time, censor_time)~rand(arm,rx)}.
+\item{formula}{a formula with a minimal structure of \code{Surv(time, status)~rand(arm,rx)}.
 Further terms can be added to the right hand side to adjust for covariates and use strata or cluster arguments.}
 
 \item{data}{an optional data frame that contains variables}
@@ -19,8 +19,8 @@ unlike standard Kaplan-Meier or Cox regression where it is only given for censor
 If no value is given then recensoring is not applied.}
 
 \item{subset}{expression indicating which subset of the rows of data should be used in the fit. 
-This can be a logical vector (which is replicated to have length equal to the number of observations)
-, a numeric vector indicating which observation numbers are to be included (or excluded if negative), 
+This can be a logical vector (which is replicated to have length equal to the number of observations),
+a numeric vector indicating which observation numbers are to be included (or excluded if negative), 
 or a character vector of row names to be included. All observations are included by default.}
 
 \item{na.action}{a missing-data filter function. This is applied to the model.frame after any subset 

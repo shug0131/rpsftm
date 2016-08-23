@@ -5,15 +5,15 @@
 #'@name rpsftm
 #'@inheritParams untreated
 #'@inheritParams est_eqn
-#'@param formula a formula with a minimal structure of \code{ReCen(time, censor_time)~rand(arm,rx)}.
+#'@param formula a formula with a minimal structure of \code{Surv(time, status)~rand(arm,rx)}.
 #'Further terms can be added to the right hand side to adjust for covariates and use strata or cluster arguments.
 #'@param data an optional data frame that contains variables
 #'@param censor_time the time at which censoring would, or has occurred. This is provided for all observations
 #' unlike standard Kaplan-Meier or Cox regression where it is only given for censored observations. 
 #'If no value is given then recensoring is not applied.
 #'@param subset expression indicating which subset of the rows of data should be used in the fit. 
-#'This can be a logical vector (which is replicated to have length equal to the number of observations)
-#', a numeric vector indicating which observation numbers are to be included (or excluded if negative), 
+#'This can be a logical vector (which is replicated to have length equal to the number of observations),
+#' a numeric vector indicating which observation numbers are to be included (or excluded if negative), 
 #'or a character vector of row names to be included. All observations are included by default.
 #'@param na.action a missing-data filter function. This is applied to the model.frame after any subset 
 #'argument has been used. Default is options()$na.action.
