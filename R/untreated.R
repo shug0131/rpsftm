@@ -1,6 +1,5 @@
 #' Calculates the counterfactual untreated event time, possibly using the recensoring method, assuming a given parameter value and returns a Surv() object
 #' 
-#' @export
 #' @title Untreated Event Time
 #' @name untreated
 #' @param psi the parameter that measures how more rapidly the lifetime is expended under treatment

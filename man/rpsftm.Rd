@@ -76,7 +76,6 @@ Further adjustment terms can be added on the right hand side of the formula if d
 or \code{cluster()} terms.
 }
 \examples{
-library(rpsftm)
 ?immdef
 fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censyrs)
 print(fit)

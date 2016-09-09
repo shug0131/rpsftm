@@ -1,0 +1,108 @@
+---
+title: "Adjusted Hazard Ratio"
+output:   
+  rmarkdown::html_vignette:
+    fig_width: 6
+    fig_height: 4
+    keep_md: TRUE
+  pdf_document: 
+    toc: FALSE
+author: "Simon Bond, Annabel Allison"
+date: "`r Sys.Date()`"
+vignette: >
+  %\VignetteIndexEntry{rpsftm: rank-preserving structural failure time models for survival data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 75)
+```
+
+The estimate of $\psi$ can be used to calculate an adjusted hazard ratio. For example, comparing the observed event times in the immediate arm to the counter-factual event times at $\hat{\psi}$ in the deferred arm using a Cox model will give an estimate of the hazard ratio that would have been observed if the deferred arm had never received treatment. 
+
+To achieve this, the `immdef` data is first combined with the counter-factual progression times/indicators from the `rpsftm` output, given by `rpsftm_fit_lr$Sstar`. A new Surv() object is then created which take the observed progression time/indicator if a patient was in the immediate group and the counter-factual progression time/indicator otherwise. 
+
+```{r}
+library(survival)
+S_psi <- rpsftm_fit_lr$Sstar
+S_psi_hat <- with(immdef, untreated( rpsftm_fit_lr$psi, progyrs, prog, censyrs, rx, imm, autoswitch = TRUE))
+Stest <- immdef$imm==1
+S_psi[test,] <- with(immdef,Surv(progyrs,prog))[test]
+```
+
+The Cox model is then fitted as follows:
+
+```{r}
+
+adj_cph_fit <- coxph(S_psi ~ immdef$imm)
+summary(adj_cph_fit)
+```
+
+This gives a hazard ratio of $`r signif(summary(adj_cph_fit)[[7]][2], 3)`$. It should be noted that the confidence interval from the above model should not be used, as it does not reflect the uncertainty in $\hat{\psi}$. Instead, the p-value and z-statistic from an ITT analysis, should correspond to a z-test applied to the adjusted log hazard ratio, assuming asymptotic normality, which can be used to derive a test-based confidence interval for the adjusted hazard ratio. So the standard error of the adjusted log hazard ratio is given by the adjusted log hazard ratio divided by the $Z$ statistic from the intention-to-treat analysis and a 95\% confidence interval can therefore be constructed as follows: 
+
+```{r}
+itt_fit    <- coxph(Surv(progyrs, prog) ~ imm, data=immdef)
+itt_z      <- summary(itt_fit)[["coefficients"]][,"z"]
+adj_lhr    <- summary(adj_cph_fit)[["coefficients"]][,"coef"]
+adj_lhr_se <- adj_lhr / itt_z
+adj_lhr_ci <- c(adj_lhr - 1.96 * adj_lhr_se, adj_lhr + 1.96 * adj_lhr_se)
+adj_hr_ci  <- exp(adj_lhr_ci)
+```
+
+```{r}
+#extra code to plot this out
+hr_psi <- function(psi){
+
+S_psi <- with(immdef, untreated( psi, progyrs, prog, censyrs, rx, imm, autoswitch = TRUE))
+test <- immdef$imm==1
+S_psi[test,] <- with(immdef,Surv(progyrs,prog))[test,]
+
+adj_lhr <- coxph( S_psi ~ immdef$imm)
+adj_lhr$coefficients
+}
+
+psi <- data.frame(psi=seq(-0.4,1,length=300))
+psi$HR <- apply(psi,1, hr_psi)
+plot(psi, type="s")
+abline(v=rpsftm_fit_lr$CI, lty=2)
+abline(v=rpsftm_fit_lr$psi, lty=2)
+abline(h=adj_cph_fit$coefficients, lty=3)
+abline(h=adj_lhr_ci, lty=3)
+
+
+```
+
+
+This gives a 95\% confidence interval for the adjusted hazard ratio of $(`r signif(adj_hr_ci, 3)`)$. 
+
+Alternatively, the process for calculating the adjusted hazard ratio can be repeated but using the values at the limits of the confidence interval for $\hat{\psi}$, rather than $\hat{\psi},$ to give a transformation of the confidence interval from the $\psi$ scale to the hazard ratio scale. We use the function `untreated` to calculate the counter-factual times at the different values of $\psi$
+
+
+```{r}
+S_psi_low <- with(immdef, untreated( rpsftm_fit_lr$CI[1], progyrs, prog, censyrs, rx, imm, autoswitch = TRUE))
+S_psi_hi <- with(immdef, untreated( rpsftm_fit_lr$CI[2], progyrs, prog, censyrs, rx, imm, autoswitch = TRUE))
+
+
+test <- immdef$imm==1
+S_psi_low[test,] <- with(immdef,Surv(progyrs,prog))[test,]
+S_psi_hi[test,] <- with(immdef, Surv(progyrs,prog))[test,]
+
+adj_lhr_low <- coxph( S_psi_low ~ immdef$imm)
+adj_lhr_hi <- coxph( S_psi_hi ~ immdef$imm)
+
+#Confidence Interval log HR
+c(adj_lhr_low$coefficients, adj_lhr_hi$coefficients)
+#Point Estimate log HR
+adj_cph_fit$coefficients
+
+
+```
+
+
+Other adjusted hazard ratios can be calculated dependent on what the question of interest is and which arm the switching occurs in.

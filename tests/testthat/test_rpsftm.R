@@ -57,7 +57,7 @@ test_that("with no data argument at all",{
   fit <- rpsftm(Surv(immdef$progyrs, immdef$prog)~rand(immdef$imm, propX)+immdef$entry,censor_time = immdef$censyrs,
               low_psi=-1, hi_psi=1
               )
-  expect_is(fit$psi, class="numeric")
+  sexpect_is(fit$psi, class="numeric")
   
 }
 )

@@ -3,23 +3,24 @@
 #'@export
 #'@title summary Method
 #'@name summary.rpsftm
-#' @param x an object returned from the \code{rpsftm()} function
-#' @return a summary of the fitted regression model
+#' @param object an object returned from the \code{rpsftm()} function.
+#' @param ... further arguments passed to or from other methods.
+#' @return a summary of the fitted regression model.
 #' @author Simon Bond
 #' 
 
 
-summary.rpsftm <- function(x) {
-  obj <- x$regression
+summary.rpsftm <- function(object,...) {
+  obj <- object$regression
   # remove the call object without this it will print the entire data set
   obj$call <- NULL
   obj.summary <- summary(obj)
-  print(x$call)
+  print(object$call)
   print(obj.summary)
-  cat("\npsi:", x$psi)
-  cat("\nexp(psi):", exp(x$psi))
-  cat("\nConfidence Interval, psi", x$CI)
-  cat("\nConfidence Interval, exp(psi) ", exp(x$CI))
+  cat("\npsi:", object$psi)
+  cat("\nexp(psi):", exp(object$psi))
+  cat("\nConfidence Interval, psi", object$CI)
+  cat("\nConfidence Interval, exp(psi) ", exp(object$CI))
   # Have not added stuff to the obj.summary- the return object about psi,
   # and CI it does vary between the different tests so would be hard to
   # generalise.
