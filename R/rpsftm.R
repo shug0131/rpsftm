@@ -48,7 +48,6 @@
 #' or \code{cluster()} terms. 
 #' 
 #' @examples 
-#' library(rpsftm)
 #' ?immdef
 #' fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censyrs)
 #' print(fit)
@@ -56,8 +55,8 @@
 #' plot(fit)
 #' 
 #' @author Simon Bond
-#' @importFrom survival Surv strata cluster
-
+#' @importFrom survival Surv strata cluster survdiff
+#' @importFrom stats terms model.extract update drop.terms reformulate uniroot qnorm
 
 rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdiff, low_psi = -1, 
                    hi_psi = 1, alpha = 0.05, treat_modifier = 1, autoswitch = TRUE, 

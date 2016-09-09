@@ -6,15 +6,17 @@ Date: 2015-04-15
 Author: Simon Bond
 Maintainer: Simon Bond <simon.bond@addenbrookes.nhs.uk>
 Description: Implements methods described by the paper Robins \& Tsiatis, 1991.
+Depends:  R (>= 2.10)
 License: GPL-2
 Imports: 
     survival,
-    ggplot2
+    ggplot2,
+    stats
 LazyData: true
 RoxygenNote: 5.0.1
-Suggests: testthat,
+Suggests: 
+    testthat,
     knitr,
     rmarkdown,
-    tableone,
-    survival
+    tableone
 VignetteBuilder: knitr

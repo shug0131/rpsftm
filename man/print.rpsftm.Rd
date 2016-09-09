@@ -4,13 +4,15 @@
 \alias{print.rpsftm}
 \title{Print Method}
 \usage{
-\method{print}{rpsftm}(x)
+\method{print}{rpsftm}(x, ...)
 }
 \arguments{
-\item{x}{an object returned from the \code{\link{rpsftm}} function}
+\item{x}{an object returned from the \code{\link{rpsftm}} function.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
-a print of the underlying test object at the point estimate
+a print of the underlying test object at the point estimate.
 }
 \description{
 Function used to print of the underlying test object at the point estimate of a rpsftm object

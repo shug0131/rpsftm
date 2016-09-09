@@ -4,13 +4,15 @@
 \alias{summary.rpsftm}
 \title{summary Method}
 \usage{
-\method{summary}{rpsftm}(x)
+\method{summary}{rpsftm}(object, ...)
 }
 \arguments{
-\item{x}{an object returned from the \code{rpsftm()} function}
+\item{object}{an object returned from the \code{rpsftm()} function.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
-a summary of the fitted regression model
+a summary of the fitted regression model.
 }
 \description{
 Function used to summarise the fitted model to an rpsftm object

@@ -1,3 +1,5 @@
+[![Travis-CI Build Status](https://travis-ci.org/NA/NA.svg?branch=master)](https://travis-ci.org/NA/NA)
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 This is an R package that implements the method of Rank Preserving Strucutural Failure Time models to estimate causal effects in failure time models in randomised control trials where participants do not comply with the treatment assigned.
 

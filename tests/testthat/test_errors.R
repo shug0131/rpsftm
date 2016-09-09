@@ -127,7 +127,7 @@ test_that("na actions",
           
           expect_error(rpsftm(Surv(progyrs, prog)~rand(myarm, 1-xoyrs/progyrs),immdef, censor_time = censyrs, na.action=na.fail,
                         low_psi=-1, hi_psi=1),
-                       "Error in na.fail.default")
+                       "missing values in object")
           }
           
           )

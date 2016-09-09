@@ -4,13 +4,15 @@
 \alias{plot.rpsftm}
 \title{Plot Method}
 \usage{
-\method{plot}{rpsftm}(x)
+\method{plot}{rpsftm}(x, ...)
 }
 \arguments{
-\item{x}{an object returned from the \code{\link{rpsftm}} function}
+\item{x}{an object returned from the \code{\link{rpsftm}} function.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
-a ggplot plot of the fitted KM curves
+a ggplot plot of the fitted KM curves.
 }
 \description{
 Function used to plot the KM curves of the treatment-free transformed times
