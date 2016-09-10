@@ -1,5 +1,6 @@
 ## Test environments
 * local Ubuntu  R 3.3.1
+* travis checks
 * win-builder
 
 ## R CMD check results
