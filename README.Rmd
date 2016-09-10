@@ -6,7 +6,7 @@ output:
   md_document:
     variant: markdown_github
 ---
-[![Travis-CI Build Status](https://travis-ci.org/NA/NA.svg?branch=master)](https://travis-ci.org/NA/NA)
+[![Travis-CI Build Status](https://travis-ci.org/shug0131/rpsftm.svg?branch=master)](https://travis-ci.org/shug0131/rpsftm)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 

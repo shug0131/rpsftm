@@ -1,5 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 README.Rmd
+README-unnamed-chunk-2-1.png
 ^\.travis\.yml$
 cran-comments.md
