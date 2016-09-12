@@ -2,7 +2,8 @@
 
 This is a resubmission. In this version I have:
 
-* Added a <doi> reference as suggested by Uwe Ligges to the paper referenced in the DESCRIPTION. 
+* Added a <DOI:> reference as suggested by Uwe Ligges and Kurt Hornik to the paper referenced in the DESCRIPTION. 
+* Double checked to ensure inst/doc contained a html copy of the vignette.
 
 
 ## Test environments
