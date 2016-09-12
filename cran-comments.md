@@ -1,3 +1,10 @@
+## Resubmission
+
+This is a resubmission. In this version I have:
+
+* Added a <doi> reference as suggested by Uwe Ligges to the paper referenced in the DESCRIPTION. 
+
+
 ## Test environments
 * local Ubuntu  R 3.3.1
 * travis checks

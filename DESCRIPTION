@@ -5,7 +5,7 @@ Version: 1.0.0
 Date: 2016-09-10
 Author: Simon Bond
 Maintainer: Simon Bond <simon.bond@addenbrookes.nhs.uk>
-Description: Implements methods described by the paper Robins \& Tsiatis, 1991.
+Description: Implements methods described by the paper Robins \& Tsiatis, 1991, <http://dx.doi.org/10.1080/03610929108830654>. These use g-estimation to estimate the causal effect of a treatment in a two-armed randomised control trial where non-compliance exists and is measured, under an assumption of an accelerated failure time model and no unmeasured confounders.
 Depends:  R (>= 2.10)
 License: GPL-2
 Imports: 
