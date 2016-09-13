@@ -1,9 +1,16 @@
 ## Resubmission
 
 This is a resubmission. In this version I have:
+* Edited description to "Robins and Tsiatis (1991) <DOI:10.1080/03610929108830654>"
 
-* Added a <DOI:> reference as suggested by Uwe Ligges and Kurt Hornik to the paper referenced in the DESCRIPTION. 
-* Double checked to ensure inst/doc contained a html copy of the vignette.
+* Resolved this error: 
+
+checking files in ‘vignettes’ ... WARNING Files in the 'vignettes' directory newer than all files in 'inst/doc':
+  ‘rpsftm_vignette_files/figure-html/unnamed-chunk-12-1.png’,
+    ‘rpsftm_vignette_files/figure-html/unnamed-chunk-5-1.png’,
+    ‘rpsftm_vignette_files/figure-html/unnamed-chunk-7-1.png’,
+    ‘rpsftm_vignette_files/figure-html/unnamed-chunk-9-1.png’
+
 
 
 ## Test environments
