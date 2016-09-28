@@ -1,15 +1,6 @@
-## Resubmission
+## Description of Changes
 
-This is a resubmission. In this version I have:
-* Edited description to "Robins and Tsiatis (1991) <DOI:10.1080/03610929108830654>"
-
-* Resolved this error: 
-
-checking files in ‘vignettes’ ... WARNING Files in the 'vignettes' directory newer than all files in 'inst/doc':
-  ‘rpsftm_vignette_files/figure-html/unnamed-chunk-12-1.png’,
-    ‘rpsftm_vignette_files/figure-html/unnamed-chunk-5-1.png’,
-    ‘rpsftm_vignette_files/figure-html/unnamed-chunk-7-1.png’,
-    ‘rpsftm_vignette_files/figure-html/unnamed-chunk-9-1.png’
+This is a minor patch version 1.0.1 to give full details of all contributors in the DESCRIPTION file.
 
 
 
@@ -23,17 +14,11 @@ There were no ERRORs or WARNINGs.
 
 There was 1 NOTE in win_build
 
-* checking CRAN incoming feasibility ... NOTE
-Maintainer: 'Simon Bond <simon.bond@addenbrookes.nhs.uk>'
-
-New submission
-
 Possibly mis-spelled words in DESCRIPTION:
-  Tsiatis (8:66)
-
-The Date field is over a month old.
-
-THe date was updated to 10/9/16
+  Tsiatis (7:67)
+  confounders (7:343)
+  
+However this text is correct and unaltered from the pervious version accepted on CRAN.
 
 ## Downstream dependencies
 New package so not yet any downstream dependencies
