@@ -7,6 +7,7 @@
 #'@author Simon Bond
 #'@param arm the randomised treatment arm. a factor with 2 levels, or numeric variable with values 0/1.
 #'@param rx the proportion of time on active treatment (arm=1 or the non-reference level of the factor)
+#'@keywords internal
 
 
 rand <- function(arm, rx) {

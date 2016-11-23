@@ -8,12 +8,13 @@
 #' @param censor_time the theoretical censoring time, either observed or set after time. Set to Inf to ignore recensoring.
 #' @param rx the proportion of time spent on treatment
 #' @param arm the randomised arm. Either a numerical indicator, with 0 as the placebo, or a factor with the lowest level as placebo.
-#' @param autoswitch a logical to autodetect cases of no switching. Default is TRUE. If all observations in an arm
+#' @param autoswitch a logical to autodetect cases of no switching. If TRUE, then if all observations in an arm
 #' have perfect compliance then recensoring is not applied in that arm. If FALSE the recensoring is applied
 #' regardless of perfect compliance.
 #' @return A Surv() object
 #' @author Simon Bond
 #' @importFrom survival Surv
+#' @keywords internal
 
 untreated <- function(psi, time, delta, censor_time, rx, arm, autoswitch) {
   

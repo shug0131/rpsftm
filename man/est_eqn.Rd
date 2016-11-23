@@ -19,7 +19,7 @@ Optionally a column named: treat_modifier}
 
 \item{test}{the survival regression function to calculate the z-statistic: survdiff, coxph, survreg}
 
-\item{autoswitch}{a logical to autodetect cases of no switching. Default is TRUE. If all observations in an arm
+\item{autoswitch}{a logical to autodetect cases of no switching. If TRUE, then if all observations in an arm
 have perfect compliance then recensoring is not applied in that arm. If FALSE the recensoring is applied
 regardless of perfect compliance.}
 
@@ -37,4 +37,5 @@ Simon Bond
 \seealso{
 \code{\link{untreated}}
 }
+\keyword{internal}
 

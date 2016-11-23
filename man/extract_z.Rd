@@ -41,4 +41,5 @@ Generic S3 methods to extract the z-statistic from a set of survival fit objects
 \author{
 Simon Bond
 }
+\keyword{internal}
 

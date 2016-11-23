@@ -8,6 +8,7 @@
 #'@param x an R object
 #'@return a character vector
 #'@importFrom survival Surv
+#'@keywords internal
 
 terms.inner <- function (x) 
 {

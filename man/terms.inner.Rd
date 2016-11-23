@@ -17,4 +17,5 @@ a character vector
 \description{
 A function taken from the survival library - it is not exported from there hence a local copy
 }
+\keyword{internal}
 

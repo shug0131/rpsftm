@@ -37,7 +37,7 @@ argument has been used. Default is options()$na.action.}
 \item{treat_modifier}{an optional parameter that psi is multiplied by on an individual observation level to give
 differing impact to treatment.}
 
-\item{autoswitch}{a logical to autodetect cases of no switching. Default is TRUE. If all observations in an arm
+\item{autoswitch}{a logical to autodetect cases of no switching. If TRUE, then if all observations in an arm
 have perfect compliance then recensoring is not applied in that arm. If FALSE the recensoring is applied
 regardless of perfect compliance.}
 

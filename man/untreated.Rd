@@ -19,7 +19,7 @@ untreated(psi, time, delta, censor_time, rx, arm, autoswitch)
 
 \item{arm}{the randomised arm. Either a numerical indicator, with 0 as the placebo, or a factor with the lowest level as placebo.}
 
-\item{autoswitch}{a logical to autodetect cases of no switching. Default is TRUE. If all observations in an arm
+\item{autoswitch}{a logical to autodetect cases of no switching. If TRUE, then if all observations in an arm
 have perfect compliance then recensoring is not applied in that arm. If FALSE the recensoring is applied
 regardless of perfect compliance.}
 }
@@ -32,4 +32,5 @@ Calculates the counterfactual untreated event time, possibly using the recensori
 \author{
 Simon Bond
 }
+\keyword{internal}
 

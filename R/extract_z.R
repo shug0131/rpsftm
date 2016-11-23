@@ -6,6 +6,7 @@
 #'@param ... extendible arguments to the S3 method
 #'@return a numeric value, the z statistic for the independence test of the treatment arm
 #'@author Simon Bond
+#'@keywords internal
 
 
 

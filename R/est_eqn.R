@@ -14,6 +14,7 @@
 #' @seealso \code{\link{untreated}}
 #' @author Simon Bond
 #' @importFrom stats update
+#' @keywords internal
 
 
 est_eqn <- function(psi, data, formula, target = 0, test = "survdiff", 

@@ -21,4 +21,5 @@ and identifed as specials in the terms() object
 \author{
 Simon Bond
 }
+\keyword{internal}
 
