@@ -1,5 +1,7 @@
 [![Travis-CI Build Status](https://travis-ci.org/shug0131/rpsftm.svg?branch=master)](https://travis-ci.org/shug0131/rpsftm)
 
+[![codecov](https://codecov.io/github/shug0131/rpsftm/branch/master/graphs/badge.svg)](https://codecov.io/github/shug0131/rpsftm)
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 This is an R package that implements the method of Rank Preserving Strucutural Failure Time models to estimate causal effects in failure time models in randomised control trials where participants do not comply with the treatment assigned.
 
@@ -8,6 +10,8 @@ As an example:
 ``` r
 library(rpsftm)
 ?immdef
+#> starting httpd help server ...
+#>  done
 fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs), data = immdef, censor_time = censyrs)
 summary(fit)
 #> rpsftm(formula = Surv(progyrs, prog) ~ rand(imm, 1 - xoyrs/progyrs), 
