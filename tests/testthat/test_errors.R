@@ -178,3 +178,17 @@ test_that("eval_z incorrect input - non-numeric input",
             
           }
 )
+
+imm2 <- immdef$imm
+imm2[1:100] <- NA
+rpsftm(Surv(progyrs, prog)~rand(imm2,1-xoyrs/progyrs),
+       data=immdef, censor_time = censyrs)
+imm3 <- factor(imm2, levels=0:1, labels=c("Cx","Rx"))
+rpsftm(Surv(progyrs, prog)~rand(imm3,1-xoyrs/progyrs),
+       data=immdef, censor_time = censyrs)
+rpsftm(Surv(progyrs, prog)~rand(1-xoyrs/progyrs,imm),
+       data=immdef, censor_time = censyrs)
+imm_3arms <- factor(rep(1:3, ceiling(1000/3))[1:1000])
+rpsftm(Surv(progyrs, prog)~rand(imm_3arms,1-xoyrs/progyrs),
+       data=immdef, censor_time = censyrs)
+
