@@ -1,5 +1,7 @@
 # rpsftm 1.0.2.9000
 
+Trying to recreate and resolve "bug" in (#2) for NA handling in the rand() function. test_errors.R revised.
+
 added a link to https://codecov.io/ for continuous cloud testing of the coverage properties of the testing suite.  (#3)
 
 added a link to https://ci.appveyor.com/ for continuous building in a windows environment (#3)
