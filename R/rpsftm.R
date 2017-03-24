@@ -214,11 +214,16 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   
   # solve to find the value of psi that gives the root to z=0, and the
   # limits of the CI.
+ 
   
   root <- function(target) {
-    uniroot(est_eqn, c(low_psi, hi_psi), data = df, formula = fit_formula, 
+    ans <- optim( (low_psi+hi_psi)/2, est_eqn, 
+                  #lower=low_psi, upper= hi_psi, 
+                  data = df, formula = fit_formula, 
             target = target, test = test, autoswitch = autoswitch, 
             ... = ...)
+    ans$root <- ans$par
+    ans
   }
   ans <- try(root(0), silent = TRUE)
   lower <- try(root(qnorm(1 - alpha/2)), silent = TRUE)
