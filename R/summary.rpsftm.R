@@ -61,7 +61,7 @@ print.summary.coxph <- function (x,
     cat(", number of events=", x$nevent, "\n")
   else cat("\n")
   if (length(omit)) 
-    cat("   (", naprint(omit), ")\n", sep = "")
+    cat("   (", stats::naprint(omit), ")\n", sep = "")
   if (nrow(x$coef) == 0) {
     cat("   Null model\n")
     return()
@@ -70,7 +70,7 @@ print.summary.coxph <- function (x,
   if (!is.null(x$coefficients) & nrow(x$coefficients)>1) {
     cat("\n")
     if (is.R()) 
-      printCoefmat(x$coefficients[-arm_index, , drop=FALSE], digits = digits, signif.stars = signif.stars, 
+      stats::printCoefmat(x$coefficients[-arm_index, , drop=FALSE], digits = digits, signif.stars = signif.stars, 
                    ...)
     else print(x$coefficients[-arm_index, , drop=FALSE])
   }
@@ -129,7 +129,7 @@ print.summary.survreg <- function (x, digits = max(options()$digits - 4, 3), ...
       "\n")
   omit <- x$na.action
   if (length(omit)) 
-    cat("n=", x$n, " (", naprint(omit), ")\n", sep = "")
+    cat("n=", x$n, " (", stats::naprint(omit), ")\n", sep = "")
   else cat("n=", x$n, "\n")
   if (!is.null(correl)) {
     arm_index <- which(rownames(correl)=="arm")

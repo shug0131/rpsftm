@@ -51,20 +51,20 @@ print.coxph <- function (x, digits = max(options()$digits - 4, 3), ...){
     if (is.null(coef) | is.null(se)) 
       stop("Input is not valid")
     if (is.null(x$naive.var)) {
-      tmp <- cbind(coef, exp(coef), se, coef/se, 1 - pchisq((coef/se)^2, 
+      tmp <- cbind(coef, exp(coef), se, coef/se, 1 - stats::pchisq((coef/se)^2, 
                                                             1))
       dimnames(tmp) <- list(names(coef), c("coef", "exp(coef)", 
                                            "se(coef)", "z", "p"))
     }
     else {
       nse <- sqrt(diag(x$naive.var[-arm_index, -arm_index, drop=FALSE]))
-      tmp <- cbind(coef, exp(coef), nse, se, coef/se, 1 - pchisq((coef/se)^2, 
+      tmp <- cbind(coef, exp(coef), nse, se, coef/se, 1 - stats::pchisq((coef/se)^2, 
                                                                  1))
       dimnames(tmp) <- list(names(coef), c("coef", "exp(coef)", 
                                            "se(coef)", "robust se", "z", "p"))
     }
     if(length(coef)>0){ 
-      printCoefmat(tmp, signif.stars = FALSE, P.values = TRUE, 
+      stats::printCoefmat(tmp, signif.stars = FALSE, P.values = TRUE, 
                  has.Pvalue = TRUE)}
     #logtest <- -2 * (x$loglik[1] - x$loglik[2])
     #if (is.null(x$df)) 
@@ -80,7 +80,7 @@ print.coxph <- function (x, digits = max(options()$digits - 4, 3), ...){
       cat(", number of events=", x$nevent, "\n")
     else cat("\n")
     if (length(omit)) 
-      cat("   (", naprint(omit), ")\n", sep = "")
+      cat("   (", stats::naprint(omit), ")\n", sep = "")
     invisible(x)
 }
 
@@ -134,7 +134,7 @@ print.survreg <-function (x, ...)
   #else cat("\n")
   omit <- x$na.action
   if (length(omit)) 
-    cat("n=", nobs, " (", naprint(omit), ")\n", sep = "")
+    cat("n=", nobs, " (", stats::naprint(omit), ")\n", sep = "")
   else cat("n=", nobs, "\n")
   invisible(x)
 } 
