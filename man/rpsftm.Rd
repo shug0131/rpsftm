@@ -10,13 +10,14 @@ rpsftm(formula, data, censor_time, subset, na.action, test = survdiff,
 }
 \arguments{
 \item{formula}{a formula with a minimal structure of \code{Surv(time, status)~rand(arm,rx)}.
-Further terms can be added to the right hand side to adjust for covariates and use strata or cluster arguments.}
+Further terms can be added to the right hand side to adjust for covariates and use strata or 
+cluster arguments.}
 
 \item{data}{an optional data frame that contains variables}
 
-\item{censor_time}{the time at which censoring would, or has occurred. This is provided for all observations
-unlike standard Kaplan-Meier or Cox regression where it is only given for censored observations. 
-If no value is given then recensoring is not applied.}
+\item{censor_time}{variable or constant giving the time at which censoring would, or has occurred. 
+This should be provided for all observations unlike standard Kaplan-Meier or Cox regression where 
+it is only given for censored observations. If no value is given then re-censoring is not applied.}
 
 \item{subset}{expression indicating which subset of the rows of data should be used in the fit. 
 This can be a logical vector (which is replicated to have length equal to the number of observations),
@@ -34,7 +35,7 @@ argument has been used. Default is options()$na.action.}
 
 \item{alpha}{the significance level used to calculate confidence intervals}
 
-\item{treat_modifier}{an optional parameter that psi is multiplied by on an individual observation level to give
+\item{treat_modifier}{an optional variable that psi is multiplied by on an individual observation level to give
 differing impact to treatment.}
 
 \item{autoswitch}{a logical to autodetect cases of no switching. If TRUE, then if all observations in an arm
