@@ -1,5 +1,7 @@
 # rpsftm 1.0.2.9000
 
+removed rows for "arm" from the print and summary methods for coxph and survreg fits.
+
 clarified the documentation for rpsftm function arguments slightly.
 
 Created a tools directory and put a copy of the image file in it for the Readme file. Left the original in the root directory, for github, which is ignored in the .Rbuildignore file. Following the instructions below.
