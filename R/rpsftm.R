@@ -6,11 +6,12 @@
 #'@inheritParams untreated
 #'@inheritParams est_eqn
 #'@param formula a formula with a minimal structure of \code{Surv(time, status)~rand(arm,rx)}.
-#'Further terms can be added to the right hand side to adjust for covariates and use strata or cluster arguments.
+#'Further terms can be added to the right hand side to adjust for covariates and use strata or 
+#'cluster arguments.
 #'@param data an optional data frame that contains variables
-#'@param censor_time the time at which censoring would, or has occurred. This is provided for all observations
-#' unlike standard Kaplan-Meier or Cox regression where it is only given for censored observations. 
-#'If no value is given then recensoring is not applied.
+#'@param censor_time variable or constant giving the time at which censoring would, or has occurred. 
+#'This should be provided for all observations unlike standard Kaplan-Meier or Cox regression where 
+#'it is only given for censored observations. If no value is given then re-censoring is not applied.
 #'@param subset expression indicating which subset of the rows of data should be used in the fit. 
 #'This can be a logical vector (which is replicated to have length equal to the number of observations),
 #' a numeric vector indicating which observation numbers are to be included (or excluded if negative), 
@@ -20,7 +21,7 @@
 #' @param low_psi the lower limit of the range to search for the causal parameter
 #' @param hi_psi the upper limit of the range to search for the causal paramater
 #' @param alpha the significance level used to calculate confidence intervals
-#' @param treat_modifier an optional parameter that psi is multiplied by on an individual observation level to give
+#' @param treat_modifier an optional variable that psi is multiplied by on an individual observation level to give
 #' differing impact to treatment.
 #' @param n_eval_z The number of points between hi_psi and low_psi at which to evaluate the Z-statistics
 #' in the estimating equation. Default  is 100.
