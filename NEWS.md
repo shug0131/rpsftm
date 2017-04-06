@@ -1,4 +1,4 @@
-# rpsftm 1.0.2.9000
+# rpsftm 1.1.0
 
 removed rows for "arm" from the print and summary methods for coxph and survreg fits.
 

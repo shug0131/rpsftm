@@ -14,9 +14,13 @@ test_that("first basict fit with mixed data sources",{
 
 test_that("print method",{
   fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs)
-
-  
+  fit_coxph <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs, 
+                test=coxph)
+  fit_survreg <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
+                        test=survreg)
   expect_output(print(fit),"exp\\(psi\\):")
+  expect_output(print(fit_coxph),"exp\\(psi\\):")
+  expect_output(print(fit_survreg),"exp\\(psi\\):")
   
 })
 
@@ -24,10 +28,75 @@ test_that("print method",{
 test_that("summary method",{
   fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
                 low_psi=-1, hi_psi=1)
-  
+  fit_coxph <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs, 
+                      test=coxph)
+  fit_survreg <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
+                        test=survreg)
   expect_output(summary(fit),"Confidence Interval")
+  expect_output(summary(fit_coxph),"Confidence Interval")
+  expect_output(summary(fit_survreg),"Confidence Interval")
   
 })
+
+test_that("detailed print.coxph test",{
+  x <- list(fail="yes")
+  class(x) <- "coxph"
+  expect_output(print(x),"Coxph failed")
+  site <- rep(1:10,each=100)
+  fit_coxph <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs)+cluster(site)+entry,immdef, censor_time = censyrs, 
+                      test=coxph)
+  expect_output(print(fit_coxph),"robust")
+    
+}
+)
+
+test_that("detailed print.summary.coxph test",{
+  site <- rep(1:10,each=100)
+  fit_coxph <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs)+entry,immdef, censor_time = censyrs, 
+                      test=coxph)
+  expect_output(summary(fit_coxph),"coef")
+  
+  fit_coxph$regression$fail <- "yes"
+  expect_output(summary(fit_coxph),"Coxreg failed")
+}
+)
+
+
+test_that("detailed print.survreg test",{
+  x <- list(fail="yes")
+  class(x) <- "survreg"
+  expect_output(print(x),"Survreg failed")
+  site <- rep(1:10,each=100)
+  fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs)+entry,immdef, censor_time = censyrs, 
+                      test=survreg, scale=1)
+  expect_output(print(fit),"Scale fixed at")
+ 
+  
+  
+  fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs)+strata(site),immdef, censor_time = censyrs, 
+                test=survreg)
+  expect_output(print(fit),"Scale:")
+  
+}
+)
+
+test_that("detailed print.summary.survreg test",{
+  site <- rep(1:10,each=100)
+  fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs)+entry,immdef, censor_time = censyrs, 
+                test=survreg, scale=1)
+  expect_output(print(fit),"Scale fixed at")
+  
+  fit$regression$fail <- "yes"
+  expect_output(summary(fit),"Survreg failed")
+  fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs)+strata(site),immdef, censor_time = censyrs, 
+                test=survreg)
+  expect_output(summary(fit),"Scale:")
+  expect_output(summary(fit,correlation=TRUE),"Correlation of Coefficients")
+  
+}
+)
+
+
 
 test_that("plot method",{
   fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,

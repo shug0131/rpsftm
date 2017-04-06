@@ -14,7 +14,7 @@ summary.rpsftm <- function(object,...) {
   obj <- object$regression
   # remove the call object without this it will print the entire data set
   obj$call <- NULL
-  obj.summary <- summary(obj)
+  obj.summary <- summary(obj,...)
   print(object$call)
   print(obj.summary)
   cat("\npsi:", object$psi)
@@ -44,11 +44,11 @@ print.summary.coxph <- function (x,
                                  digits = max(getOption("digits") - 3, 3), 
                                  signif.stars = getOption("show.signif.stars"), 
                                  ...) {
-  if (!is.null(x$call)) {
-    cat("Call:\n")
-    dput(x$call)
-    cat("\n")
-  }
+  #if (!is.null(x$call)) {
+  #  cat("Call:\n")
+  #  dput(x$call)
+  #  cat("\n")
+  #}
   if (!is.null(x$fail)) {
     cat(" Coxreg failed.", x$fail, "\n")
     return()
@@ -62,10 +62,10 @@ print.summary.coxph <- function (x,
   else cat("\n")
   if (length(omit)) 
     cat("   (", stats::naprint(omit), ")\n", sep = "")
-  if (nrow(x$coef) == 0) {
-    cat("   Null model\n")
-    return()
-  }
+  #if (nrow(x$coef) == 0) {
+  #  cat("   Null model\n")
+  #  return()
+  #}
   arm_index <- which(rownames(x$coefficients)=="arm")
   if (!is.null(x$coefficients) & nrow(x$coefficients)>1) {
     cat("\n")
@@ -132,7 +132,6 @@ print.summary.survreg <- function (x, digits = max(options()$digits - 4, 3), ...
     cat("n=", x$n, " (", stats::naprint(omit), ")\n", sep = "")
   else cat("n=", x$n, "\n")
   if (!is.null(correl)) {
-    arm_index <- which(rownames(correl)=="arm")
     correl <- correl[-arm_index,-arm_index, drop=FALSE]
     p <- dim(correl)[2]
     if (p > 1) {

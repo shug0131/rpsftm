@@ -33,11 +33,6 @@ print.rpsftm <- function(x,...) {
 #' @keywords internal
 
 print.coxph <- function (x, digits = max(options()$digits - 4, 3), ...){
-    if (!is.null(cl <- x$call)) {
-      cat("Call:\n")
-      dput(cl)
-      cat("\n")
-    }
     if (!is.null(x$fail)) {
       cat(" Coxph failed.", x$fail, "\n")
       return()
@@ -95,10 +90,7 @@ print.coxph <- function (x, digits = max(options()$digits - 4, 3), ...){
 
 print.survreg <-function (x, ...) 
 {
-  if (!is.null(cl <- x$call)) {
-    cat("Call:\n")
-    dput(cl)
-  }
+  
   if (!is.null(x$fail)) {
     cat(" Survreg failed.", x$fail, "\n")
     return(invisible(x))
@@ -106,13 +98,14 @@ print.survreg <-function (x, ...)
   coef <- x$coef
   arm_index <- which(names(coef)=="arm")
   coef <- coef[-arm_index, drop=FALSE]
-  if (any(nas <- is.na(coef))) {
-    if (is.null(names(coef))) 
-      names(coef) <- paste("b", 1:length(coef), sep = "")
-    cat("\nCoefficients: (", sum(nas), " not defined because of singularities)\n", 
-        sep = "")
-  }
-  else cat("\nCoefficients:\n")
+# if (any(nas <- is.na(coef))) {
+#    if (is.null(names(coef))) 
+#      names(coef) <- paste("b", 1:length(coef), sep = "")
+#    cat("\nCoefficients: (", sum(nas), " not defined because of singularities)\n", 
+#        sep = "")
+#  }
+#  else 
+  cat("\nCoefficients:\n")
   print(coef, ...)
   if (nrow(x$var)-1 == length(coef)) 
     cat("\nScale fixed at", format(x$scale), "\n")
