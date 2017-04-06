@@ -28,7 +28,7 @@ summary(fit)
 plot(fit)
 ```
 
-![](README-unnamed-chunk-2-1.png)
+![](tools/README-unnamed-chunk-2-1.png)
 
 The main function is `rpsftm` which returns an object that has `print`, `summary`, and `plot` S3 methods.
 
