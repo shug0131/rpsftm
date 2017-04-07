@@ -1,9 +1,9 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 README.Rmd
-  ^\.travis\.yml$
+^\.travis\.yml$
 cran-comments.md
 vignettes\dev
 appveyor.yml
 ^revdep$
-revdep
+
