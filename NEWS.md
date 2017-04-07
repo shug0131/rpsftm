@@ -1,3 +1,8 @@
+# rpsftm 1.1.0.9000
+
+ready for next increment.
+
+
 # rpsftm 1.1.0
 
 removed rows for "arm" from the print and summary methods for coxph and survreg fits.
