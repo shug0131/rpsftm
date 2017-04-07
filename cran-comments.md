@@ -33,4 +33,4 @@ Possibly mis-spelled words in DESCRIPTION:
 However this text is correct and unaltered from the pervious version accepted on CRAN.
 
 ## Downstream dependencies
-New package so not yet any downstream dependencies
+devtools::revdep_check()  issued No ERRORs or WARNINGs found :)
