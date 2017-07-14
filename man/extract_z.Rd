@@ -2,8 +2,8 @@
 % Please edit documentation in R/extract_z.R
 \name{extract_z}
 \alias{extract_z}
-\alias{extract_z.coxph}
 \alias{extract_z.survdiff}
+\alias{extract_z.coxph}
 \alias{extract_z.survreg}
 \title{Extracting the z-statistic from a survival object}
 \usage{
@@ -38,8 +38,8 @@ Generic S3 methods to extract the z-statistic from a set of survival fit objects
 
 \item \code{survreg}: Method for survreg objects
 }}
+
 \author{
 Simon Bond
 }
 \keyword{internal}
-

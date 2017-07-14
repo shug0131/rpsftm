@@ -33,4 +33,3 @@ Calculates the counterfactual untreated event time, possibly using the recensori
 Simon Bond
 }
 \keyword{internal}
-

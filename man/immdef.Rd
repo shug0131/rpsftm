@@ -28,4 +28,3 @@ immdef
 Simulated data to use with the \code{\link{rpsftm}} function.
 }
 \keyword{datasets}
-

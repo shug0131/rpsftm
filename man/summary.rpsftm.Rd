@@ -20,4 +20,3 @@ Function used to summarise the fitted model to an rpsftm object
 \author{
 Simon Bond
 }
-

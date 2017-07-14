@@ -20,4 +20,3 @@ Function used to plot the KM curves of the treatment-free transformed times
 \author{
 Simon Bond
 }
-

@@ -1,6 +1,6 @@
 # rpsftm 1.1.0.9000
 
-ready for next increment.
+Defined a class "rand" for rand() output;added a print method that gives summary of rx values by arm; exported rand and print.rand.
 
 
 # rpsftm 1.1.0

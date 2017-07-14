@@ -20,4 +20,3 @@ Function used to print of the underlying test object at the point estimate of a 
 \author{
 Simon Bond
 }
-

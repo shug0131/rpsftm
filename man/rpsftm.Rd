@@ -87,4 +87,3 @@ plot(fit)
 \author{
 Simon Bond
 }
-

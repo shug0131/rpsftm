@@ -3,11 +3,19 @@
 #'
 #'@title rand functions to use in the rpsftm() formula
 #'
+#'@export
 #'@return matrix with two columns named arm and rx. These can be used in the formula argument to rpsftm()
 #'@author Simon Bond
 #'@param arm the randomised treatment arm. a factor with 2 levels, or numeric variable with values 0/1.
 #'@param rx the proportion of time on active treatment (arm=1 or the non-reference level of the factor)
-#'@keywords internal
+#'@seealso \code{\link{print.rand}}, \code{\link{rpsftm}}
+#'@examples 
+#'x <- with(immdef, rand(imm , 1 - xoyrs / progyrs ) )
+#'x
+#'class(x)
+#'y <- as.data.frame(x)
+#'head(y)
+
 
 
 rand <- function(arm, rx) {
@@ -21,5 +29,8 @@ rand <- function(arm, rx) {
     # converts the numerically coding (1,2,..), to 0 or 1.
     arm <- as.numeric(arm) - 1
   }
-  cbind(arm = arm, rx = rx)
+  structure(
+    cbind(arm = arm, rx = rx),
+    class=c("rand", "matrix")
+  )
 }

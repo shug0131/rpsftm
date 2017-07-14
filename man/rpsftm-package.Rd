@@ -23,4 +23,3 @@ Communications in Statistics--Theory and Methods 1991; 20: 2609--2631
 
 \code{\link[survival]{survreg}}
 }
-

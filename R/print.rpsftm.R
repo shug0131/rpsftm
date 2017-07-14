@@ -132,3 +132,20 @@ print.survreg <-function (x, ...)
   invisible(x)
 } 
 
+#' print method for rand() objects - to display the summary of rx, by arm
+#'
+#'@title Print method
+#'@export
+#'@name print.rand
+#'@param x a rand() object
+#'@param ... further arguments passed to or from other methods.
+#'@return a summary of rx values broken down by arm for a rand() object
+#'@seealso \code{\link{rand}}, \code{\link{rpsftm}}
+#'@author Simon Bond
+
+
+print.rand <- function(x,...){
+  print( stats::aggregate(rx~arm, data=x, summary) )
+  invisible(x)
+}
+

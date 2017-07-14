@@ -31,11 +31,10 @@ A scalar value of the estimating equation: the z-statistics from a test minus a 
 \description{
 Calculates the Estimating Equation to be solved in RPSFTM models
 }
-\author{
-Simon Bond
-}
 \seealso{
 \code{\link{untreated}}
 }
+\author{
+Simon Bond
+}
 \keyword{internal}
-

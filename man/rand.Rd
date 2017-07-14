@@ -18,8 +18,16 @@ matrix with two columns named arm and rx. These can be used in the formula argum
 A function that is defined to be used in the formula argument, 
 and identifed as specials in the terms() object
 }
+\examples{
+x <- with(immdef, rand(imm , 1 - xoyrs / progyrs ) )
+x
+class(x)
+y <- as.data.frame(x)
+head(y)
+}
+\seealso{
+\code{\link{print.rand}}, \code{\link{rpsftm}}
+}
 \author{
 Simon Bond
 }
-\keyword{internal}
-
