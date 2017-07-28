@@ -281,22 +281,28 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     fit <- NULL
     Sstar <- NULL
   }
-  value=list(psi=ans$root, 
-        #for the plot function
-        fit=fit, 
-        #for using the update() function
-        formula=return_formula,
-        rand=rand_object,
-        #for the print and summary methods
-       regression=attr(ans$f.root, "fit"),
-       #Not strictly needed but why not include it.
-       Sstar=Sstar, 
-       ans=ans, 
-       CI=c(lower$root,upper$root),
-       call=cl,
-       eval_z=eval_z
-       )
+  regression=attr(ans$f.root, "fit")
+  #modify the call and formula (for regressions)
+  regression$call <- cl
+  if( test %in% c("coxph", "survreg")){
+    regression$formula <- return_formula
+    regression$terms <- return_formula
+  }
+  
+  value=c(
+    list(
+      psi=ans$root, 
+      #for the plot function
+      fit=fit, 
+      CI=c(lower$root,upper$root),
+      Sstar=Sstar, 
+      rand=rand_object,
+      ans=ans,
+      eval_z=eval_z),
+      #for the print and summary methods
+    regression
+  )
 
   if (length(na.action)){ value$na.action <- na.action }
-  structure(value, class="rpsftm")
+  structure(value, class=c("rpsftm",test))
 }

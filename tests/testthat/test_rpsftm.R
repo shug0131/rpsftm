@@ -56,7 +56,7 @@ test_that("detailed print.summary.coxph test",{
                       test=coxph)
   expect_output(summary(fit_coxph),"coef")
   
-  fit_coxph$regression$fail <- "yes"
+  fit_coxph$fail <- "yes"
   expect_output(summary(fit_coxph),"Coxreg failed")
 }
 )
@@ -86,7 +86,7 @@ test_that("detailed print.summary.survreg test",{
                 test=survreg, scale=1)
   expect_output(print(fit),"Scale fixed at")
   
-  fit$regression$fail <- "yes"
+  fit$fail <- "yes"
   expect_output(summary(fit),"Survreg failed")
   fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs)+strata(site),immdef, censor_time = censyrs, 
                 test=survreg)
@@ -247,14 +247,14 @@ test_that( "check variants on fitting",
 ##These may need to be specific to different fit, ie. adjustment is different for survdiff and coxph.
 test_that("Check that a strata and cluster fits",
           {
-            propX <- with(immdef,1-xoyrs/progyrs)
-            f0 <- rpsftm(Surv(progyrs, prog)~rand(imm,propX), immdef, censor_time = censyrs,
+            f0 <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs), immdef, censor_time = censyrs,
                           low_psi=-1, hi_psi=1
                 #formula=~1
                          )
-            category <- rep(c("A","B","C","D"),rep(250,4))
-            covar <- rnorm(1000)
-            clusterId <- rep(1:100,10)
+            immdef$category <- rep(c("A","B","C","D"),rep(250,4))
+            immdef$covar <- rnorm(1000)
+            immdef$clusterId <- rep(1:100,10)
+            f0 <- update(f0, data=immdef)
             f0.strata <- update(f0,~.+strata(category))
             f1 <- update(f0, test=coxph)
             f1.All <- update(f1,~.+strata(category)+covar+cluster(clusterId))

@@ -11,12 +11,14 @@
 
 
 print.rpsftm <- function(x,...) {
-  obj <- x$regression
-  # remove the call object without this it will print the entire data set
-  obj$call <- NULL
-  print(x$call)
   print(x$rand)
-  print(obj)
+  #NextMethod(generic="print", object=x, ...=...)
+  #searches in the global environment first so doesn't use the print.* defined below.
+  y <- x
+  class(y) <- class(y)[2]
+  # manually setting the "next" method using a copy of the objecti
+  print(y)
+  #whereas this looks in the environment that defines the function for the method print.*
   cat("\npsi:", x$psi)
   cat("\nexp(psi):", exp(x$psi))
   invisible(x)
@@ -96,7 +98,7 @@ print.survreg <-function (x, ...)
     cat(" Survreg failed.", x$fail, "\n")
     return(invisible(x))
   }
-  coef <- x$coef
+  coef <- x$coefficients
   arm_index <- which(names(coef)=="arm")
   coef <- coef[-arm_index, drop=FALSE]
 # if (any(nas <- is.na(coef))) {

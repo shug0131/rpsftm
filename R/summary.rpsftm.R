@@ -11,11 +11,11 @@
 
 
 summary.rpsftm <- function(object,...) {
-  obj <- object$regression
+  #obj <- object$regression
   # remove the call object without this it will print the entire data set
-  obj$call <- NULL
-  obj.summary <- summary(obj,...)
-  print(object$call)
+  #obj$call <- NULL
+  obj.summary <- NextMethod(generic="summary", object=obj,...=...)
+  #print(object$call)
   print(object$rand)
   print(obj.summary)
   cat("\npsi:", object$psi)
