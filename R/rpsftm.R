@@ -30,6 +30,7 @@
 #' \item psi: the estimated parameter
 #' \item fit: a survdiff object to produce Kaplan-Meier curves of the estimated counterfactual untreated failure times for each treatment arm
 #' \item formula: a formula representing any adjustments, strata or clusters- used for the \code{update()} function
+#' \item rand: the rand() object used to specify the allocated and observed amount of treatment.
 #' \item regression: the survival regression object at the estimated value of psi
 #' \item Sstar: the recensored \code{Surv()} data using the estimate value of psi to give counterfactual untreated failure times.
 #' \item ans: the object returned from \code{uniroot} used to solve the estimating equation
@@ -130,6 +131,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   fit_formula <- terms(update(mf$formula, . ~ arm + .))
   fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)
   
+  rand_object <- df[,rand_index]
   
   df_basic <- data.frame( time=df[,response_index][,"time"], 
                           status=df[,response_index][,"status"], 
@@ -274,7 +276,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
                        df[,"(censor_time)"],df[, "rx"], df[, "arm"], autoswitch)
     # Ignores any covariates, strata or adjustors. On Purpose as this is
     # too general to deal with
-    fit <- survival::survfit(Sstar ~ arm, data = df)
+    fit <- survival::survfit(Sstar ~ arm, data = df, conf.int=1-alpha)
   } else {
     fit <- NULL
     Sstar <- NULL
@@ -284,6 +286,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
         fit=fit, 
         #for using the update() function
         formula=return_formula,
+        rand=rand_object,
         #for the print and summary methods
        regression=attr(ans$f.root, "fit"),
        #Not strictly needed but why not include it.

@@ -15,6 +15,7 @@ print.rpsftm <- function(x,...) {
   # remove the call object without this it will print the entire data set
   obj$call <- NULL
   print(x$call)
+  print(x$rand)
   print(obj)
   cat("\npsi:", x$psi)
   cat("\nexp(psi):", exp(x$psi))

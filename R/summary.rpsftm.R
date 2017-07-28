@@ -16,6 +16,7 @@ summary.rpsftm <- function(object,...) {
   obj$call <- NULL
   obj.summary <- summary(obj,...)
   print(object$call)
+  print(object$rand)
   print(obj.summary)
   cat("\npsi:", object$psi)
   cat("\nexp(psi):", exp(object$psi))

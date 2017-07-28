@@ -53,6 +53,7 @@ a rpsftm method object that is a list of the following:
 \item psi: the estimated parameter
 \item fit: a survdiff object to produce Kaplan-Meier curves of the estimated counterfactual untreated failure times for each treatment arm
 \item formula: a formula representing any adjustments, strata or clusters- used for the \code{update()} function
+\item rand: the rand() object used to specify the allocated and observed amount of treatment.
 \item regression: the survival regression object at the estimated value of psi
 \item Sstar: the recensored \code{Surv()} data using the estimate value of psi to give counterfactual untreated failure times.
 \item ans: the object returned from \code{uniroot} used to solve the estimating equation

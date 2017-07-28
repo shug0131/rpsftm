@@ -15,10 +15,10 @@
 a summary of rx values broken down by arm for a rand() object
 }
 \description{
-modified version of print.rand
-}
-\details{
 print method for rand() objects - to display the summary of rx, by arm
+}
+\seealso{
+\code{\link{rand}}, \code{\link{rpsftm}}
 }
 \author{
 Simon Bond

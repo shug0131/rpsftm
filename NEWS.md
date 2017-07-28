@@ -1,6 +1,10 @@
 # rpsftm 1.1.0.9000
 
-Defined a class "rand" for rand() output;added a print method that gives summary of rx values by arm; exported rand and print.rand.
+Defined a class "rand" for rand() output;added a print method that gives summary of rx values by arm; exported rand and print.rand, modified rpsftm to return the rand() object, and the print.rpsftm, and print.summary methods to print the rand() 
+
+added an example to the plot.rpsftm documentation to illustrate how to modify the ggplot2 object. Standardised the underlying data.frame to have lower-case variable names. Modified the call to survfit() in rpsftm to use the same alpha argument (original set for CI around psi), but for the KM curves.
+
+
 
 
 # rpsftm 1.1.0
