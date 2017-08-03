@@ -233,9 +233,23 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   # limits of the CI.
   
   root <- function(target) {
-    uniroot(est_eqn, c(low_psi, hi_psi), data = df, formula = fit_formula, 
-            target = target, test = test, autoswitch = autoswitch, 
-            ... = ...)
+    est_eqn_vectorize <- Vectorize(est_eqn, vectorize.args="psi")
+    ans <- rootSolve::uniroot.all(est_eqn_vectorize, 
+                                  c(low_psi, hi_psi), data = df, formula = fit_formula, 
+                                  target = target, test = test, autoswitch = autoswitch, 
+                                  ... = ...)
+    #give back the same elements as uniroot()
+    if( length(ans)>1){warning("Multiple Roots found")}
+    list( root=ans[1], 
+          root_all=ans,
+          f.root= est_eqn(ans[1],
+                          data = df, formula = fit_formula, 
+                          target = target, test = test, autoswitch = autoswitch, 
+                          ... = ...),
+          iter=NA,
+          estim.prec=NA
+    )  
+    
   }
   ans <- try(root(0), silent = TRUE)
   lower <- try(root(qnorm(1 - alpha/2)), silent = TRUE)
