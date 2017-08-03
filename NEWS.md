@@ -6,6 +6,7 @@ added an example to the plot.rpsftm documentation to illustrate how to modify th
 
 made the returned object inherit from survreg/coxph/survdiff as appopriate. Moved the returned object from the survival objects directly into the returned list rather than nested, with modified formula, terms, and call elements. Modified the print and summary methods. Hence standard methods are availble: anova, extractIAC, logLik, model.frame, model.matrix, predict, residuals, vcov.
 
+added checks on the treat_modifier values: fail if they are all zero, and warn if not all strictly positive.
 
 # rpsftm 1.1.0
 
