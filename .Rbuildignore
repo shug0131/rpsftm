@@ -6,4 +6,6 @@ cran-comments.md
 vignettes\dev
 appveyor.yml
 ^revdep$
+inst\doc
+
 

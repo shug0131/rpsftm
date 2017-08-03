@@ -29,17 +29,22 @@
 #' \itemize{
 #' \item psi: the estimated parameter
 #' \item fit: a survdiff object to produce Kaplan-Meier curves of the estimated counterfactual untreated failure times for each treatment arm
-#' \item formula: a formula representing any adjustments, strata or clusters- used for the \code{update()} function
-#' \item rand: the rand() object used to specify the allocated and observed amount of treatment.
-#' \item regression: the survival regression object at the estimated value of psi
-#' \item Sstar: the recensored \code{Surv()} data using the estimate value of psi to give counterfactual untreated failure times.
-#' \item ans: the object returned from \code{uniroot} used to solve the estimating equation
 #' \item CI: a vector of the confidence interval around psi
-#' \item call: the R call object
+#' \item Sstar: the recensored \code{Surv()} data using the estimate value of psi to give counterfactual untreated failure times.
+#' \item rand: the rand() object used to specify the allocated and observed amount of treatment.
+#' \item ans: the object returned from \code{uniroot} used to solve the estimating equation
 #' \item eval_z: a data frame with the Z-statistics from the estimating equation evaluated at
 #' a sequence of values of psi. Used to plot and check if the range of values to search for solution
 #' and limits of confidence intervals need to be modified.
+#' \item Further elements corresponding to either a \code{survdiff}, \code{coxph}, or \code{survreg} object. This will always include:
+#'   \itemize{
+#'   \item call: the R call object
+#'   \item formula: a formula representing any adjustments, strata or clusters- used for the \code{update()} function
+#'   \item terms: a more detailed representation of the model formula
+#'   }
 #' }
+#' @seealso \code{\link[survival]{survdiff}}, \code{\link[survival]{coxph.object}}, \code{\link[survival]{survreg.object}}
+#'  
 #' @details the formula object \code{Surv(time, status)~rand(arm,rx)}. \code{rand()} stands 
 #' for randomistion, both the randomly assigned and actual observed treatment. 
 #' \itemize{
@@ -284,10 +289,9 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   regression=attr(ans$f.root, "fit")
   #modify the call and formula (for regressions)
   regression$call <- cl
-  if( test %in% c("coxph", "survreg")){
-    regression$formula <- return_formula
-    regression$terms <- return_formula
-  }
+  regression$formula <- return_formula
+  regression$terms <- return_formula
+  
   
   value=c(
     list(

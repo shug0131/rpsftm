@@ -26,6 +26,8 @@ Function used to plot the KM curves of the treatment-free transformed times
 }
 \examples{
 fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censyrs)
+plot(fit)
+library(ggplot2)
 plot(fit)+
    scale_linetype_discrete(labels=c("Control","Experimental"))+
    ylim(0.5,1)+

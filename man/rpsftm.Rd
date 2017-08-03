@@ -52,16 +52,19 @@ a rpsftm method object that is a list of the following:
 \itemize{
 \item psi: the estimated parameter
 \item fit: a survdiff object to produce Kaplan-Meier curves of the estimated counterfactual untreated failure times for each treatment arm
-\item formula: a formula representing any adjustments, strata or clusters- used for the \code{update()} function
-\item rand: the rand() object used to specify the allocated and observed amount of treatment.
-\item regression: the survival regression object at the estimated value of psi
-\item Sstar: the recensored \code{Surv()} data using the estimate value of psi to give counterfactual untreated failure times.
-\item ans: the object returned from \code{uniroot} used to solve the estimating equation
 \item CI: a vector of the confidence interval around psi
-\item call: the R call object
+\item Sstar: the recensored \code{Surv()} data using the estimate value of psi to give counterfactual untreated failure times.
+\item rand: the rand() object used to specify the allocated and observed amount of treatment.
+\item ans: the object returned from \code{uniroot} used to solve the estimating equation
 \item eval_z: a data frame with the Z-statistics from the estimating equation evaluated at
 a sequence of values of psi. Used to plot and check if the range of values to search for solution
 and limits of confidence intervals need to be modified.
+\item Further elements corresponding to either a \code{survdiff}, \code{coxph}, or \code{survreg} object. This will always include:
+  \itemize{
+  \item call: the R call object
+  \item formula: a formula representing any adjustments, strata or clusters- used for the \code{update()} function
+  \item terms: a more detailed representation of the model formula
+  }
 }
 }
 \description{
@@ -84,6 +87,9 @@ print(fit)
 summary(fit)
 plot(fit)
 
+}
+\seealso{
+\code{\link[survival]{survdiff}}, \code{\link[survival]{coxph.object}}, \code{\link[survival]{survreg.object}}
 }
 \author{
 Simon Bond
