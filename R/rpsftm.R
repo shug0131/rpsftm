@@ -175,6 +175,15 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     stop("arm must have exactly 2 observed values")
   }
   
+  # check the values of treatment modifier
+  if ("(treat_modifier)" %in% names(df)) {
+    if( all(df[,"(treat_modifier)"]==0, na.rm = TRUE) ){ 
+      stop("treat_modifier values cannot all be zero")
+    }
+    if( any(df[,"(treat_modifier)"]<=0) ){ 
+      warning("treat_modifier values are not all strictly positive")
+    }
+  }
   
   
   

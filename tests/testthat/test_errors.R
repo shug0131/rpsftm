@@ -197,3 +197,27 @@ expect_error(rpsftm(Surv(progyrs, prog)~rand(imm_3arms,1-xoyrs/progyrs),
        data=immdef, censor_time = censyrs))
 }
 )
+
+
+test_that("Checking of Treatment modifier",
+          {
+            
+            mod <- rep(0, nrow(immdef))
+            expect_error(rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),
+                                data=immdef, treat_modifier=mod, censor_time = censyrs))
+            mod <- rep(-1, nrow(immdef))
+            expect_warning(rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),
+                                  data=immdef,treat_modifier = mod, censor_time = censyrs),
+                           "treat_modifier values are not all strictly positive"
+                           )
+            mod <- c(0,rep(2,nrow(immdef)-1))
+            expect_warning(fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),
+                                  data=immdef,treat_modifier =mod, censor_time = censyrs),
+                           "treat_modifier values are not all strictly positive"
+            )
+            expect_is(fit, class="rpsftm")
+            
+          }
+          
+          )
+
