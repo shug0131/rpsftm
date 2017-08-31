@@ -14,11 +14,18 @@ print.rpsftm <- function(x,...) {
   print(x$rand)
   #NextMethod(generic="print", object=x, ...=...)
   #searches in the global environment first so doesn't use the print.* defined below.
-  y <- x
+  #whereas this looks in the environment that defines the function for the method print.
+  #manually setting the "next" method using a copy of the object
+  y<- x
   class(y) <- class(y)[2]
-  # manually setting the "next" method using a copy of the objecti
-  print(y)
-  #whereas this looks in the environment that defines the function for the method print.*
+  
+  if( !is.null(y$fail)){
+    cat("Fitting failed." , y$fail,"\n")
+    return()
+  } else {
+    print(y)
+  }
+  
   cat("\npsi:", x$psi)
   cat("\nexp(psi):", exp(x$psi))
   invisible(x)

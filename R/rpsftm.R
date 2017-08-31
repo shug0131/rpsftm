@@ -217,11 +217,17 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   
   # Preliminary check of low_psi and hi_psi with a meaningful warning
   
-  est_eqn_low <- est_eqn(low_psi, data = df, formula = fit_formula, target = 0, 
-                         test = test,  autoswitch = autoswitch, ... = ...)
-  est_eqn_hi <- est_eqn(hi_psi, data = df, formula = fit_formula, target = 0, 
-                        test = test, autoswitch = autoswitch, ... = ...)
-  if (est_eqn_low * est_eqn_hi > 0) {
+  #est_eqn_low <- est_eqn(low_psi, data = df, formula = fit_formula, target = 0, 
+  #                       test = test,  autoswitch = autoswitch, ... = ...)
+  #est_eqn_hi <- est_eqn(hi_psi, data = df, formula = fit_formula, target = 0, 
+  #                      test = test, autoswitch = autoswitch, ... = ...)
+  est_eqn_low <- eval_z[1,"Z"]
+  est_eqn_hi <-  eval_z[n_eval_z,"Z"]
+  
+  
+  if (!is.na( est_eqn_low) & 
+      !is.na( est_eqn_hi ) &  
+      est_eqn_low * est_eqn_hi > 0) {
     message <- paste("\nThe starting interval (", low_psi, ", ", hi_psi, 
                      ") to search for a solution for psi\ngives values of the same sign (", 
                      signif(est_eqn_low, 3), ", ", signif(est_eqn_hi, 3), ").\nTry a wider interval. plot(obj$eval_z, type=\"s\"), where obj is the output of rpsftm()", 
@@ -251,9 +257,9 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     )  
     
   }
-  ans <- try(root(0), silent = TRUE)
-  lower <- try(root(qnorm(1 - alpha/2)), silent = TRUE)
-  upper <- try(root(qnorm(alpha/2)), silent = TRUE)
+  ans <- try(root(0))#, silent = TRUE)
+  lower <- try(root(qnorm(1 - alpha/2)))#, silent = TRUE)
+  upper <- try(root(qnorm(alpha/2)))#, silent = TRUE)
   
   # handle errors in root and CI finding
   
@@ -265,14 +271,14 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     ans <- list(root = NA)
   }
   if (lower.error) {
-    warning("Evaluation of a limit of the Confidence Interval failed.  It is set to NA")
     lower <- list(root = NA)
   }
   if (upper.error) {
-    warning("Evaluation of a limit of the Confidence Interval failed.  It is set to NA")
     upper <- list(root = NA)
   }
-  
+  if (lower.error|| upper.error) {
+    warning("Evaluation of a limit of the Confidence Interval failed.  It is set to NA")
+  }
   
   
   
@@ -331,5 +337,6 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   )
 
   if (length(na.action)){ value$na.action <- na.action }
+  if( is.na( value$psi )){ value$fail <- "yes"}
   structure(value, class=c("rpsftm",test))
 }

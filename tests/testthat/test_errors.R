@@ -139,6 +139,9 @@ test_that("error for poor initial starting values",{
     )
 })
 
+
+
+
 test_that("warning for non-convergencevalues",{
   expect_error( fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs)+entry,immdef, censor_time = censyrs)
                   )
@@ -221,3 +224,28 @@ test_that("Checking of Treatment modifier",
           
           )
 
+
+test_that("Multiple Roots",
+          {
+            load("multi_root.Rdata")
+            expect_warning( 
+              rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),multi_root, censyrs),
+              "Multiple Roots found"
+              )
+            
+          }
+          )
+
+# fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censyrs,
+#        low_psi = 1, hi_psi=2, test=survreg
+#        )
+# fit
+# summary(fit)
+# 
+# fit2 <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censyrs,
+#        low_psi = -1, hi_psi=-0.1
+# )
+# 
+# summary(fit2)
+# 
+# summary(fit)
