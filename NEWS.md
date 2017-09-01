@@ -10,6 +10,8 @@ added checks on the treat_modifier values: fail if they are all zero, and warn i
 
 replaced uniroot with rootSolve::uniroot.all, to deal with multiple roots.
 
+added in methods for residuals.rpsftm and survfit.rpsftm - essentially just calling the "inner" fitted model as needed. This allows cox.zph to be used. 
+
 # rpsftm 1.1.0
 
 removed rows for "arm" from the print and summary methods for coxph and survreg fits.

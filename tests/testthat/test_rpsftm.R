@@ -1,4 +1,5 @@
 library(rpsftm)
+library(survival)
 context("Test the rpsftm() function")
 
 
@@ -325,6 +326,36 @@ fit2 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+log(entry+1),
 expect_equal(fit1$psi, fit2$psi)
 }
 )
+
+
+test_that("survfit",{
+          fit0 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+entry, 
+                         data=immdef, censor_time=censyrs, test=coxph)
+          fit1 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs), 
+                         data=immdef, censor_time=censyrs, test=survdiff)
+          fit2 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+entry, 
+                         data=immdef, censor_time=censyrs, test=survreg)
+          expect_is(survfit(fit0), class="survfit")
+          expect_error(survfit(fit1),"No applicable method")
+          expect_error(survfit(fit2),"No applicable method")
+          
+          }
+          
+)
+
+test_that("residual",{
+  
+  fit0 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+entry, 
+                 data=immdef, censor_time=censyrs, test=coxph)
+  fit1 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+entry, 
+                 data=immdef, censor_time=censyrs, test=survreg)
+  
+  expect_is(residuals(fit0), class="numeric")
+  expect_is(residuals(fit1, "dfbetas"), class="matrix")
+  expect_is(cox.zph(fit0), "cox.zph")
+})
+
+
 #CHECK that each line of code has been called somehow in this testing process??
 #DONE:
 #> #install.packages("covr")
