@@ -8,8 +8,7 @@ made the returned object inherit from survreg/coxph/survdiff as appopriate. Move
 
 added checks on the treat_modifier values: fail if they are all zero, and warn if not all strictly positive.
 
-replaced uniroot with rootSolve::uniroot.all, to deal with multiple roots - in principle. No testing
-done yet when multiple roots exist. Note - the same package claims to deal with multiple eqns, ie. the multi-arm problem multiroot(). Need to test this properly with a data set that has multiple roots. 
+replaced uniroot with rootSolve::uniroot.all, to deal with multiple roots.
 
 # rpsftm 1.1.0
 

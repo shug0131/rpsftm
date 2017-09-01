@@ -51,7 +51,7 @@ test_that("Censoring before Time warning",{
 
 test_that("Variables on left and right terms",
          {
-          expect_warning( rpsftm(Surv(progyrs, prog)~rand(imm, 1-xoyrs/progyrs)+progyrs,immdef, censor_time = censyrs, 
+          expect_error( rpsftm(Surv(progyrs, prog)~rand(imm, 1-xoyrs/progyrs)+progyrs,immdef, censor_time = censyrs, 
                               low_psi=-1, hi_psi=1, test=coxph), "a variable appears on both the left and right sides of the formula")
         
      }
@@ -132,8 +132,8 @@ test_that("na actions",
           
           )
 
-test_that("error for poor initial starting values",{
-    expect_warning( rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
+test_that("warning for poor initial starting values",{
+    expect_warning( fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
                low_psi=-1, hi_psi=-0.9),
                "The starting interval"
     )
@@ -229,23 +229,24 @@ test_that("Multiple Roots",
           {
             load("multi_root.Rdata")
             expect_warning( 
-              rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),multi_root, censyrs),
+              fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),multi_root, censyrs),
               "Multiple Roots found"
               )
             
           }
           )
+test_that("problems with limits",
+          {
+expect_warning(rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censyrs,
+       low_psi = 1, hi_psi=2, test=survreg
+       ), "The starting interval")
+            
+expect_warning(rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censyrs,
+       low_psi = -1, hi_psi=-0.1
+), "Evaluation of a limit")
+          
+expect_warning(rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censyrs,
+       low_psi = -2, hi_psi=-1), "Evaluation of the estimated values of psi failed")
+          }
+)
 
-# fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censyrs,
-#        low_psi = 1, hi_psi=2, test=survreg
-#        )
-# fit
-# summary(fit)
-# 
-# fit2 <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censyrs,
-#        low_psi = -1, hi_psi=-0.1
-# )
-# 
-# summary(fit2)
-# 
-# summary(fit)

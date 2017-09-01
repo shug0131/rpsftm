@@ -16,7 +16,7 @@ summary.rpsftm <- function(object,...) {
   #obj$call <- NULL
   y <- object
   class(y) <- class(object)[2]
-  obj.summary <- summary(y)
+  obj.summary <- summary(y,...=...)
   #print(object$call)
   print(object$rand)
   print(obj.summary)

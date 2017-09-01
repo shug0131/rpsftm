@@ -32,7 +32,10 @@
 #' \item CI: a vector of the confidence interval around psi
 #' \item Sstar: the recensored \code{Surv()} data using the estimate value of psi to give counterfactual untreated failure times.
 #' \item rand: the rand() object used to specify the allocated and observed amount of treatment.
-#' \item ans: the object returned from \code{uniroot} used to solve the estimating equation
+#' \item ans: the values from \code{\link[rootSolve]{uniroot.all}} used to solve the estimating equation, 
+#' but embeded within a list as per \code{\link[stats]{uniroot}}, with an extra element \code{root_all},
+#' a vector of all roots found in the case of multiple solutions. The first element of \code{root_all} 
+#' is subsequently used.
 #' \item eval_z: a data frame with the Z-statistics from the estimating equation evaluated at
 #' a sequence of values of psi. Used to plot and check if the range of values to search for solution
 #' and limits of confidence intervals need to be modified.
@@ -117,7 +120,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     ytemp <- terms.inner(formula[[2]])
     xtemp <- terms.inner(formula[[3]])
     if (any(!is.na(match(xtemp, ytemp)))) 
-      warning("a variable appears on both the left and right sides of the formula")
+      stop("a variable appears on both the left and right sides of the formula")
   }
   
   
@@ -197,43 +200,11 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   #create values of psi to evaluate in a data frame
   eval_z <- data.frame( psi = seq(low_psi, hi_psi, length=n_eval_z))
   # evaluate them
-  
-  #need to wrap est_eqn in try() to cope with non-convergent fits
-  
-  fn_eval_z <- function(psi){
-    answer <- try( est_eqn(psi,data = df, formula = fit_formula, target = 0, 
-                           test = test, 
-                           autoswitch = autoswitch, ... = ... ),
-                   silent = TRUE
-                   )
-    if (class(answer) == "try-error"){ 
-      return(NA)
-    } else {
-      return(answer)
-    }
-  }
-  
-  eval_z$Z <- apply(eval_z,1, fn_eval_z)
-  
-  # Preliminary check of low_psi and hi_psi with a meaningful warning
-  
-  #est_eqn_low <- est_eqn(low_psi, data = df, formula = fit_formula, target = 0, 
-  #                       test = test,  autoswitch = autoswitch, ... = ...)
-  #est_eqn_hi <- est_eqn(hi_psi, data = df, formula = fit_formula, target = 0, 
-  #                      test = test, autoswitch = autoswitch, ... = ...)
-  est_eqn_low <- eval_z[1,"Z"]
-  est_eqn_hi <-  eval_z[n_eval_z,"Z"]
+  eval_z$Z <- apply(eval_z,1, est_eqn, 
+                    data=df, formula=fit_formula, test=test,
+                    target=0, autoswitch=autoswitch,...=...)
   
   
-  if (!is.na( est_eqn_low) & 
-      !is.na( est_eqn_hi ) &  
-      est_eqn_low * est_eqn_hi > 0) {
-    message <- paste("\nThe starting interval (", low_psi, ", ", hi_psi, 
-                     ") to search for a solution for psi\ngives values of the same sign (", 
-                     signif(est_eqn_low, 3), ", ", signif(est_eqn_hi, 3), ").\nTry a wider interval. plot(obj$eval_z, type=\"s\"), where obj is the output of rpsftm()", 
-                     sep = "")
-    warning(message)
-  }
   
   # solve to find the value of psi that gives the root to z=0, and the
   # limits of the CI.
@@ -257,13 +228,40 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     )  
     
   }
-  ans <- try(root(0))#, silent = TRUE)
-  lower <- try(root(qnorm(1 - alpha/2)))#, silent = TRUE)
-  upper <- try(root(qnorm(alpha/2)))#, silent = TRUE)
+  ans <- try(root(0), silent = TRUE)
+  ans.error <- class(ans) == "try-error"
+  
+ 
+  
+  # Preliminary check of ans,  low_psi and hi_psi with a meaningful warning
+  
+  est_eqn_low <- eval_z[1,"Z"]
+  est_eqn_hi <-  eval_z[n_eval_z,"Z"]
+  
+  
+  if (
+      (  # still get try-errors in simple case as I guess uniroot.all, looks at silly places for psi and crashes survdiff
+        (!ans.error && length(ans$root_all)==0 ) || 
+         ans.error
+      ) &&
+      !is.na( est_eqn_low) && 
+      !is.na( est_eqn_hi ) &&  
+      est_eqn_low * est_eqn_hi > 0) {
+    message <- paste("\nThe starting interval (", low_psi, ", ", hi_psi, 
+                     ") to search for a solution for psi\ngives values of the same sign (", 
+                     signif(est_eqn_low, 3), ", ", signif(est_eqn_hi, 3), ").\nTry a wider interval. plot(obj$eval_z, type=\"s\"), where obj is the output of rpsftm()", 
+                     sep = "")
+    warning(message)
+  }
+  
+  #Find limits to confidence interval
+  
+  lower <- try(root(qnorm(1 - alpha/2)), silent = TRUE)
+  upper <- try(root(qnorm(alpha/2)), silent = TRUE)
   
   # handle errors in root and CI finding
   
-  ans.error <- class(ans) == "try-error"
+ 
   lower.error <- class(lower) == "try-error"
   upper.error <- class(upper) == "try-error"
   if (ans.error) {

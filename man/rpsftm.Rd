@@ -55,7 +55,10 @@ a rpsftm method object that is a list of the following:
 \item CI: a vector of the confidence interval around psi
 \item Sstar: the recensored \code{Surv()} data using the estimate value of psi to give counterfactual untreated failure times.
 \item rand: the rand() object used to specify the allocated and observed amount of treatment.
-\item ans: the object returned from \code{uniroot} used to solve the estimating equation
+\item ans: the values from \code{\link[rootSolve]{uniroot.all}} used to solve the estimating equation, 
+but embeded within a list as per \code{\link[stats]{uniroot}}, with an extra element \code{root_all},
+a vector of all roots found in the case of multiple solutions. The first element of \code{root_all} 
+is subsequently used.
 \item eval_z: a data frame with the Z-statistics from the estimating equation evaluated at
 a sequence of values of psi. Used to plot and check if the range of values to search for solution
 and limits of confidence intervals need to be modified.
