@@ -12,19 +12,30 @@ library(rpsftm)
 #>  done
 fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs), data = immdef, censor_time = censyrs)
 summary(fit)
-#> rpsftm(formula = Surv(progyrs, prog) ~ rand(imm, 1 - xoyrs/progyrs), 
-#>     data = immdef, censor_time = censyrs)
-#>       Length Class  Mode   
-#> n     2      table  numeric
-#> obs   2      -none- numeric
-#> exp   2      -none- numeric
-#> var   4      -none- numeric
-#> chisq 1      -none- numeric
+#>   arm   rx.Min. rx.1st Qu. rx.Median   rx.Mean rx.3rd Qu.   rx.Max.
+#> 1   0 0.0000000  0.0000000 0.0000000 0.1574062  0.2547779 0.9770941
+#> 2   1 1.0000000  1.0000000 1.0000000 1.0000000  1.0000000 1.0000000
+#>         Length Class      Mode   
+#> psi        1   -none-     numeric
+#> fit       14   survfit    list   
+#> CI         2   -none-     numeric
+#> Sstar   2000   Surv       numeric
+#> rand    2000   rand       numeric
+#> ans        5   -none-     list   
+#> eval_z     2   data.frame list   
+#> n          2   table      numeric
+#> obs        2   -none-     numeric
+#> exp        2   -none-     numeric
+#> var        4   -none-     numeric
+#> chisq      1   -none-     numeric
+#> call       4   -none-     call   
+#> formula    3   terms      call   
+#> terms      3   terms      call   
 #> 
-#> psi: -0.1811218
-#> exp(psi): 0.8343337
-#> Confidence Interval, psi -0.3497161 0.001993204
-#> Confidence Interval, exp(psi)  0.7048882 1.001995
+#> psi: -0.1810871
+#> exp(psi): 0.8343627
+#> Confidence Interval, psi -0.3496948 0.002042503
+#> Confidence Interval, exp(psi)  0.7049032 1.002045
 plot(fit)
 ```
 
