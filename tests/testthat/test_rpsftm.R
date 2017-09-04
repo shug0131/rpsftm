@@ -41,6 +41,8 @@ test_that("summary method",{
 
 test_that("detailed print.coxph test",{
   x <- list(fail="yes")
+  class(x) <- "rpsftm"
+  expect_output(print(x),"Fitting failed")
   class(x) <- "coxph"
   expect_output(print(x),"Coxph failed")
   site <- rep(1:10,each=100)
