@@ -69,7 +69,7 @@ print.summary.coxph <- function (x,
   #  cat("   Null model\n")
   #  return()
   #}
-  arm_index <- which(rownames(x$coefficients)=="arm")
+  arm_index <- which(rownames(x$coefficients)==".arm")
   if (!is.null(x$coefficients) & nrow(x$coefficients)>1) {
     cat("\n")
     if (is.R()) 
@@ -112,7 +112,7 @@ print.summary.survreg <- function (x, digits = max(options()$digits - 4, 3), ...
     digits <- options()$digits
   cat("\nCall:\n")
   dput(x$call)
-  arm_index <- which(rownames(x$table)=="arm")
+  arm_index <- which(rownames(x$table)==".arm")
   print(x$table[-arm_index,, drop=FALSE], digits = digits)
   if (nrow(x$var) == length(x$coefficients)) 
     cat("\nScale fixed at", format(x$scale, digits = digits), 

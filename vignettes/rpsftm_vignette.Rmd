@@ -76,11 +76,12 @@ The `immdef` data frame has 1000 observations and 8 variables:
 * __id__ participant ID number
 * __def__ indicator that the participant was assigned to the Deferred treatment arm
 * __imm__ indicator that the participant was assigned to the Immediate treatment arm
-* __censyrs__ censoring time, corresponding to the close of study minus the time of entry for each participant
+* __censyrs__ censoring time, corresponding to the close of study minus the time of randomisation for each participant
 * __xo__ an indicator that crossover occurred
-* __xoyrs__ the time at which crossover happened, or 0 for participants in the Immediate arm
+* __xoyrs__ the time from randomisation at which crossover happened, or 0 for participants in the Immediate arm
 * __prog__ an indicator of disease progression (1), or censoring (0)
-* __entry__ the time of entry into the study
+* __progyrs__ time from randomisation of disease progression or censoring
+* __entry__ the time from the global start of study of the participant's entry into the study
 
 The first six entries are:
 
@@ -121,13 +122,15 @@ The above formula fits a RPSFTM where `progyrs` is the observed event time, `pro
 
 * __psi__ the estimated parameter
 * __fit__ a `survdiff` object to produce Kaplan-Meier curves of the estimated        counter-factual event times in each treatment arm using `plot()`
-* __formula__ a formula representing any adjustments, strata or clusters used 
-* __regression__ the survival regression object at __psi__
-* __Sstar__ the (possibly) recensored `Surv()` data using __psi__ 
-* __ans__ the object returned from `uniroot` used to solve the estimating equation
 * __CI__ a vector of the confidence interval around __psi__
-* __call__ the R call object
+* __Sstar__ the (possibly) recensored `Surv()` data using __psi__ 
+* __rand__ the `rand()` object used to specify the allocated and observed amount of treatment
+* __ans__ the values from `uniroot.all` used to solve the estimating equation, but embeded within a list as per `uniroot`, with an extra element `root_all`, a vector of all roots found in the case of multiple solutions. The first element of `root_all` is subsequently used.
 * __eval_z__ a data frame giving values of the Z-statistics at different values of __psi__
+* Further elements corresponding to either a `survdiff`, `coxph`, or `survreg` object. This will always include:
+    * __call__ the R call object
+    * __formula__ a formula representing any adjustments, strata or clusters used 
+    * __terms___ a more detailed representation of the model formula
  
 The point estimate and 95% confidence interval can be returned using `rpsftm_fit_lr$psi` and `rpsftm_fit_lr$CI` which gives $\hat{\psi} = `r signif(rpsftm_fit_lr$psi, 3)` (`r signif(rpsftm_fit_lr$CI, 3)`)$. The function `plot()` produces Kaplan-Meier curves of the counter-factual event times in each group and can be used to check that the distributions are indeed the same at $\hat{\psi}$.
 

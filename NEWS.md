@@ -12,6 +12,10 @@ replaced uniroot with rootSolve::uniroot.all, to deal with multiple roots.
 
 added in methods for residuals.rpsftm and survfit.rpsftm - essentially just calling the "inner" fitted model as needed. This allows cox.zph to be used. 
 
+modified the vignette to improve clarity
+
+change the internal use of arm and rx, to .arm and .rx and put in checks for these terms, and "time" "status" in the adjusting formula
+
 # rpsftm 1.1.0
 
 removed rows for "arm" from the print and summary methods for coxph and survreg fits.

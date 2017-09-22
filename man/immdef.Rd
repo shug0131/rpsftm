@@ -13,12 +13,12 @@ The data are based on a randomized controlled trial Concorde \url{http://dx.doi.
    \item{id}{participant ID number}
    \item{def}{indicator that the participant was assigned to the Deferred treatment arm}
    \item{imm}{indicator that the participant was assigned to the Immediate treatment arm}
-   \item{censyrs}{a real, or theoretical censoring time, corresponding to the close of study}
+   \item{censyrs}{a real, or theoretical censoring time (from randomisation), corresponding to the close of study}
    \item{xo}{an indicator that crossover occured}
-   \item{xoyrs}{the time at which crossover happened, or 0 for participants in the Immediate arm}
+   \item{xoyrs}{the time from randomisation at which crossover happened, or 0 for participants in the Immediate arm}
    \item{prog}{an indicator of disease progression (1), or censoring (0)}
-   \item{progyrs}{time of disease progression or censoring}
-   \item{entry}{the time of entry into the study}
+   \item{progyrs}{time from randomisation of disease progression or censoring}
+   \item{entry}{the time from the global start of study of the participant's entry into the study}
  
   }}
 \usage{

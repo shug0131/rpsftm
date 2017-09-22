@@ -50,7 +50,7 @@ print.coxph <- function (x, digits = max(options()$digits - 4, 3), ...){
     savedig <- options(digits = digits)
     on.exit(options(savedig))
     coef <- x$coefficients
-    arm_index <- which(names(coef)=="arm")
+    arm_index <- which(names(coef)==".arm")
     coef <- coef[-arm_index, drop=FALSE]
     se <- sqrt(diag(x$var[-arm_index, -arm_index, drop=FALSE]))
     if (is.null(coef) | is.null(se)) 
@@ -106,7 +106,7 @@ print.survreg <-function (x, ...)
     return(invisible(x))
   }
   coef <- x$coefficients
-  arm_index <- which(names(coef)=="arm")
+  arm_index <- which(names(coef)==".arm")
   coef <- coef[-arm_index, drop=FALSE]
 # if (any(nas <- is.na(coef))) {
 #    if (is.null(names(coef))) 

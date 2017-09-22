@@ -25,7 +25,7 @@ est_eqn <- function(psi, data, formula, target = 0, test = "survdiff",
   }
   
   Sstar <- untreated(psi, data[, "time"], data[, "status"], data[,"(censor_time)"],
-                     data[,"rx"], data[, "arm"],  autoswitch)
+                     data[,".rx"], data[, ".arm"],  autoswitch)
   data <- cbind(Sstar, data)
   # build a formula object,
   fit_formula <- update(formula, Sstar ~ .)
@@ -35,7 +35,7 @@ est_eqn <- function(psi, data, formula, target = 0, test = "survdiff",
   fit <- do.call(functionName, list(fit_formula, data, ...))
   # a 'cheat' to enable this to plugged into uniroot as a function that
   # returns a number AND store the fit object.
-  .value <- extract_z(fit, arm = "arm") - target
+  .value <- extract_z(fit, arm = ".arm") - target
   attr(.value, "fit") <- fit
   .value
 }

@@ -84,6 +84,17 @@ test_that("rand() interaction",
           }
 )
 
+test_that("using covariates with special clashing names",
+          {
+            .arm <- rep(0:1,500)
+            expect_warning(
+              rpsftm(Surv(progyrs, prog)~rand(imm, 1-xoyrs/progyrs)+ .arm ,immdef, test=coxph, censor_time = censyrs)
+              ,
+              "Please rename"
+            )
+          }
+)
+
 
 
 test_that("More than 2 arms",

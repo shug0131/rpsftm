@@ -135,16 +135,25 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     stop("rand() term must not be in any interactions")
   }
   
+  # check for special terms
+  if( length(labels(mf$formula))>1){
+    adjustor_formula <- drop.terms( mf$formula, dropx = rand_drops , keep.response = FALSE)
+    adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), terms.inner)[-1])
+    if( any( adjustor_names %in% c(".arm",".rx","time","status"))){
+      warning( "'.arm', '.rx', 'time', 'status' are used internally within rpsftm. Please rename these variables used in the formula outside of rand() and surv()")
+    }
+  }
+  # add in the special covariate .arm
   
-  fit_formula <- terms(update(mf$formula, . ~ arm + .))
+  fit_formula <- terms(update(mf$formula, . ~ .arm + .))
   fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)
   
   rand_object <- df[,rand_index]
   
   df_basic <- data.frame( time=df[,response_index][,"time"], 
                           status=df[,response_index][,"status"], 
-                          arm=df[, rand_index][,"arm"], 
-                          rx=df[,rand_index][,"rx"])
+                          ".arm"=df[, rand_index][,"arm"], 
+                          ".rx"=df[,rand_index][,"rx"])
   
   
   df_adjustor <- df[,-c( response_index, rand_index), drop = FALSE]
@@ -153,7 +162,6 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     adjustor_formula <- drop.terms( mf$formula, dropx = rand_drops , keep.response = FALSE)
     adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), terms.inner)[-1])
     mf$formula <- reformulate(adjustor_names)
-    
     mf$formula <- if (missing(data)) {
       terms(mf$formula)
     } else {
@@ -174,7 +182,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   
   
   # Check that the number of arms is 2.
-  if (length(unique(df[, "arm"])) != 2) {
+  if (length(unique(df[, ".arm"])) != 2) {
     stop("arm must have exactly 2 observed values")
   }
   
@@ -305,10 +313,10 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     
     
     Sstar <- untreated(psiHat, df[, "time"], df[, "status"], 
-                       df[,"(censor_time)"],df[, "rx"], df[, "arm"], autoswitch)
+                       df[,"(censor_time)"],df[, ".rx"], df[, ".arm"], autoswitch)
     # Ignores any covariates, strata or adjustors. On Purpose as this is
     # too general to deal with
-    fit <- survival::survfit(Sstar ~ arm, data = df, conf.int=1-alpha)
+    fit <- survival::survfit(Sstar ~ .arm, data = df, conf.int=1-alpha)
   } else {
     fit <- NULL
     Sstar <- NULL
