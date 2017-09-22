@@ -2,35 +2,33 @@
 
 This is a minor version release with several enhancements
 
+Defined a class "rand" for rand() output;added a print method that gives summary of rx values by arm; exported rand and print.rand, modified rpsftm to return the rand() object, and the print.rpsftm, and print.summary methods to print the rand() 
 
-removed rows for "arm" from the print and summary methods for coxph and survreg fits.
+added an example to the plot.rpsftm documentation to illustrate how to modify the ggplot2 object. Standardised the underlying data.frame to have lower-case variable names. Modified the call to survfit() in rpsftm to use the same alpha argument (original set for CI around psi), but for the KM curves.
 
-clarified the documentation for rpsftm function arguments slightly.
+made the returned object inherit from survreg/coxph/survdiff as appopriate. Moved the returned object from the survival objects directly into the returned list rather than nested, with modified formula, terms, and call elements. Modified the print and summary methods. Hence standard methods are availble: anova, extractIAC, logLik, model.frame, model.matrix, predict, residuals, vcov.
 
-Created a tools directory and put a copy of the image file in it for the Readme file. Left the original in the root directory, for github, which is ignored in the .Rbuildignore file. Following the instructions below.
+added checks on the treat_modifier values: fail if they are all zero, and warn if not all strictly positive.
 
->It was recently pointed out to us that some README.html files (generated from the corresponding README.md ones) on the CRAN package web pages are incomplete, missing 'local' images not available from the web page and in most cases actually not even shipped with the package.  This clearly should be changed, so we will move to using '--self-contained' for the pandoc conversion to ensure that the README.html files are "complete".
->Of course, this implies that all 'local' images used in README.md are needed in the package sources.
->If the images are also used for vignettes or Rd files, you can put them in the 'vignettes' or 'man/figures' directories.  Otherwise, please put them in the top-level 'tools' directory, or a subdirectory of it.
->The CRAN incoming checks in r-devel were changed to perform the pandoc conversion checks with '--self-contained', and hence will warn about missing images.
+replaced uniroot with rootSolve::uniroot.all, to deal with multiple roots.
 
+added in methods for residuals.rpsftm and survfit.rpsftm - essentially just calling the "inner" fitted model as needed. This allows cox.zph to be used. 
+
+modified the vignette to improve clarity
+
+change the internal use of  variable names arm and rx, to .arm and .rx and put in checks for these terms, and "time" "status" in the adjusting formula.
 
 
 ## Test environments
 * travis checks
 * appveyor
 * win-builder
+* windows 7
+* ubuntu 
 
 ## R CMD check results
 There were no ERRORs or WARNINGs. 
 
-There was 1 NOTE in win_build
-
-Possibly mis-spelled words in DESCRIPTION:
-  Tsiatis (7:67)
-  confounders (7:343)
-  
-However this text is correct and unaltered from the pervious version accepted on CRAN.
 
 ## Downstream dependencies
 devtools::revdep_check()  issued No ERRORs or WARNINGs found :)

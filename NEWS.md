@@ -1,4 +1,4 @@
-# rpsftm 1.1.0.9000
+# rpsftm 1.2.0
 
 Defined a class "rand" for rand() output;added a print method that gives summary of rx values by arm; exported rand and print.rand, modified rpsftm to return the rand() object, and the print.rpsftm, and print.summary methods to print the rand() 
 
@@ -14,7 +14,7 @@ added in methods for residuals.rpsftm and survfit.rpsftm - essentially just call
 
 modified the vignette to improve clarity
 
-change the internal use of arm and rx, to .arm and .rx and put in checks for these terms, and "time" "status" in the adjusting formula.
+change the internal use of  variable names arm and rx, to .arm and .rx and put in checks for these terms, and "time" "status" in the adjusting formula.
 
 # rpsftm 1.1.0
 

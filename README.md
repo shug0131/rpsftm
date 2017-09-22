@@ -8,8 +8,6 @@ As an example:
 ``` r
 library(rpsftm)
 ?immdef
-#> starting httpd help server ...
-#>  done
 fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs), data = immdef, censor_time = censyrs)
 summary(fit)
 #>   arm   rx.Min. rx.1st Qu. rx.Median   rx.Mean rx.3rd Qu.   rx.Max.
