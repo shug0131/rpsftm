@@ -14,7 +14,7 @@ added in methods for residuals.rpsftm and survfit.rpsftm - essentially just call
 
 modified the vignette to improve clarity
 
-change the internal use of arm and rx, to .arm and .rx and put in checks for these terms, and "time" "status" in the adjusting formula
+change the internal use of arm and rx, to .arm and .rx and put in checks for these terms, and "time" "status" in the adjusting formula.
 
 # rpsftm 1.1.0
 
