@@ -4,7 +4,7 @@
 #'
 #'@title terms.inner
 #'
-#'@return a list of variables refered to in a formula or call object
+#'@return a list of variables referred to in a formula or call object
 #'@param x an R object
 #'@return a character vector
 #'@importFrom survival Surv

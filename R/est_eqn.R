@@ -6,7 +6,7 @@
 #' @param data the data set that contains the variables. 
 #' Must contain columns named: time, censor_time,rx, arm.
 #' Optionally a column named: treat_modifier
-#' @param formula a forumula object of covariates to adjust for: \code{~strata(A)+B*C}
+#' @param formula a formula object of covariates to adjust for: \code{~strata(A)+B*C}
 #' @param target the value to subtract off from the z-statistic 
 #' @param test the survival regression function to calculate the z-statistic: survdiff, coxph, survreg
 #' @param ... arguments to supply to the test function.

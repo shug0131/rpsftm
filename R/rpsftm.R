@@ -1,4 +1,4 @@
-#'Main Function used for estmating causal parameters under the Rank Preserving Structural Failure Time Model
+#'Main Function used for estimating causal parameters under the Rank Preserving Structural Failure Time Model
 #'
 #'@export
 #'@title Rank Preserving Structural Failure Time Model
@@ -19,7 +19,7 @@
 #'@param na.action a missing-data filter function. This is applied to the model.frame after any subset 
 #'argument has been used. Default is options()$na.action.
 #' @param low_psi the lower limit of the range to search for the causal parameter
-#' @param hi_psi the upper limit of the range to search for the causal paramater
+#' @param hi_psi the upper limit of the range to search for the causal parameter
 #' @param alpha the significance level used to calculate confidence intervals
 #' @param treat_modifier an optional variable that psi is multiplied by on an individual observation level to give
 #' differing impact to treatment.
@@ -33,7 +33,7 @@
 #' \item Sstar: the recensored \code{Surv()} data using the estimate value of psi to give counterfactual untreated failure times.
 #' \item rand: the rand() object used to specify the allocated and observed amount of treatment.
 #' \item ans: the values from \code{\link[rootSolve]{uniroot.all}} used to solve the estimating equation, 
-#' but embeded within a list as per \code{\link[stats]{uniroot}}, with an extra element \code{root_all},
+#' but embedded within a list as per \code{\link[stats]{uniroot}}, with an extra element \code{root_all},
 #' a vector of all roots found in the case of multiple solutions. The first element of \code{root_all} 
 #' is subsequently used.
 #' \item eval_z: a data frame with the Z-statistics from the estimating equation evaluated at
@@ -49,7 +49,7 @@
 #' @seealso \code{\link[survival]{survdiff}}, \code{\link[survival]{coxph.object}}, \code{\link[survival]{survreg.object}}
 #'  
 #' @details the formula object \code{Surv(time, status)~rand(arm,rx)}. \code{rand()} stands 
-#' for randomistion, both the randomly assigned and actual observed treatment. 
+#' for randomisation, both the randomly assigned and actual observed treatment. 
 #' \itemize{
 #'   \item arm: the randomised treatment arm. a factor with 2 levels, or numeric variable with values 0/1.
 #'  \item rx: the proportion of time on active treatment (arm=1 or the non-reference level of the factor)

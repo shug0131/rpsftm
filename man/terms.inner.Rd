@@ -10,7 +10,7 @@
 \item{x}{an R object}
 }
 \value{
-a list of variables refered to in a formula or call object
+a list of variables referred to in a formula or call object
 
 a character vector
 }

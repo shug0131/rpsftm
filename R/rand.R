@@ -1,5 +1,5 @@
 #' A function that is defined to be used in the formula argument, 
-#' and identifed as specials in the terms() object
+#' and identified as specials in the terms() object
 #'
 #'@title rand functions to use in the rpsftm() formula
 #'

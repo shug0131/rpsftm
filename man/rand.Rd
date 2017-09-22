@@ -16,7 +16,7 @@ matrix with two columns named arm and rx. These can be used in the formula argum
 }
 \description{
 A function that is defined to be used in the formula argument, 
-and identifed as specials in the terms() object
+and identified as specials in the terms() object
 }
 \examples{
 x <- with(immdef, rand(imm , 1 - xoyrs / progyrs ) )
