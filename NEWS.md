@@ -1,3 +1,7 @@
+# rpsftm 1.2.1
+
+Ensuring forward compatibility with testthat package v2.0.0 .
+
 # rpsftm 1.2.0
 
 Defined a class "rand" for rand() output;added a print method that gives summary of rx values by arm; exported rand and print.rand, modified rpsftm to return the rand() object, and the print.rpsftm, and print.summary methods to print the rand() 

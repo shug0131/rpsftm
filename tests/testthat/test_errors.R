@@ -229,7 +229,7 @@ test_that("Checking of Treatment modifier",
                                   data=immdef,treat_modifier =mod, censor_time = censyrs),
                            "treat_modifier values are not all strictly positive"
             )
-            expect_is(fit, class="rpsftm")
+            expect_s3_class(fit, class="rpsftm")
             
           }
           

@@ -8,7 +8,7 @@ context("Test the rpsftm() function")
 test_that("first basict fit with mixed data sources",{
   propX <- with(immdef,1-xoyrs/progyrs)
   fit <- rpsftm(Surv(progyrs, prog)~rand(imm,propX),immdef, censyrs)
-  expect_is(fit$psi, class="numeric")
+  expect_is(fit$psi, "numeric")
 })
 
 
@@ -105,7 +105,7 @@ test_that("plot method",{
   fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
                 low_psi=-1, hi_psi=1)
   fig <- plot(fit)
-  expect_is(fig, class="ggplot")
+  expect_s3_class(fig, class="ggplot")
   
 })
 
@@ -164,7 +164,7 @@ test_that("Try it with Censoring off",
           {
             fit  <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef,
                                  low_psi=-1, hi_psi=1)
-            expect_is(fit, class="rpsftm")
+            expect_s3_class(fit, class="rpsftm")
             
           }
           )
@@ -172,7 +172,7 @@ test_that("Try it with autoswitch off",
           {
             fit  <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
                            low_psi=-1, hi_psi=1, autoswitch = FALSE)
-            expect_is(fit, class="rpsftm")
+            expect_s3_class(fit, class="rpsftm")
             
           }
 )
@@ -239,8 +239,11 @@ test_that( "check variants on fitting",
            
            fits <- list(f0,f1,f2,f3,f4,f5,f6)
              
-             
-             lapply(fits, expect_is, class="rpsftm")}
+             for( obj in fits){
+               expect_s3_class(obj, class="rpsftm")
+             }
+             #lapply(fits, expect_s3_class, class="rpsftm")
+           }
            )
 ## need to create some data for strata cluster, covariates.
 
@@ -262,8 +265,8 @@ test_that("Check that a strata and cluster fits",
             f1 <- update(f0, test=coxph)
             f1.All <- update(f1,~.+strata(category)+covar+cluster(clusterId))
             
-            expect_is(f0.strata, class="rpsftm")
-            expect_is(f1.All, class="rpsftm")
+            expect_s3_class(f0.strata, class="rpsftm")
+            expect_s3_class(f1.All, class="rpsftm")
             })
 
 
@@ -337,7 +340,7 @@ test_that("survfit",{
                          data=immdef, censor_time=censyrs, test=survdiff)
           fit2 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+entry, 
                          data=immdef, censor_time=censyrs, test=survreg)
-          expect_is(survfit(fit0), class="survfit")
+          expect_s3_class(survfit(fit0), class="survfit")
           expect_error(survfit(fit1),"No applicable method")
           expect_error(survfit(fit2),"No applicable method")
           
@@ -354,7 +357,7 @@ test_that("residual",{
   
   expect_is(residuals(fit0), class="numeric")
   expect_is(residuals(fit1, "dfbetas"), class="matrix")
-  expect_is(cox.zph(fit0), "cox.zph")
+  expect_s3_class(cox.zph(fit0), "cox.zph")
 })
 
 
