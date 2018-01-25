@@ -10,10 +10,13 @@ library(rpsftm)
 head(immdef)
 
 ## ------------------------------------------------------------------------
-library(tableone)
-vars       <- c("def", "imm", "censyrs", "xo", "xoyrs", "prog", "progyrs", "entry")
-factorVars <- c("def", "imm", "xo", "prog") 
-CreateTableOne(vars=vars, data=immdef, factorVars=factorVars, includeNA=FALSE, test=FALSE)
+if( requireNamespace("tableone")){
+  vars       <- c("def", "imm", "censyrs", "xo", "xoyrs", "prog", "progyrs", "entry")
+  factorVars <- c("def", "imm", "xo", "prog") 
+  tableone::CreateTableOne(vars=vars, data=immdef, factorVars=factorVars, includeNA=FALSE, test=FALSE)
+} else{
+  summary(immdef)
+}
 
 ## ------------------------------------------------------------------------
 rx <- with(immdef, 1 - xoyrs/progyrs)

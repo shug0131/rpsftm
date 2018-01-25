@@ -12,7 +12,7 @@
 
 <meta name="author" content="Simon Bond, Annabel Allison" />
 
-<meta name="date" content="2017-10-20" />
+<meta name="date" content="2018-01-25" />
 
 <title>rpsftm: rank-preserving structural failure time models for survival data</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">rpsftm: rank-preserving structural failure time models for survival data</h1>
 <h4 class="author"><em>Simon Bond, Annabel Allison</em></h4>
-<h4 class="date"><em>2017-10-20</em></h4>
+<h4 class="date"><em>2018-01-25</em></h4>
 
 
 
@@ -135,10 +135,14 @@ Further terms can be added to the right hand side to adjust for covariates.</li>
 <span class="co">#&gt; 5  5   1   0       3  1 2.122100    1 2.884646     0</span>
 <span class="co">#&gt; 6  6   1   0       3  1 0.557392    0 3.000000     0</span></code></pre></div>
 <p>For example, subject 2 was randomised to the deferred arm, started treatment at 2.65 years and was censored at 3 years (the end of the study). Subject 3 was randomised to the immediate treatment arm and progressed (observed the event) at 1.74 years. Subject 5 was randomised to the deferred treatment arm, started treatment at 2.12 years and progressed at 2.88 years. The trial lasted 3 years with staggered entry over the first 1.5 years. The variable <strong>censyrs</strong> gives the time from entry to the end of the trial. The table below shows summary statistics for the <code>immdef</code> data:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tableone)
-vars       &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;def&quot;</span>, <span class="st">&quot;imm&quot;</span>, <span class="st">&quot;censyrs&quot;</span>, <span class="st">&quot;xo&quot;</span>, <span class="st">&quot;xoyrs&quot;</span>, <span class="st">&quot;prog&quot;</span>, <span class="st">&quot;progyrs&quot;</span>, <span class="st">&quot;entry&quot;</span>)
-factorVars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;def&quot;</span>, <span class="st">&quot;imm&quot;</span>, <span class="st">&quot;xo&quot;</span>, <span class="st">&quot;prog&quot;</span>) 
-<span class="kw">CreateTableOne</span>(<span class="dt">vars=</span>vars, <span class="dt">data=</span>immdef, <span class="dt">factorVars=</span>factorVars, <span class="dt">includeNA=</span><span class="ot">FALSE</span>, <span class="dt">test=</span><span class="ot">FALSE</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">if( <span class="kw">requireNamespace</span>(<span class="st">&quot;tableone&quot;</span>)){
+  vars       &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;def&quot;</span>, <span class="st">&quot;imm&quot;</span>, <span class="st">&quot;censyrs&quot;</span>, <span class="st">&quot;xo&quot;</span>, <span class="st">&quot;xoyrs&quot;</span>, <span class="st">&quot;prog&quot;</span>, <span class="st">&quot;progyrs&quot;</span>, <span class="st">&quot;entry&quot;</span>)
+  factorVars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;def&quot;</span>, <span class="st">&quot;imm&quot;</span>, <span class="st">&quot;xo&quot;</span>, <span class="st">&quot;prog&quot;</span>) 
+  tableone::<span class="kw">CreateTableOne</span>(<span class="dt">vars=</span>vars, <span class="dt">data=</span>immdef, <span class="dt">factorVars=</span>factorVars, <span class="dt">includeNA=</span><span class="ot">FALSE</span>, <span class="dt">test=</span><span class="ot">FALSE</span>)
+} else{
+  <span class="kw">summary</span>(immdef)
+}
+<span class="co">#&gt; Loading required namespace: tableone</span>
 <span class="co">#&gt;                      </span>
 <span class="co">#&gt;                       Overall     </span>
 <span class="co">#&gt;   n                   1000        </span>
