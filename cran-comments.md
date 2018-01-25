@@ -3,7 +3,6 @@
 This is a minor version release. The vignette is modified  to conditionally load the package "tableone", or use summary() as an alternative. Tableone package has been archived and so the CRAN checks are failing. 
 
 
-
 ## Test environments
 * travis checks
 * appveyor
