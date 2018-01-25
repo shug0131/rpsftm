@@ -13,6 +13,7 @@ This is a minor version release. The vignette is modified  to conditionally load
 ## R CMD check results
 There were no ERRORs or WARNINGs. 
 
+1 Note: "tableone" package is in Suggests, but has been archived. This is handled using conditional loading in the vignette file as per section 1.1.3.1 in Writing R Extensions. 
 
 ## Downstream dependencies
 devtools::revdep_check()  issued No ERRORs or WARNINGs found :)
