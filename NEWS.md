@@ -1,3 +1,7 @@
+# rpsftm 1.2.3.9000
+
+version control: the next dev
+
 # rpsftm 1.2.2
 
 modified the vignette to conditionally load the package "tableone", or use summary() as an alternative. Tableone package has been archived and so the CRAN checks are failing. 
