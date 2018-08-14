@@ -1,6 +1,19 @@
-# rpsftm: rank-preserving structural failure time models for survival data
-Simon Bond, Annabel Allison  
-`r Sys.Date()`  
+---
+title: 'rpsftm: rank-preserving structural failure time models for survival data'
+output:   
+  rmarkdown::html_vignette:
+    fig_width: 6
+    fig_height: 4
+    keep_md: TRUE
+  pdf_document: 
+    toc: FALSE
+author: "Simon Bond, Annabel Allison"
+date: "2018-08-14"
+vignette: >
+  %\VignetteIndexEntry{rpsftm: rank-preserving structural failure time models for survival data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
 
 
@@ -144,6 +157,8 @@ The point estimate and 95% confidence interval can be returned using `rpsftm_fit
 
 
 ```r
+library(ggplot2)
+#> Warning: package 'ggplot2' was built under R version 3.5.1
 plot(rpsftm_fit_lr)
 ```
 
@@ -339,7 +354,7 @@ rpsftm( Surv( progyrs, prog) ~ rand( imm, rx), data = immdef, censor_time = cens
 #> .arm=0 500      157      157  5.75e-07  1.22e-06
 #> .arm=1 500      143      143  6.31e-07  1.22e-06
 #> 
-#>  Chisq= 0  on 1 degrees of freedom, p= 0.999 
+#>  Chisq= 0  on 1 degrees of freedom, p= 1 
 #> 
 #> psi: -0.1704745
 #> exp(psi): 0.8432646

@@ -27,7 +27,7 @@ print.rpsftm <- function(x,...) {
   }
   
   cat("\npsi:", x$psi)
-  cat("\nexp(psi):", exp(x$psi))
+  cat("\nexp(psi):", exp(x$psi),"\n")
   invisible(x)
 }
 

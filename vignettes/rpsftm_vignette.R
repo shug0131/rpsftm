@@ -27,6 +27,7 @@ rpsftm_fit_lr <- rpsftm(formula=Surv(progyrs, prog) ~ rand(imm, rx),
                         censor_time=censyrs)
 
 ## ------------------------------------------------------------------------
+library(ggplot2)
 plot(rpsftm_fit_lr)
 
 ## ------------------------------------------------------------------------

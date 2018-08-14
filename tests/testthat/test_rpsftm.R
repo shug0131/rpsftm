@@ -22,8 +22,18 @@ test_that("print method",{
   expect_output(print(fit),"exp\\(psi\\):")
   expect_output(print(fit_coxph),"exp\\(psi\\):")
   expect_output(print(fit_survreg),"exp\\(psi\\):")
+  #this is a test that the end of file is valid witha new line - a warning is issued from readLines()
+  expect_failure(expect_warning(
+    {
+      file <- tempfile()
+      sink(file)
+      print(fit)
+      sink()
+      readLines(file, warn=TRUE)
+    }))
   
 })
+
 
 
 test_that("summary method",{
@@ -36,8 +46,20 @@ test_that("summary method",{
   expect_output(summary(fit),"Confidence Interval")
   expect_output(summary(fit_coxph),"Confidence Interval")
   expect_output(summary(fit_survreg),"Confidence Interval")
+  #this is a test that the end of file is valid witha new line - a warning is issued from readLines()
+  expect_failure(expect_warning(
+    {
+      file <- tempfile()
+      sink(file)
+      summary(fit)
+      sink()
+      readLines(file, warn=TRUE)
+    }))
+  
   
 })
+
+context("Placemarker for end of end-of-line tests")
 
 test_that("detailed print.coxph test",{
   x <- list(fail="yes")

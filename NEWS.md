@@ -1,6 +1,6 @@
-# rpsftm 1.2.3.9000
+# rpsftm 1.2.3
 
-version control: the next dev
+Minor aesthetic corrections to ensure that the print() and summary() output finishes with a new line.
 
 # rpsftm 1.2.2
 

@@ -23,7 +23,7 @@ summary.rpsftm <- function(object,...) {
   cat("\npsi:", object$psi)
   cat("\nexp(psi):", exp(object$psi))
   cat("\nConfidence Interval, psi", object$CI)
-  cat("\nConfidence Interval, exp(psi) ", exp(object$CI))
+  cat("\nConfidence Interval, exp(psi) ", exp(object$CI),"\n")
   # Have not added stuff to the obj.summary- the return object about psi,
   # and CI it does vary between the different tests so would be hard to
   # generalise.
