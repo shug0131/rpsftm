@@ -5,3 +5,4 @@
 ~*
 rpsftm.Rproj
 .Renviron
+^revdep$
