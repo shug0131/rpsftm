@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 [![Travis-CI Build Status](https://travis-ci.org/shug0131/rpsftm.svg?branch=master)](https://travis-ci.org/shug0131/rpsftm) [![codecov](https://codecov.io/github/shug0131/rpsftm/branch/master/graphs/badge.svg)](https://codecov.io/github/shug0131/rpsftm) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/shug0131/rpsftm?branch=master&svg=true)](https://ci.appveyor.com/project/shug0131/rpsftm) [![CRAN version](http://www.r-pkg.org/badges/version/rpsftm)](https://cran.r-project.org/package=rpsftm) [![downloads](https://cranlogs.r-pkg.org/badges/rpsftm)](https://cran.rstudio.com/web/packages/rpsftm/index.html) <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+=======
+[![Travis-CI Build Status](https://travis-ci.org/shug0131/rpsftm.svg?branch=master)](https://travis-ci.org/shug0131/rpsftm) [![codecov](https://codecov.io/github/shug0131/rpsftm/branch/master/graphs/badge.svg)](https://codecov.io/github/shug0131/rpsftm) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/shug0131/rpsftm?branch=master&svg=true)](https://ci.appveyor.com/project/shug0131/rpsftm) [![CRAN version](http://www.r-pkg.org/badges/version/rpsftm)](https://cran.r-project.org/package=rpsftm)
+[![](https://cranlogs.r-pkg.org/badges/rpsftm)](https://cran.rstudio.com/web/packages/rpsftm/index.html)
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+>>>>>>> 0fa1b4bb4ccdd351e2b9c7507e91d4087c9ce677
 This is an R package that implements the method of Rank Preserving Strucutural Failure Time models to estimate causal effects in failure time models in randomised control trials where participants do not comply with the treatment assigned.
 
 As an example:
