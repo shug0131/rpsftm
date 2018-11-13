@@ -27,8 +27,8 @@ extract_z.survdiff <- function(fit, ...) {
     etmp <- fit$exp
   }
   df <- (etmp > 0)
-  if (sum(df) < 2) 
-    z <- 0 else {
+  if (sum(df) < 2)
+    z <- 0  else {
       temp2 <- ((otmp - etmp)[df])[-1]
       vv <- (fit$var[df, df])[-1, -1, drop = FALSE]
       # chi <- sum(solve(vv, temp2) * temp2)
