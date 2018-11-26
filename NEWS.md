@@ -1,4 +1,6 @@
-# rpsftm 1.2.4.9000
+# rpsftm 1.2.4
+
+Small modifications to get 100% coverage of the tests.
 
 # rpsftm 1.2.3
 

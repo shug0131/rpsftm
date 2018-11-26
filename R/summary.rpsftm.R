@@ -60,9 +60,8 @@ print.summary.coxph <- function (x,
   on.exit(options(savedig))
   omit <- x$na.action
   cat("  n=", x$n)
-  if (!is.null(x$nevent)) 
-    cat(", number of events=", x$nevent, "\n")
-  else cat("\n")
+  if (!is.null(x$nevent)) cat(", number of events=", x$nevent)
+  cat("\n")
   if (length(omit)) 
     cat("   (", stats::naprint(omit), ")\n", sep = "")
   #if (nrow(x$coef) == 0) {
@@ -72,10 +71,8 @@ print.summary.coxph <- function (x,
   arm_index <- which(rownames(x$coefficients)==".arm")
   if (!is.null(x$coefficients) & nrow(x$coefficients)>1) {
     cat("\n")
-    if (is.R()) 
-      stats::printCoefmat(x$coefficients[-arm_index, , drop=FALSE], digits = digits, signif.stars = signif.stars, 
-                   ...)
-    else print(x$coefficients[-arm_index, , drop=FALSE])
+    stats::printCoefmat(x$coefficients[-arm_index, , drop=FALSE], 
+                        digits = digits, signif.stars = signif.stars, ...)
   }
   if (!is.null(x$conf.int)& nrow(x$conf.int)>1) {
     cat("\n")

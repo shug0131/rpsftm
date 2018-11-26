@@ -81,9 +81,8 @@ print.coxph <- function (x, digits = max(options()$digits - 4, 3), ...){
     #                                                  df)), "\n", sep = "")
     omit <- x$na.action
     cat("n=", x$n)
-    if (!is.null(x$nevent)) 
-      cat(", number of events=", x$nevent, "\n")
-    else cat("\n")
+    if (!is.null(x$nevent)) cat(", number of events=", x$nevent)
+    cat("\n")
     if (length(omit)) 
       cat("   (", stats::naprint(omit), ")\n", sep = "")
     invisible(x)

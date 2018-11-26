@@ -392,6 +392,35 @@ test_that("extract_z",{
 })
 
 
+test_that("print.summary.rpsftm",{
+  
+  immdef2 <- immdef
+  for( i in 1:nrow(immdef2)){
+    if( i%%2==0) immdef2[i,] <- NA
+  }
+  fit1 <- rpsftm(Surv(progyrs,prog)~rand(imm,1 -xoyrs/progyrs), immdef2, censor_time=censyrs, test= coxph)
+  expect_output(summary(fit1),"observations deleted due to missingness")
+  fit3 <- rpsftm(Surv(progyrs,prog)~rand(imm,1 -xoyrs/progyrs), immdef2, censor_time=censyrs, test= survreg,scale=0.5)
+  #this is just toget coverage of line 109 in summary.rpsftm.R
+  expect_output(print(summary(fit3), digits=NULL), "Scale fixed")
+  expect_output(summary(fit3), "observations deleted due to missingness")
+}
+)
+
+test_that("print.rpsftm",{
+  immdef2 <- immdef
+  for( i in 1:nrow(immdef2)){
+    if( i%%2==0) immdef2[i,] <- NA
+  }
+  fit1 <- rpsftm(Surv(progyrs,prog)~rand(imm,1 -xoyrs/progyrs), immdef2, censor_time=censyrs, test= coxph)
+  fit3 <- rpsftm(Surv(progyrs,prog)~rand(imm,1 -xoyrs/progyrs), immdef2, censor_time=censyrs, test= survreg,scale=0.5)
+  expect_error(rpsftm:::print.coxph(NULL),"Input is not valid")
+  expect_output(print(fit1),"observations deleted due to missingness")
+  expect_output(print(fit3),"observations deleted due to missingness")
+})
+          
+
+
 #CHECK that each line of code has been called somehow in this testing process??
 #DONE:
 #> #install.packages("covr")
