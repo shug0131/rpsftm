@@ -68,7 +68,7 @@
 #' @importFrom survival Surv strata cluster survdiff
 #' @importFrom stats terms model.extract update drop.terms reformulate uniroot qnorm
 
-rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdiff, low_psi = -1, 
+rpsftm <- function(formula, treatment, rand, data, censor_time, subset, na.action,  test = survdiff, low_psi = -1, 
                    hi_psi = 1, alpha = 0.05, treat_modifier = 1, autoswitch = TRUE, 
                    n_eval_z = 100, ...) {
   cl <- match.call()
@@ -76,7 +76,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   # create formula for fitting, and to feed into model.frame() from the
   # lm() function
   mf <- match.call(expand.dots = FALSE)
-  m <- match(c("formula", "data", "censor_time", "treat_modifier", "subset", "na.action"), 
+  m <- match(c("formula", "treatment","rand", "data", "censor_time", "treat_modifier", "subset", "na.action"), 
              names(mf), 0L)
  
   mf <- mf[c(1L, m)]
@@ -85,16 +85,19 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   
   # this ultimately returns a data frame, df, with all the variables in and
   # renamed time, status, censor_time, rx, arm as appropriate
-  special <- c("rand","strata","cluster")
+  special <- c("strata","cluster")
+  mf$formula <- asOneFormula(mf$formula, mf$treatment, mf$rand)
+  m <- match(c("treatment", "rand"), names(mf), 0)
+  mf <- mf[-m]
+  
   mf$formula <- if (missing(data)) {
-    terms(formula, special)
+    terms(mf$formula, special)
   } else {
-    terms(formula, special, data = data)
+    terms(mf$formula, special, data = data)
   }
   
   
   formula_env <- new.env(parent = environment(mf$formula))
-  assign("rand", rand, envir = formula_env)
   assign("Surv", Surv, envir = formula_env)
   assign("cluster", cluster, envir = formula_env)
   assign("strata", strata, envir = formula_env)
@@ -105,9 +108,13 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   mf[[1L]] <- as.name("model.frame")
   df <- eval(mf, parent.frame())
 
+#df has everything in it with na.action applied universally
+  
   na.action <- attr(df, "na.action")
  #adapted from coxph()   
-  Y <- model.extract(df, "response")
+  
+  
+  Y <- model.extract( model.frame(formula,data=df), "response")
   if (!inherits(Y, "Surv")) 
     stop("Response must be a survival object")
   type <- attr(Y, "type")
@@ -125,53 +132,53 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   
   
   
-  rand_index <- attr(mf$formula, "specials")$rand
-  rand_drops <- which(attr(mf$formula, "factors")[rand_index, ] > 0)
-  if (length(rand_drops) != 1) {
-    stop("Exactly one rand() term allowed")
-  }
-  rand_column <- attr(mf$formula, "factors")[, rand_drops]
-  if (sum(rand_column > 0) > 1) {
-    stop("rand() term must not be in any interactions")
-  }
-  
+  # rand_index <- attr(mf$formula, "specials")$rand
+  # rand_drops <- which(attr(mf$formula, "factors")[rand_index, ] > 0)
+  # if (length(rand_drops) != 1) {
+  #   stop("Exactly one rand() term allowed")
+  # }
+  # rand_column <- attr(mf$formula, "factors")[, rand_drops]
+  # if (sum(rand_column > 0) > 1) {
+  #   stop("rand() term must not be in any interactions")
+  # }
+  # 
   # check for special terms
-  if( length(labels(mf$formula))>1){
-    adjustor_formula <- drop.terms( mf$formula, dropx = rand_drops , keep.response = FALSE)
-    adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), terms.inner)[-1])
-    if( any( adjustor_names %in% c(".arm",".rx","time","status"))){
-      warning( "'.arm', '.rx', 'time', 'status' are used internally within rpsftm. Please rename these variables used in the formula outside of rand() and surv()")
-    }
-  }
+  # if( length(labels(mf$formula))>1){
+  #   adjustor_formula <- drop.terms( mf$formula, dropx = rand_drops , keep.response = FALSE)
+  #   adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), terms.inner)[-1])
+  #   if( any( adjustor_names %in% c(".arm",".rx","time","status"))){
+  #     warning( "'.arm', '.rx', 'time', 'status' are used internally within rpsftm. Please rename these variables used in the formula outside of rand() and surv()")
+  #   }
+  # }
   # add in the special covariate .arm
   
-  fit_formula <- terms(update(mf$formula, . ~ .arm + .))
-  fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)
+  #fit_formula <- terms(update(mf$formula, . ~ .arm + .))
+  #fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)
   
-  rand_object <- df[,rand_index]
+  #rand_object <- df[,rand_index]
   
-  df_basic <- data.frame( time=df[,response_index][,"time"], 
-                          status=df[,response_index][,"status"], 
-                          ".arm"=df[, rand_index][,"arm"], 
-                          ".rx"=df[,rand_index][,"rx"])
+  #df_basic <- data.frame( time=df[,response_index][,"time"], 
+  #                        status=df[,response_index][,"status"], 
+  #                        ".arm"=df[, rand_index][,"arm"], 
+  #                        ".rx"=df[,rand_index][,"rx"])
   
   
-  df_adjustor <- df[,-c( response_index, rand_index), drop = FALSE]
-  if( length( attr( fit_formula, "variables")) > 2){
-    #this pulls out the core variables, rather than strata(var), say
-    adjustor_formula <- drop.terms( mf$formula, dropx = rand_drops , keep.response = FALSE)
-    adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), terms.inner)[-1])
-    mf$formula <- reformulate(adjustor_names)
-    mf$formula <- if (missing(data)) {
-      terms(mf$formula)
-    } else {
-      terms(mf$formula, data = data)
-    }
-    #to evaluate out of this internal loop
-    environment(mf$formula) <- formula_env
-    df_adjustor <- eval(mf,parent.frame())
-  }
-  df <- cbind( df_basic,  df_adjustor)
+  # df_adjustor <- df[,-c( response_index, rand_index), drop = FALSE]
+  # if( length( attr( fit_formula, "variables")) > 2){
+  #   #this pulls out the core variables, rather than strata(var), say
+  #   adjustor_formula <- drop.terms( mf$formula, dropx = rand_drops , keep.response = FALSE)
+  #   adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), terms.inner)[-1])
+  #   mf$formula <- reformulate(adjustor_names)
+  #   mf$formula <- if (missing(data)) {
+  #     terms(mf$formula)
+  #   } else {
+  #     terms(mf$formula, data = data)
+  #   }
+  #   #to evaluate out of this internal loop
+  #   environment(mf$formula) <- formula_env
+  #   df_adjustor <- eval(mf,parent.frame())
+  # }
+  # df <- cbind( df_basic,  df_adjustor)
   
 
   #force the default value to be included in df if needed.
@@ -182,8 +189,10 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   
   
   # Check that the number of arms is 2.
-  if (length(unique(df[, ".arm"])) != 2) {
-    stop("arm must have exactly 2 observed values")
+  p <- qr(model.matrix(rand, data=df))$rank
+  q <- qr(model.matrix(treatment, data=df))$rank
+  if (p!=q) {
+    stop("the treament and rand model matrices must be the same rank")
   }
   
   # check the values of treatment modifier
@@ -208,8 +217,10 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   #create values of psi to evaluate in a data frame
   eval_z <- data.frame( psi = seq(low_psi, hi_psi, length=n_eval_z))
   # evaluate them
+  print(head(df))
+  
   eval_z$Z <- apply(eval_z,1, est_eqn, 
-                    data=df, formula=fit_formula, test=test,
+                    data=df, formula=formula, treatment=treatment, rand=rand,  test=test,
                     target=0, autoswitch=autoswitch,...=...)
   
   
@@ -220,7 +231,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   root <- function(target) {
     est_eqn_vectorize <- Vectorize(est_eqn, vectorize.args="psi")
     ans <- rootSolve::uniroot.all(est_eqn_vectorize, 
-                                  c(low_psi, hi_psi), data = df, formula = fit_formula, 
+                                  c(low_psi, hi_psi), data = df, formula = formula, treatment=treatment, rand=rand, 
                                   target = target, test = test, autoswitch = autoswitch, 
                                   ... = ...)
     #give back the same elements as uniroot()
@@ -228,7 +239,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     list( root=ans[1], 
           root_all=ans,
           f.root= est_eqn(ans[1],
-                          data = df, formula = fit_formula, 
+                          data = df, formula = formula,  treatment=treatment, rand=rand, 
                           target = target, test = test, autoswitch = autoswitch, 
                           ... = ...),
           iter=NA,
@@ -312,11 +323,16 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     }
     
     
-    Sstar <- untreated(psiHat, df[, "time"], df[, "status"], 
-                       df[,"(censor_time)"],df[, ".rx"], df[, ".arm"], autoswitch)
+    response <- model.response(model.frame(formula, data=df))
+    treatment_matrix <- model.matrix(treatment, data=df)
+    rand_matrix <- model.matrix(rand, data=df)
+    
+    Sstar <- untreated(psiHat, response,treatment_matrix, rand_matrix, df[,"(censor_time)"], autoswitch)
+    
+    df <- cbind(Sstar, df)
     # Ignores any covariates, strata or adjustors. On Purpose as this is
     # too general to deal with
-    fit <- survival::survfit(Sstar ~ .arm, data = df, conf.int=1-alpha)
+    fit <- survival::survfit(update(rand, Sstar ~ .) , data = df, conf.int=1-alpha)
   } else {
     fit <- NULL
     Sstar <- NULL
@@ -335,7 +351,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
       fit=fit, 
       CI=c(lower$root,upper$root),
       Sstar=Sstar, 
-      rand=rand_object,
+      #rand=rand_object,
       ans=ans,
       eval_z=eval_z),
       #for the print and summary methods

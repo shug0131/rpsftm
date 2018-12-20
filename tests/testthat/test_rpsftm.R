@@ -7,7 +7,7 @@ context("Test the rpsftm() function")
 
 test_that("first basict fit with mixed data sources",{
   propX <- with(immdef,1-xoyrs/progyrs)
-  fit <- rpsftm(Surv(progyrs, prog)~rand(imm,propX),immdef, censyrs)
+  fit <- rpsftm(Surv(progyrs, prog)~1,treatment=~propX, rand=~imm,data=immdef, censor_time=censyrs)
   expect_is(fit$psi, "numeric")
 })
 
