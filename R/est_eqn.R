@@ -7,6 +7,10 @@
 #' Must contain columns named: time, censor_time,rx, arm.
 #' Optionally a column named: treat_modifier
 #' @param formula a formula object of covariates to adjust for: \code{~strata(A)+B*C}
+#' @param rand a one-side formula giving the randomised arms
+#' @param treatment a one-sided formula giving the amount of treatment recieved. 
+#' The model matrix it produces must be of the same rank as for the \code{rand} argument. So either remove the intercept with '-1',
+#'  or only provide \code{(k-1)} terms on a scale \emph{relative} to the control treatment, where \code{k} is the number of arms.
 #' @param target the value to subtract off from the z-statistic 
 #' @param test the survival regression function to calculate the z-statistic: survdiff, coxph, survreg
 #' @param ... arguments to supply to the test function.

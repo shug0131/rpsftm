@@ -217,7 +217,7 @@ rpsftm <- function(formula, treatment, rand, data, censor_time, subset, na.actio
   #create values of psi to evaluate in a data frame
   eval_z <- data.frame( psi = seq(low_psi, hi_psi, length=n_eval_z))
   # evaluate them
-  print(head(df))
+  #print(head(df))
   
   eval_z$Z <- apply(eval_z,1, est_eqn, 
                     data=df, formula=formula, treatment=treatment, rand=rand,  test=test,
