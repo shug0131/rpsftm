@@ -19,7 +19,6 @@ allVarsRec <- function (object)
 }
 
 one_becomes_three <- function(formula, env=parent.frame()){
-  
   formula <- terms(formula, specials = "rand")
   var_list <- attr(formula, "variables")
   rand_index <- attr(formula, "specials")$rand
@@ -28,7 +27,7 @@ one_becomes_three <- function(formula, env=parent.frame()){
   }
   rand_expression <- var_list[[1+rand_index]]
   if( length(rand_expression)!=2 ){
-    stop("' ",deparse(rand_expression), "' must have only one argument, which is a  formula")
+    stop("'",deparse(rand_expression), "' must have only one argument, which is a  formula")
   }
   if(!grepl("~",deparse(rand_expression[[2]]))){
     warning("'",deparse(rand_expression[[2]]), "' does not look like a formula")
@@ -37,21 +36,23 @@ one_becomes_three <- function(formula, env=parent.frame()){
   environment(rand_formula) <- env
   rand_formula <- terms(rand_formula)
   if(!attr(rand_formula,"response")){
-    stop("' ", deparse(rand_expression[[2]]),"' must be a two-sided formula" )
+    stop("'", deparse(rand_expression[[2]]),"' must be a two-sided formula" )
   }
-  formula <- drop.terms(formula, dropx=rand_index-1, keep.response = TRUE)
+  length(attr(formula, "variables"))
+  #formula <- drop.terms(formula, dropx=rand_index-1, keep.response = TRUE)
+  formula <- formula[-(rand_index-1)] #this works if there is only the rand() terms
   randomise <- delete.response(rand_formula)
   treatment <- eval(call("~", attr(rand_formula,"variables")[[2]]))
   environment(treatment) <- env
-  list(formula=formula, treatment=treatment, randomise=randomise, rand_formula=rand_formula)
+  list(formula=formula, treatment=terms(treatment), randomise=randomise)
 }
 
 
-test <- one_becomes_three(Surv(progyrs,prog)~entry+rand(I(1-xoyrs/progyrs)~imm))
-test <- one_becomes_three(Surv(progyrs,prog)~entry+rand(imm+def~imm) +age/sex)
-one_becomes_three(y~x+rand(frm,x))
+#test <- one_becomes_three(Surv(progyrs,prog)~entry+rand(I(1-xoyrs/progyrs)~imm))
+#test <- one_becomes_three(Surv(progyrs,prog)~entry+rand(imm+def~imm) +age/sex)
+#one_becomes_three(y~x+rand(a~x)+rand(x~a))
 
-asOneFormula(test)
+#asOneFormula(test)
 
 
 

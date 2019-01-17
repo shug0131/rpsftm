@@ -18,7 +18,7 @@
 
 
 
-rand <- function(arm, rx) {
+old_rand <- function(arm, rx) {
   if (is.numeric(arm) & any(!(arm %in% c(0, 1)))) {
     warning("Auto checking of no switching needs treatment to have value 0 or 1")
   }

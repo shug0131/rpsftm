@@ -68,7 +68,7 @@
 #' @importFrom survival Surv strata cluster survdiff
 #' @importFrom stats terms model.extract update drop.terms reformulate uniroot qnorm
 
-rpsftm <- function(formula, treatment, rand, data, censor_time, subset, na.action,  test = survdiff, low_psi = -1, 
+rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdiff, low_psi = -1, 
                    hi_psi = 1, alpha = 0.05, treat_modifier = 1, autoswitch = TRUE, 
                    n_eval_z = 100, ...) {
   cl <- match.call()
@@ -76,7 +76,7 @@ rpsftm <- function(formula, treatment, rand, data, censor_time, subset, na.actio
   # create formula for fitting, and to feed into model.frame() from the
   # lm() function
   mf <- match.call(expand.dots = FALSE)
-  m <- match(c("formula", "treatment","rand", "data", "censor_time", "treat_modifier", "subset", "na.action"), 
+  m <- match(c("formula", "data", "censor_time", "treat_modifier", "subset", "na.action"), 
              names(mf), 0L)
  
   mf <- mf[c(1L, m)]
@@ -86,9 +86,9 @@ rpsftm <- function(formula, treatment, rand, data, censor_time, subset, na.actio
   # this ultimately returns a data frame, df, with all the variables in and
   # renamed time, status, censor_time, rx, arm as appropriate
   special <- c("strata","cluster")
-  mf$formula <- asOneFormula(mf$formula, mf$treatment, mf$rand)
-  m <- match(c("treatment", "rand"), names(mf), 0)
-  mf <- mf[-m]
+  formula_list <- one_becomes_three(formula)
+  
+  mf$formula <- asOneFormula(formula_list[1:3])
   
   mf$formula <- if (missing(data)) {
     terms(mf$formula, special)
@@ -107,14 +107,15 @@ rpsftm <- function(formula, treatment, rand, data, censor_time, subset, na.actio
   
   mf[[1L]] <- as.name("model.frame")
   df <- eval(mf, parent.frame())
-
-#df has everything in it with na.action applied universally
+  #df has everything in it  with na.action applied universally
+  attr(df, "terms") <- NULL 
+  # but we don't want to save the formula that created it in case of I()
   
   na.action <- attr(df, "na.action")
  #adapted from coxph()   
   
   
-  Y <- model.extract( model.frame(formula,data=df), "response")
+  Y <- model.extract( model.frame(formula_list$formula,data=df), "response")
   if (!inherits(Y, "Surv")) 
     stop("Response must be a survival object")
   type <- attr(Y, "type")
@@ -188,9 +189,10 @@ rpsftm <- function(formula, treatment, rand, data, censor_time, subset, na.actio
  
   
   
-  # Check that the number of arms is 2.
-  p <- qr(model.matrix(rand, data=df))$rank
-  q <- qr(model.matrix(treatment, data=df))$rank
+#
+  
+  p <- qr(model.matrix(formula_list$randomise, data=df))$rank
+  q <- qr(model.matrix(formula_list$treatment, data=df))$rank
   if (p!=q) {
     stop("the treament and rand model matrices must be the same rank")
   }
@@ -220,10 +222,13 @@ rpsftm <- function(formula, treatment, rand, data, censor_time, subset, na.actio
   #print(head(df))
   
   eval_z$Z <- apply(eval_z,1, est_eqn, 
-                    data=df, formula=formula, treatment=treatment, rand=rand,  test=test,
+                    data=df, 
+                    formula=formula_list$formula, 
+                    treatment=formula_list$treatment, 
+                    rand=formula_list$randomise,  
+                    test=test,
                     target=0, autoswitch=autoswitch,...=...)
-  
-  
+ 
   
   # solve to find the value of psi that gives the root to z=0, and the
   # limits of the CI.
@@ -231,7 +236,9 @@ rpsftm <- function(formula, treatment, rand, data, censor_time, subset, na.actio
   root <- function(target) {
     est_eqn_vectorize <- Vectorize(est_eqn, vectorize.args="psi")
     ans <- rootSolve::uniroot.all(est_eqn_vectorize, 
-                                  c(low_psi, hi_psi), data = df, formula = formula, treatment=treatment, rand=rand, 
+                                  c(low_psi, hi_psi), data = df, formula=formula_list$formula, 
+                                  treatment=formula_list$treatment, 
+                                  rand=formula_list$randomise,  
                                   target = target, test = test, autoswitch = autoswitch, 
                                   ... = ...)
     #give back the same elements as uniroot()
@@ -239,7 +246,9 @@ rpsftm <- function(formula, treatment, rand, data, censor_time, subset, na.actio
     list( root=ans[1], 
           root_all=ans,
           f.root= est_eqn(ans[1],
-                          data = df, formula = formula,  treatment=treatment, rand=rand, 
+                          data = df, formula=formula_list$formula, 
+                          treatment=formula_list$treatment, 
+                          rand=formula_list$randomise,  
                           target = target, test = test, autoswitch = autoswitch, 
                           ... = ...),
           iter=NA,
@@ -323,16 +332,16 @@ rpsftm <- function(formula, treatment, rand, data, censor_time, subset, na.actio
     }
     
     
-    response <- model.response(model.frame(formula, data=df))
-    treatment_matrix <- model.matrix(treatment, data=df)
-    rand_matrix <- model.matrix(rand, data=df)
+    response <- model.response(model.frame(formula_list$formula, data=df))
+    treatment_matrix <- model.matrix(formula_list$treatment, data=df)
+    rand_matrix <- model.matrix(formula_list$randomise, data=df)
     
     Sstar <- untreated(psiHat, response,treatment_matrix, rand_matrix, df[,"(censor_time)"], autoswitch)
     
     df <- cbind(Sstar, df)
     # Ignores any covariates, strata or adjustors. On Purpose as this is
     # too general to deal with
-    fit <- survival::survfit(update(rand, Sstar ~ .) , data = df, conf.int=1-alpha)
+    fit <- survival::survfit(update(formula_list$randomise, Sstar ~ .) , data = df, conf.int=1-alpha)
   } else {
     fit <- NULL
     Sstar <- NULL
