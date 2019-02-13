@@ -4,8 +4,8 @@
 \alias{est_eqn}
 \title{Estimating Equations for \code{rpsftm()}}
 \usage{
-est_eqn(psi, data, formula, target = 0, test = "survdiff", autoswitch,
-  ...)
+est_eqn(psi, data, formula, treatment, rand, target = 0,
+  test = "survdiff", autoswitch, ...)
 }
 \arguments{
 \item{psi}{the parameter that measures how more rapidly the lifetime is expended under treatment}
@@ -16,13 +16,19 @@ Optionally a column named: treat_modifier}
 
 \item{formula}{a formula object of covariates to adjust for: \code{~strata(A)+B*C}}
 
+\item{treatment}{a one-sided formula giving the amount of treatment recieved. 
+The model matrix it produces must be of the same rank as for the \code{rand} argument. So either remove the intercept with '-1',
+ or only provide \code{(k-1)} terms on a scale \emph{relative} to the control treatment, where \code{k} is the number of arms.}
+
+\item{rand}{a one-side formula giving the randomised arms}
+
 \item{target}{the value to subtract off from the z-statistic}
 
 \item{test}{the survival regression function to calculate the z-statistic: survdiff, coxph, survreg}
 
-\item{autoswitch}{a logical to autodetect cases of no switching. If TRUE, then if all observations in an arm
+\item{autoswitch}{Currently has no effect ( formerly: a logical to autodetect cases of no switching. If TRUE, then if all observations in an arm
 have perfect compliance then recensoring is not applied in that arm. If FALSE the recensoring is applied
-regardless of perfect compliance.}
+regardless of perfect compliance.)}
 
 \item{...}{arguments to supply to the test function.}
 }

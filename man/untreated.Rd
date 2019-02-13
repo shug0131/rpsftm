@@ -4,24 +4,23 @@
 \alias{untreated}
 \title{Untreated Event Time}
 \usage{
-untreated(psi, time, delta, censor_time, rx, arm, autoswitch)
+untreated(psi, response, treatment_matrix, rand_matrix, censor_time,
+  autoswitch)
 }
 \arguments{
 \item{psi}{the parameter that measures how more rapidly the lifetime is expended under treatment}
 
-\item{time}{the observed failure or censoring time.}
+\item{response}{the response variable, a Surv() object}
 
-\item{delta}{the status of the time: 1 = observed, 0 = censored.}
+\item{treatment_matrix}{a model.matrix object capturing the amount of active treatment(s) received}
+
+\item{rand_matrix}{a model.matrix object catpuring the randomised treatment arms. Unused at presnet}
 
 \item{censor_time}{the theoretical censoring time, either observed or set after time. Set to Inf to ignore recensoring.}
 
-\item{rx}{the proportion of time spent on treatment}
-
-\item{arm}{the randomised arm. Either a numerical indicator, with 0 as the placebo, or a factor with the lowest level as placebo.}
-
-\item{autoswitch}{a logical to autodetect cases of no switching. If TRUE, then if all observations in an arm
+\item{autoswitch}{Currently has no effect ( formerly: a logical to autodetect cases of no switching. If TRUE, then if all observations in an arm
 have perfect compliance then recensoring is not applied in that arm. If FALSE the recensoring is applied
-regardless of perfect compliance.}
+regardless of perfect compliance.)}
 }
 \value{
 A Surv() object
