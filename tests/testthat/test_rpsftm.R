@@ -4,6 +4,17 @@ context("Test the rpsftm() function")
 
 
 
+test_that("check of test that with mixed data sources",{
+  propX <- with(immdef,I(1-xoyrs/progyrs))
+  fit <- lm(progyrs~propX, data=immdef)
+  expect_is(fit$coefficients, "numeric")
+})
+
+test_that("first basict fit",{
+  fit <- rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs)
+  expect_is(fit$psi, "numeric")
+})
+
 
 test_that("first basict fit with mixed data sources",{
   propX <- with(immdef,I(1-xoyrs/progyrs))

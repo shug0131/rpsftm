@@ -5,6 +5,7 @@ asOneFormula <- function (..., omit = c(".", "pi"))
   if (length(names)) 
     eval(parse(text = paste("~", paste(names, collapse = "+")))[[1]])
   else ~1
+  #environments are not preseved. reassign outside of the function call
 }
 
 

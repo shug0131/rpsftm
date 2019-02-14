@@ -87,8 +87,10 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   # renamed time, status, censor_time, rx, arm as appropriate
   special <- c("strata","cluster")
   formula_list <- one_becomes_three(formula)
+  all_var_formula <- asOneFormula(formula_list[1:3])
+  environment(all_var_formula) <- environment(formula)
   
-  mf$formula <- asOneFormula(formula_list[1:3])
+  mf$formula <- all_var_formula
   
   mf$formula <- if (missing(data)) {
     terms(mf$formula, special)
@@ -360,6 +362,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
       fit=fit, 
       CI=c(lower$root,upper$root),
       Sstar=Sstar, 
+      formula_list=formula_list,
       #rand=rand_object,
       ans=ans,
       eval_z=eval_z),

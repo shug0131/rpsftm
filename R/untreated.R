@@ -30,7 +30,7 @@ untreated <- function(psi, response,treatment_matrix, rand_matrix, censor_time, 
   
  
   nontreatment <- 1-apply(treatment_matrix,1,sum)
-  treatment_matrix <- sweep(treatment_matrix,2, exp(psi), FUN="*")
+  treatment_matrix <- sweep(treatment_matrix,1, exp(psi), FUN="*")
   treatment <- apply(treatment_matrix,1, sum)
   
   u <- time * (nontreatment + treatment)
