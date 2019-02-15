@@ -1,23 +1,41 @@
-asOneFormula <- function (..., omit = c(".", "pi")) 
-{
-  names <- unique(allVarsRec(list(...)))
-  names <- names[is.na(match(names, omit))]
-  if (length(names)) 
-    eval(parse(text = paste("~", paste(names, collapse = "+")))[[1]])
-  else ~1
-  #environments are not preseved. reassign outside of the function call
+
+
+
+
+add_formula_list <- function(formula_list, env=parent.frame()){
+  lhs_var_list <- lapply(formula_list, lhs)
+  rhs_var_list <- lapply(formula_list, rhs)
+  lhs_text <- paste(unlist(lhs_var_list), collapse="+")
+  rhs_text <- paste(unlist(rhs_var_list), collapse="+")
+  formula <- as.formula(paste(lhs_text, "~",rhs_text))
+  environment(formula) <- env
+  terms(formula, simplify=TRUE)
 }
 
 
-allVarsRec <- function (object) 
-{
-  if (is.list(object)) {
-    unlist(lapply(object, allVarsRec))
-  }
-  else {
-    all.vars(object)
+
+
+lhs <- function(formula){
+  formula <- as.formula(formula)
+  if(length(formula)==3){ 
+    paste(deparse(formula[[2]]),collapse="")
+  } else{ character(0) }
+}
+
+rhs <- function(formula){
+  formula <- as.formula(formula)
+  if(length(formula)==3){
+    paste(deparse(formula[[3]]), collapse="")
+  } else{ 
+    paste(deparse(formula[[2]]), collapse="")
   }
 }
+
+
+
+
+
+
 
 one_becomes_three <- function(formula, env=parent.frame()){
   formula <- terms(formula, specials = "rand")
@@ -42,10 +60,11 @@ one_becomes_three <- function(formula, env=parent.frame()){
   length(attr(formula, "variables"))
   #formula <- drop.terms(formula, dropx=rand_index-1, keep.response = TRUE)
   formula <- formula[-(rand_index-1)] #this works if there is only the rand() terms
+  if(length(attr(rand_formula,"variables"))<=2){warning("your argument to rand() makes very little sense")}
   randomise <- delete.response(rand_formula)
   treatment <- eval(call("~", attr(rand_formula,"variables")[[2]]))
   environment(treatment) <- env
-  list(formula=formula, treatment=terms(treatment), randomise=randomise)
+  list(formula=formula, treatment=terms(treatment), randomise=terms(randomise))
 }
 
 

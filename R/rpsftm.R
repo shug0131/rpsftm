@@ -84,13 +84,21 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   mf$drop.unused.levels <- TRUE
   
   # this ultimately returns a data frame, df, with all the variables in and
-  # renamed time, status, censor_time, rx, arm as appropriate
-  special <- c("strata","cluster")
+  special <- c("strata","cluster","rand")
   formula_list <- one_becomes_three(formula)
-  all_var_formula <- asOneFormula(formula_list[1:3])
-  environment(all_var_formula) <- environment(formula)
+  mf$formula <- add_formula_list(formula_list, env=environment(formula))
+ 
+  #modify the data argument to have all the variables 
+ 
   
-  mf$formula <- all_var_formula
+  simple_formula <- reformulate(terms.inner(mf$formula))
+  environment(simple_formula) <- environment(formula)
+  
+  temp <- mf
+  temp$formula <- simple_formula
+  temp[[1L]] <- quote(stats::model.frame)
+  data <- eval(temp,parent.frame())
+  #print(head(data))
   
   mf$formula <- if (missing(data)) {
     terms(mf$formula, special)
@@ -98,26 +106,21 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     terms(mf$formula, special, data = data)
   }
   
+  # from coxph, not clear why this is needed, but it fails in testthat() without.
+  coxenv <- new.env(parent = environment(mf$formula))
+  assign("Surv", Surv, env = coxenv)
+  assign("strata", strata, env = coxenv)
+  assign("cluster", cluster, env = coxenv)
+  environment(mf$formula) <- coxenv
   
-  formula_env <- new.env(parent = environment(mf$formula))
-  assign("Surv", Surv, envir = formula_env)
-  assign("cluster", cluster, envir = formula_env)
-  assign("strata", strata, envir = formula_env)
-  environment(mf$formula) <- formula_env
   
-  return_formula <- mf$formula
-  
-  mf[[1L]] <- as.name("model.frame")
+  mf[[1L]] <- quote(stats::model.frame)
   df <- eval(mf, parent.frame())
+  #print(head(df))
   #df has everything in it  with na.action applied universally
-  attr(df, "terms") <- NULL 
-  # but we don't want to save the formula that created it in case of I()
-  
   na.action <- attr(df, "na.action")
  #adapted from coxph()   
-  
-  
-  Y <- model.extract( model.frame(formula_list$formula,data=df), "response")
+  Y <- model.extract(df, "response")
   if (!inherits(Y, "Surv")) 
     stop("Response must be a survival object")
   type <- attr(Y, "type")
@@ -130,7 +133,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     ytemp <- terms.inner(formula[[2]])
     xtemp <- terms.inner(formula[[3]])
     if (any(!is.na(match(xtemp, ytemp)))) 
-      stop("a variable appears on both the left and right sides of the formula")
+      warning("a variable appears on both the left and right sides of the formula")
   }
   
   
@@ -155,56 +158,32 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   # }
   # add in the special covariate .arm
   
-  #fit_formula <- terms(update(mf$formula, . ~ .arm + .))
-  #fit_formula <- drop.terms(fit_formula, dropx = 1 + rand_drops, keep.response = FALSE)
-  
-  #rand_object <- df[,rand_index]
-  
-  #df_basic <- data.frame( time=df[,response_index][,"time"], 
-  #                        status=df[,response_index][,"status"], 
-  #                        ".arm"=df[, rand_index][,"arm"], 
-  #                        ".rx"=df[,rand_index][,"rx"])
-  
-  
-  # df_adjustor <- df[,-c( response_index, rand_index), drop = FALSE]
-  # if( length( attr( fit_formula, "variables")) > 2){
-  #   #this pulls out the core variables, rather than strata(var), say
-  #   adjustor_formula <- drop.terms( mf$formula, dropx = rand_drops , keep.response = FALSE)
-  #   adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), terms.inner)[-1])
-  #   mf$formula <- reformulate(adjustor_names)
-  #   mf$formula <- if (missing(data)) {
-  #     terms(mf$formula)
-  #   } else {
-  #     terms(mf$formula, data = data)
-  #   }
-  #   #to evaluate out of this internal loop
-  #   environment(mf$formula) <- formula_env
-  #   df_adjustor <- eval(mf,parent.frame())
-  # }
-  # df <- cbind( df_basic,  df_adjustor)
+ 
   
 
   #force the default value to be included in df if needed.
-  if( !( "(censor_time)" %in% names(df))){
-    df <- cbind(df, "(censor_time)" = Inf)
+  if( !( "(censor_time)" %in% names(data))){
+    data <- cbind(data, "(censor_time)" = Inf)
+    attr(data,"terms") <- mf$formula
   }
  
-  
   
 #
   
   p <- qr(model.matrix(formula_list$randomise, data=df))$rank
   q <- qr(model.matrix(formula_list$treatment, data=df))$rank
+  
+  
   if (p!=q) {
     stop("the treament and rand model matrices must be the same rank")
   }
   
   # check the values of treatment modifier
-  if ("(treat_modifier)" %in% names(df)) {
-    if( all(df[,"(treat_modifier)"]==0, na.rm = TRUE) ){ 
+  if ("(treat_modifier)" %in% names(data)) {
+    if( all(data[,"(treat_modifier)"]==0, na.rm = TRUE) ){ 
       stop("treat_modifier values cannot all be zero")
     }
-    if( any(df[,"(treat_modifier)"]<=0) ){ 
+    if( any(data[,"(treat_modifier)"]<=0) ){ 
       warning("treat_modifier values are not all strictly positive")
     }
   }
@@ -223,11 +202,15 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   # evaluate them
   #print(head(df))
   
+  treatment_matrix <- model.matrix(formula_list$treatment, data=df)
+  rand_matrix <- model.matrix(formula_list$randomise, data=df)
+  
   eval_z$Z <- apply(eval_z,1, est_eqn, 
-                    data=df, 
-                    formula=formula_list$formula, 
-                    treatment=formula_list$treatment, 
-                    rand=formula_list$randomise,  
+                    response=Y,
+                    data=data, 
+                    formula_list=formula_list, 
+                    treatment_matrix=treatment_matrix, 
+                    rand_matrix=rand_matrix,
                     test=test,
                     target=0, autoswitch=autoswitch,...=...)
  
@@ -238,9 +221,10 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   root <- function(target) {
     est_eqn_vectorize <- Vectorize(est_eqn, vectorize.args="psi")
     ans <- rootSolve::uniroot.all(est_eqn_vectorize, 
-                                  c(low_psi, hi_psi), data = df, formula=formula_list$formula, 
-                                  treatment=formula_list$treatment, 
-                                  rand=formula_list$randomise,  
+                                  c(low_psi, hi_psi), data = data, formula_list=formula_list, 
+                                  response=Y,
+                                  treatment_matrix=treatment_matrix, 
+                                  rand_matrix=rand_matrix, 
                                   target = target, test = test, autoswitch = autoswitch, 
                                   ... = ...)
     #give back the same elements as uniroot()
@@ -248,9 +232,10 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     list( root=ans[1], 
           root_all=ans,
           f.root= est_eqn(ans[1],
-                          data = df, formula=formula_list$formula, 
-                          treatment=formula_list$treatment, 
-                          rand=formula_list$randomise,  
+                          data = data, formula_list=formula_list, 
+                          response=Y,
+                          treatment_matrix=treatment_matrix, 
+                          rand_matrix=rand_matrix,
                           target = target, test = test, autoswitch = autoswitch, 
                           ... = ...),
           iter=NA,
@@ -334,16 +319,16 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     }
     
     
-    response <- model.response(model.frame(formula_list$formula, data=df))
-    treatment_matrix <- model.matrix(formula_list$treatment, data=df)
-    rand_matrix <- model.matrix(formula_list$randomise, data=df)
+    #response <- model.response(df)#model.frame(formula_list$formula, data=df))
+    #treatment_matrix <- model.matrix(formula_list$treatment, data=df)
+    #rand_matrix <- model.matrix(formula_list$randomise, data=df)
     
-    Sstar <- untreated(psiHat, response,treatment_matrix, rand_matrix, df[,"(censor_time)"], autoswitch)
+    Sstar <- untreated(psiHat, Y,treatment_matrix, rand_matrix, data[,"(censor_time)"], autoswitch)
     
     df <- cbind(Sstar, df)
     # Ignores any covariates, strata or adjustors. On Purpose as this is
     # too general to deal with
-    fit <- survival::survfit(update(formula_list$randomise, Sstar ~ .) , data = df, conf.int=1-alpha)
+    fit <- survival::survfit(update(formula_list$randomise, Sstar ~ .) , data = data, conf.int=1-alpha)
   } else {
     fit <- NULL
     Sstar <- NULL
@@ -351,8 +336,8 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   regression=attr(ans$f.root, "fit")
   #modify the call and formula (for regressions)
   regression$call <- cl
-  regression$formula <- return_formula
-  regression$terms <- return_formula
+  regression$formula <- formula
+  regression$terms <- formula
   
   
   value=c(
@@ -365,7 +350,8 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
       formula_list=formula_list,
       #rand=rand_object,
       ans=ans,
-      eval_z=eval_z),
+      eval_z=eval_z,
+      data=df),
       #for the print and summary methods
     regression
   )

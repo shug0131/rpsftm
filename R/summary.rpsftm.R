@@ -16,10 +16,16 @@ summary.rpsftm <- function(object,...) {
   #obj$call <- NULL
   y <- object
   class(y) <- class(object)[2]
-  obj.summary <- summary(y,...=...)
+  
   #print(object$call)
+  
+  rand_names <- colnames(model.matrix(object$formula_list$randomise, data=object$data))
+  rand_names <- rand_names[rand_names!="(Intercept)"]
+  arm_index <- which(names(object$coefficients) %in% rand_names)
+  obj.summary <- summary(y, ...=...)
+  
   print(object$rand)
-  print(obj.summary)
+  print(obj.summary,arm_index=arm_index)
   cat("\npsi:", object$psi)
   cat("\nexp(psi):", exp(object$psi))
   cat("\nConfidence Interval, psi", object$CI)
@@ -43,7 +49,7 @@ summary.rpsftm <- function(object,...) {
 #' @keywords internal
 #' 
 
-print.summary.coxph <- function (x, 
+print.summary.coxph <- function (x, arm_index,
                                  digits = max(getOption("digits") - 3, 3), 
                                  signif.stars = getOption("show.signif.stars"), 
                                  ...) {
@@ -68,7 +74,7 @@ print.summary.coxph <- function (x,
   #  cat("   Null model\n")
   #  return()
   #}
-  arm_index <- which(rownames(x$coefficients)==".arm")
+ 
   if (!is.null(x$coefficients) & nrow(x$coefficients)>1) {
     cat("\n")
     stats::printCoefmat(x$coefficients[-arm_index, , drop=FALSE], 
@@ -102,14 +108,14 @@ print.summary.coxph <- function (x,
 #' @keywords internal
 #' 
 
-print.summary.survreg <- function (x, digits = max(options()$digits - 4, 3), ...) 
+print.summary.survreg <- function (x,arm_index, digits = max(options()$digits - 4, 3), ...) 
 {
   correl <- x$correlation
   if (is.null(digits)) 
     digits <- options()$digits
   cat("\nCall:\n")
   dput(x$call)
-  arm_index <- which(rownames(x$table)==".arm")
+  #arm_index <- which(rownames(x$table)==".arm")
   print(x$table[-arm_index,, drop=FALSE], digits = digits)
   if (nrow(x$var) == length(x$coefficients)) 
     cat("\nScale fixed at", format(x$scale, digits = digits), 

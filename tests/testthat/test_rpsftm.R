@@ -218,10 +218,11 @@ test_that("swapping the definition of arm",
           { propX <- with(immdef, 1-xoyrs/progyrs)
           fit <- rpsftm(Surv(progyrs, prog)~rand(propX~imm), immdef, censor_time = censyrs,
                         low_psi=-1, hi_psi=1)
-            propX <- with(immdef, 1-xoyrs/progyrs)
-            fitInv <- rpsftm(Surv(progyrs, prog)~rand(propX~1-imm), immdef, censor_time = censyrs,test=survdiff, 
+            propX <- with(immdef, xoyrs/progyrs)
+            imm2 <- with(immdef,1-imm)
+            fitInv <- rpsftm(Surv(progyrs, prog)~rand(propX~imm2), immdef, censor_time = censyrs,test=survdiff, 
                              low_psi=-1, hi_psi=1)
-            expect_true(  abs(fit$psi-fitInv$psi)<1e-4)}
+            expect_true(  abs(fit$psi+fitInv$psi)<1e-4)}
           )
 test_that("swapping the definition of rx",
           { propX <- with(immdef, 1-xoyrs/progyrs)
@@ -340,10 +341,9 @@ test_that("eval_z output",
           }
 )
 
-test_that("check it works when arm=rx",
-          {fit <- rpsftm(Surv(progyrs, prog)~rand(imm~ imm), immdef, censor_time = censyrs)
-          expect_is(fit$psi, class="numeric")
-            }
+test_that("check it fails when arm=rx",
+          {expect_error(rpsftm(Surv(progyrs, prog)~rand(imm~ imm), immdef, censor_time = censyrs))
+                    }
           )
 
 test_that("symbolic covariates",
@@ -409,11 +409,11 @@ test_that("print.summary.rpsftm",{
   for( i in 1:nrow(immdef2)){
     if( i%%2==0) immdef2[i,] <- NA
   }
-  fit1 <- rpsftm(Surv(progyrs,prog)~rand(imm,1 -xoyrs/progyrs), immdef2, censor_time=censyrs, test= coxph)
+  fit1 <- rpsftm(Surv(progyrs,prog)~rand(I(1 -xoyrs/progyrs)~imm), immdef2, censor_time=censyrs, test= coxph)
   expect_output(summary(fit1),"observations deleted due to missingness")
-  fit3 <- rpsftm(Surv(progyrs,prog)~rand(imm,1 -xoyrs/progyrs), immdef2, censor_time=censyrs, test= survreg,scale=0.5)
+  fit3 <- rpsftm(Surv(progyrs,prog)~rand(I(1 -xoyrs/progyrs)~imm), immdef2, censor_time=censyrs, test= survreg,scale=0.5)
   #this is just toget coverage of line 109 in summary.rpsftm.R
-  expect_output(print(summary(fit3), digits=NULL), "Scale fixed")
+  expect_output(print(summary(fit3),arm_index=1, digits=NULL), "Scale fixed")
   expect_output(summary(fit3), "observations deleted due to missingness")
 }
 )
@@ -423,8 +423,8 @@ test_that("print.rpsftm",{
   for( i in 1:nrow(immdef2)){
     if( i%%2==0) immdef2[i,] <- NA
   }
-  fit1 <- rpsftm(Surv(progyrs,prog)~rand(imm,1 -xoyrs/progyrs), immdef2, censor_time=censyrs, test= coxph)
-  fit3 <- rpsftm(Surv(progyrs,prog)~rand(imm,1 -xoyrs/progyrs), immdef2, censor_time=censyrs, test= survreg,scale=0.5)
+  fit1 <- rpsftm(Surv(progyrs,prog)~rand(I(1 -xoyrs/progyrs)~imm), immdef2, censor_time=censyrs, test= coxph)
+  fit3 <- rpsftm(Surv(progyrs,prog)~rand(I(1 -xoyrs/progyrs)~imm), immdef2, censor_time=censyrs, test= survreg,scale=0.5)
   expect_error(rpsftm:::print.coxph(NULL),"Input is not valid")
   expect_output(print(fit1),"observations deleted due to missingness")
   expect_output(print(fit3),"observations deleted due to missingness")

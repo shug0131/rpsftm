@@ -21,21 +21,21 @@
 #' @keywords internal
 
 
-est_eqn <- function(psi, data, formula, treatment, rand,  target = 0, test = "survdiff", 
+est_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_matrix,  target = 0, test = "survdiff", 
                    autoswitch, ...) {
   
   if ("(treat_modifier)" %in% names(data)) {
       psi <- psi * data[, "(treat_modifier)"]
   }
   
-  response <- model.response(model.frame(formula, data=data))
-  treatment_matrix <- model.matrix(treatment, data=data)
-  rand_matrix <- model.matrix(rand, data=data)
+  #response <- model.response(data)
+  #treatment_matrix <- model.matrix(treatment, data=data)
+  #rand_matrix <- model.matrix(rand, data=data)
   
   Sstar <- untreated(psi, response,treatment_matrix, rand_matrix, data[,"(censor_time)"], autoswitch)
   data <- cbind(Sstar, data)
   # build a formula object,
-  fit_formula <- reformulate(  c(as.character(formula)[3], as.character(rand)[2]), response="Sstar")
+  fit_formula <- reformulate(  c(as.character(formula_list$formula)[3], as.character(formula_list$rand)[2]), response="Sstar")
   rand_names <- colnames(rand_matrix)
   rand_names <- rand_names[rand_names!="(Intercept)"]
   
