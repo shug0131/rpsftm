@@ -26,14 +26,20 @@ df %<>% mutate( censtime=6,
 
 rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs)
 rpsftm_multi(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="BFGS")
-rpsftm_multi(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="Nelder-Mead")
+fit <- rpsftm_multi(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="Nelder-Mead")
 
-fitm <- rpsftm_multi(Surv(survtime,status)~rand(r_p+t_p+p_p~rx), data=df, censor_time = censtime,
-                     method="BFGS", start=c(-1, -0.5)) 
+fitm <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
+                     method="BFGS") 
 fitm
-fitm <- rpsftm_multi(Surv(survtime,status)~rand(r_p+t_p+p_p~rx), data=df, censor_time = censtime,
+fitm <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
                      method="Nelder-Mead", start=fitm$psi)
+fitm
 
 plot(fitm)
 
 fit <- survdiff(Surv(survtime,status)~rx, data=df)
+
+
+
+rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx)+switchtime, data=df, censor_time = censtime,
+             method="Nelder-Mead", test=survreg, start=fitm$psi)

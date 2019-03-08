@@ -168,13 +168,15 @@ rpsftm_multi <- function(formula, data, censor_time, subset, na.action,  test = 
  
   
 #
+  treatment_matrix <- model.matrix(formula_list$treatment, data=df)
+  rand_matrix <- model.matrix(formula_list$randomise, data=df)
   
-  p <- qr(model.matrix(formula_list$randomise, data=df))$rank
-  q <- qr(model.matrix(formula_list$treatment, data=df))$rank
+  p <- qr(rand_matrix)$rank
+  q <- max( ncol(treatment_matrix), qr(treatment_matrix)$rank)
   
   
   if (p!=q) {
-    stop("the treament and rand model matrices must be the same rank")
+    stop("the treament and rand model matrices must be the same rank & dimensions")
   }
   
   # check the values of treatment modifier
@@ -198,8 +200,7 @@ rpsftm_multi <- function(formula, data, censor_time, subset, na.action,  test = 
   if (!is.numeric(n_eval_z)|| length(n_eval_z)>1 || n_eval_z<2) {stop ("invalid value of n_eval_z")}
   #create values of psi to evaluate in a data frame
  
-  treatment_matrix <- model.matrix(formula_list$treatment, data=df)
-  rand_matrix <- model.matrix(formula_list$randomise, data=df)
+ 
   
   
   # solve to find the value of psi that gives the root to z=0, and the
@@ -243,7 +244,11 @@ rpsftm_multi <- function(formula, data, censor_time, subset, na.action,  test = 
   
   # Preliminary check of ans,  low_psi and hi_psi with a meaningful warning
   
- 
+# for CI.  Modify the min_eqn to 
+#  a) minimise the chisq  over the nuisance parameters with the parameter of interest fixed, 
+# b) find the value of the parameter of interest that hits the target qchisq(1-alpha,df=1)
+# this is 1 dimensional so use root finding, and limit to search in one direction from the estimate
+# to get the upper and lower values. 
   
   
   
