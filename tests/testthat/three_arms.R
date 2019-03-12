@@ -31,6 +31,7 @@ fit <- rpsftm_multi(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, cen
 fitm <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
                      method="BFGS") 
 fitm
+
 fitm <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
                      method="Nelder-Mead", start=fitm$psi)
 fitm
