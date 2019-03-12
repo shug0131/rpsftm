@@ -250,26 +250,27 @@ rpsftm_multi <- function(formula, data, censor_time, subset, na.action,  test = 
 # this is 1 dimensional so use root finding, and limit to search in one direction from the estimate
 # to get the upper and lower values. 
   
-min_eqn_profile <- function(nuisance,x, index,test_args, ...){
+min_eqn_profile <- function(nuisance,x, index, ...){
   psi <- rep(0,length(nuisance)+1)
   psi[-index] <- nuisance
   psi[index] <- x
-  do.call(min_eqn, list(psi, ...,test_args))
+  do.call(min_eqn, list(psi, ...))
   #min_eqn(psi,...)
 }  
   
   
-find_limit <- function(x, index, psi_hat,outer_target=qchisq(1-alpha,df=1), test_args,... )  {
+find_limit <- function(x, index, psi_hat,outer_target=qchisq(1-alpha,df=1), ... )  {
   
-  optim(par=psi_hat[-index], fn=min_eqn_profile, x=x, index=index, #gr=NULL, method=method,
-        target = 0, test_args,
+  optim(par=psi_hat[-index], fn=min_eqn_profile, x=x, index=index, # method=method,
+        target = 0, #test_args,
+        method=method,gr=NULL,
         ...)$value - outer_target
   
 }
   
 upper1 <- uniroot(find_limit,c(ans$root[1], ans$root[1]+10), index=1, psi_hat=ans$root,
         
-        data = data, formula_list=formula_list, 
+       data = data, formula_list=formula_list, 
         treatment_matrix=treatment_matrix, 
         rand_matrix=rand_matrix,
         test = test, autoswitch = autoswitch, 
@@ -277,7 +278,7 @@ upper1 <- uniroot(find_limit,c(ans$root[1], ans$root[1]+10), index=1, psi_hat=an
         #gr=NULL, method=method, including this line breaks it all ?!?
         #THIS IS THE problem for extra arguments into the survival test.
         ## "control = genopt.control(...), ..." construct??
-        test_args = list(...)
+        #test_args = list(...)
         )
   
   

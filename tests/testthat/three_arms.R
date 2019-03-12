@@ -32,6 +32,9 @@ fitm <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_tim
                      method="BFGS") 
 fitm
 
+fitrho <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
+             method="BFGS", rho=0.5) 
+
 fitm <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
                      method="Nelder-Mead", start=fitm$psi)
 fitm
