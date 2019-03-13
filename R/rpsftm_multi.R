@@ -245,7 +245,7 @@ rpsftm_multi <- function(formula, data, censor_time, subset, na.action,  test = 
   # Preliminary check of ans,  low_psi and hi_psi with a meaningful warning
   
 # for CI.  Modify the min_eqn to 
-#  a) minimise the chisq  over the nuisance parameters with the parameter of interest fixed, 
+# a) minimise the chisq  over the nuisance parameters with the parameter of interest fixed, 
 # b) find the value of the parameter of interest that hits the target qchisq(1-alpha,df=1)
 # this is 1 dimensional so use root finding, and limit to search in one direction from the estimate
 # to get the upper and lower values. 
@@ -257,35 +257,42 @@ min_eqn_profile <- function(nuisance,x, index, test_args, ...){
   # https://www.burns-stat.com/pages/Tutor/R_inferno.pdf 8.3.15 ???
   dots <- list(...)
   do.call(min_eqn, c(list(psi),dots,test_args))
-  #min_eqn(psi,...)
-}  
+ }  
   
   
-find_limit <- function(x, index, psi_hat,outer_target=qchisq(1-alpha,df=1), method,
-                       test_args,
-                       ... )  {
-  
-  optim(par=psi_hat[-index], fn=min_eqn_profile, x=x, index=index, # method=method,
-        target = 0, #test_args,
-        method=method,gr=NULL,test_args=test_args,
-        ...)$value - outer_target
+find_limit <- function(x, outer_target=qchisq(1-alpha,df=1),psi_hat,
+                       index, ... )  {
+  optim(par=psi_hat[-index], fn=min_eqn_profile,
+        target = 0, gr=NULL,
+        index=index, 
+        x=x,...)$value - outer_target
   
 }
-  
-upper1 <- uniroot(find_limit,c(ans$root[1], ans$root[1]+10), index=1, psi_hat=ans$root,
-        
-       data = data, formula_list=formula_list, 
-        treatment_matrix=treatment_matrix, 
-        rand_matrix=rand_matrix,
-        test = test, autoswitch = autoswitch, 
-        response=Y,
-        method=method,
-        #gr=NULL, method=method, including this line breaks it all ?!?
-        #THIS IS THE problem for extra arguments into the survival test.
-        ## "control = genopt.control(...), ..." construct??
-        test_args = list(...)
-        )
-  
+
+dim_psi <- length(ans$root)
+CI <- data.frame(lower=rep(NA,dim_psi), upper=rep(NA, dim_psi))
+
+for( side in c(-1,1)){
+  column <- (side+3)/2
+  for(index in 1:dim_psi){
+    
+     limit <-try(uniroot(
+      find_limit,c(ans$root[index], ans$root[index]+side*2), 
+      index=index, psi_hat=ans$root,
+      data = data, formula_list=formula_list, 
+      treatment_matrix=treatment_matrix, 
+      rand_matrix=rand_matrix,
+      test = test, autoswitch = autoswitch, 
+      response=Y,method=method,
+      test_args = list(...)
+    ))
+    
+  if(class(limit)!="try-error"){CI[index,column] <- limit$root}
+  }
+}
+
+
+
   
   
   # create a simple KM curve for each recensored arm. Used in the plot
@@ -325,7 +332,7 @@ upper1 <- uniroot(find_limit,c(ans$root[1], ans$root[1]+10), index=1, psi_hat=an
       psi=ans$root, 
       #for the plot function
       fit=fit, 
-     CI=upper1,
+     CI=CI,
       Sstar=Sstar, 
       formula_list=formula_list,
       #rand=rand_object,
