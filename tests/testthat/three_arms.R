@@ -28,8 +28,7 @@ rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs)
 rpsftm_multi(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="BFGS")
 fit <- rpsftm_multi(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="Nelder-Mead")
 
-fitm <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
-                     method="BFGS") 
+fitm <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime)
 fitm
 
 fitrho <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,

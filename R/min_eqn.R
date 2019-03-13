@@ -42,7 +42,10 @@ min_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_ma
   # allow different methods to test the independence of arm constrained
   # to be from the survival package.
   functionName <- get(test, asNamespace("survival"))
-  fit <- do.call(functionName, list(fit_formula, data, ...))
+  
+  # https://www.burns-stat.com/pages/Tutor/R_inferno.pdf 8.3.15 ???
+  dots <- list(...)
+  fit <- do.call(functionName, c( list(fit_formula, data),dots))
   # a 'cheat' to enable this to plugged into uniroot as a function that
   # returns a number AND store the fit object.
     .value <-  extract_chisq(fit, arm = rand_names) - target 
