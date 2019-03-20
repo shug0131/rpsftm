@@ -21,32 +21,31 @@ untreated <- function(psi, response,treatment_matrix, rand_matrix, censor_time, 
   delta <- response[,"status"]
   treatment_matrix <- treatment_matrix[, colnames(treatment_matrix)!="(Intercept)", drop=FALSE]
   
-  if (any(!(0 <= treatment_matrix & treatment_matrix <= 1))) {
-    stop("Invalid values for rx. Must be proportions in [0,1]")
-  }
-  if (any(censor_time < time)) {
-    warning("You have observed events AFTER censoring")
-  }
+  
   
  
-  nontreatment <- 1-apply(treatment_matrix,1,sum)
+  nontreatment <- 1-rowSums(treatment_matrix) #apply(treatment_matrix,1,sum)
  # won't work with treatment_modifier at present!!!
-  treatment_matrix <- sweep(treatment_matrix,2, exp(psi), FUN="*")
-  treatment <- apply(treatment_matrix,1, sum)
+  #treatment_matrix <- sweep(treatment_matrix,2, exp(psi), FUN="*")
+  #treatment <- rowSums(treatment_matrix)#apply(treatment_matrix,1, sum)
+  treatment <- treatment_matrix %*% exp(psi)
   
   u <- time * (nontreatment + treatment)
   
   
   #make use of setting censor_time=Inf to avoid recensoring, and implimenting Autoswitch
-  c_star <- apply(cbind( censor_time , censor_time %o% exp(psi)),1, min)
+  
+  c_star <- censor_time* min(1, exp(psi) ) #apply(cbind( censor_time , censor_time %o% exp(psi)),1, min)
   if( autoswitch){
     #if( all(rx[arm==1]==1)){ c_star <- ifelse(arm==1, Inf, c_star)}
     #if( all(rx[arm==0]==0)){ c_star <- ifelse(arm==0, Inf, c_star)}
   }
   
-  t_star <- pmin(u, c_star)
+  t_star <-  (u < c_star)*(u-c_star) + c_star  #pmin(u, c_star)
   #only change delta if necessary
-  delta_star <-  ifelse( c_star < u, 0, delta)
-  output <- Surv(t_star, delta_star)
+  delta_star <-  (u < c_star)*delta #ifelse( c_star < u, 0, delta)
+  output <- cbind("time"=t_star, "status"=delta_star)
+  attr(output, "type")="right"
+  class(output) <- "Surv"
   return(output)
 }

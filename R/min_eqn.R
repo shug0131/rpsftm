@@ -33,7 +33,7 @@ min_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_ma
   #rand_matrix <- model.matrix(rand, data=data)
   
   Sstar <- untreated(psi, response,treatment_matrix, rand_matrix, data[,"(censor_time)"], autoswitch)
-  data <- cbind(Sstar, data)
+  data$Sstar <-Sstar# cbind(Sstar, data)
   # build a formula object,
   fit_formula <- reformulate(  c(as.character(formula_list$formula)[3], as.character(formula_list$rand)[2]), response="Sstar")
   rand_names <- colnames(rand_matrix)

@@ -28,8 +28,12 @@ rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs)
 rpsftm_multi(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="BFGS")
 fit <- rpsftm_multi(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="Nelder-Mead")
 
-fitm <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
+library(profvis)
+profvis({
+
+  fitm <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
                      method="BFGS")
+})
 fitm
 
 fitrho <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
@@ -47,3 +51,9 @@ fit <- survdiff(Surv(survtime,status)~rx, data=df)
 
 rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx)+switchtime, data=df, censor_time = censtime,
              method="Nelder-Mead", test=survreg, start=fitm$psi)
+
+X <- matrix(runif(12), ncol=3)
+pmin(list(X[,1],X[,2],X[,3]))
+
+
+

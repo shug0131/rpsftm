@@ -165,10 +165,19 @@ rpsftm_multi <- function(formula, data, censor_time, subset, na.action,  test = 
     data <- cbind(data, "(censor_time)" = Inf)
     attr(data,"terms") <- mf$formula
   }
- 
+  
+  if (sum(data[,"(censor_time)"] < Y[,"time"])) {
+    warning("You have observed events AFTER censoring")
+  }
+  
   
 #
   treatment_matrix <- model.matrix(formula_list$treatment, data=df)
+  if (sum(!(0 <= treatment_matrix & treatment_matrix <= 1))) {
+    stop("Invalid values for treatment. Must be proportions in [0,1]")
+  }
+  
+  
   rand_matrix <- model.matrix(formula_list$randomise, data=df)
   
   p <- qr(rand_matrix)$rank
