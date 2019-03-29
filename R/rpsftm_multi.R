@@ -23,8 +23,12 @@
 #' @param alpha the significance level used to calculate confidence intervals
 #' @param treat_modifier an optional variable that psi is multiplied by on an individual observation level to give
 #' differing impact to treatment.
-#' @param n_eval_z The number of points between hi_psi and low_psi at which to evaluate the Z-statistics
-#' in the estimating equation. Default  is 100.
+#' @param conf_interval a logical to determine if confidence intervals will be calculated for psi. Default is TRUE
+#' @param ci_search_limit a matrix with 2 columns and the length of psi for the number of rows. 
+#' The confidence intervals are found by solving a univariate equation, searching between the estimate of psi, and psi plus an increment, given by the matrix. 
+#' It defaults to NULL in which case the increments are heuristically given as 6*dim(psi)/sqrt(number of events).
+#' @param n_eval_z The number of points to store evaluations of the chi-squared statistic minimised in 
+#' the estimating equation. Default  is 100.
 #' @return a rpsftm method object that is a list of the following:
 #' \itemize{
 #' \item psi: the estimated parameter
@@ -36,7 +40,7 @@
 #' but embedded within a list as per \code{\link[stats]{uniroot}}, with an extra element \code{root_all},
 #' a vector of all roots found in the case of multiple solutions. The first element of \code{root_all} 
 #' is subsequently used.
-#' \item eval_z: a data frame with the Z-statistics from the estimating equation evaluated at
+#' \item evaluation: a matrix with the chi-squared statistic from the estimating equation evaluated at
 #' a sequence of values of psi. Used to plot and check if the range of values to search for solution
 #' and limits of confidence intervals need to be modified.
 #' \item Further elements corresponding to either a \code{survdiff}, \code{coxph}, or \code{survreg} object. This will always include:
@@ -69,7 +73,7 @@
 #' @importFrom stats terms model.extract update drop.terms reformulate uniroot qnorm
 
 rpsftm_multi <- function(formula, data, censor_time, subset, na.action,  test = survdiff, start=0, alpha = 0.05, treat_modifier = 1, autoswitch = TRUE, 
-                   n_eval_z = 100, method="Nelder-Mead", ...) {
+                   n_eval_z = 100, method="Nelder-Mead", conf_interval=TRUE, ci_search_limit=NULL, ...) {
   cl <- match.call()
   
   # create formula for fitting, and to feed into model.frame() from the
@@ -209,7 +213,13 @@ rpsftm_multi <- function(formula, data, censor_time, subset, na.action,  test = 
   if (!is.numeric(n_eval_z)|| length(n_eval_z)>1 || n_eval_z<2) {stop ("invalid value of n_eval_z")}
   #create values of psi to evaluate in a data frame
  
- 
+ # capture the evaluation of the test statistic
+  
+  assign("fn_count", 0, envir= environment(min_eqn))
+  assign("n_eval_z", n_eval_z, envir= environment(min_eqn))
+  assign("evaluation", matrix(0,nrow=n_eval_z, ncol=p), 
+	envir=environment(min_eqn))
+  
   
   
   # solve to find the value of psi that gives the root to z=0, and the
@@ -245,9 +255,34 @@ rpsftm_multi <- function(formula, data, censor_time, subset, na.action,  test = 
   }
   
   
-  #print(ans1)
+  
   ans <- try(root(0), silent = TRUE)
   ans.error <- class(ans) == "try-error"
+ 
+  #fit a K-M curve on the untreated transformed times
+  
+  if (!is.na(ans$root)) {
+    psiHat <- ans$root
+    if ("(treat_modifier)" %in% names(df)) {
+      psiHat <- psiHat * df[, "(treat_modifier)"]
+    }
+    
+    
+    #response <- model.response(df)#model.frame(formula_list$formula, data=df))
+    #treatment_matrix <- model.matrix(formula_list$treatment, data=df)
+    #rand_matrix <- model.matrix(formula_list$randomise, data=df)
+    
+    Sstar <- untreated(psiHat, Y,treatment_matrix, rand_matrix, data[,"(censor_time)"], autoswitch)
+    
+    df <- cbind(Sstar, df)
+    # Ignores any covariates, strata or adjustors. On Purpose as this is
+    # too general to deal with
+    fit <- survival::survfit(update(formula_list$randomise, Sstar ~ .) , data = data, conf.int=1-alpha)
+  } else {
+    fit <- NULL
+    Sstar <- NULL
+  }
+  
   
 
   
@@ -279,56 +314,54 @@ find_limit <- function(x, outer_target=qchisq(1-alpha,df=1),psi_hat,
 }
 
 dim_psi <- length(ans$root)
-CI <- data.frame(lower=rep(NA,dim_psi), upper=rep(NA, dim_psi))
+n_events <- sum(fit$n.event)
 
-for( side in c(-1,1)){
-  column <- (side+3)/2
-  for(index in 1:dim_psi){
-    
-     limit <-try(uniroot(
-      find_limit,c(ans$root[index], ans$root[index]+side*2), 
-      index=index, psi_hat=ans$root,
-      data = data, formula_list=formula_list, 
-      treatment_matrix=treatment_matrix, 
-      rand_matrix=rand_matrix,
-      test = test, autoswitch = autoswitch, 
-      response=Y,method=method,
-      test_args = list(...)
-    ))
-    
-  if(class(limit)!="try-error"){CI[index,column] <- limit$root}
+
+if( conf_interval){
+  CI <- data.frame(lower=rep(NA,dim_psi), upper=rep(NA, dim_psi))
+  if(is.null(ci_search_limit)){
+    limit <- rep(6*dim_psi/sqrt(n_events), dim_psi)
+    ci_search_limit <- cbind(-limit, limit)
+    }
+  
+  
+  for( column in 1:2){
+    for(index in 1:dim_psi){
+      
+      limit <-try(uniroot(
+        find_limit,c(ans$root[index], ans$root[index]+ci_search_limit[index, column]), 
+        index=index, psi_hat=ans$root,
+        data = data, formula_list=formula_list, 
+        treatment_matrix=treatment_matrix, 
+        rand_matrix=rand_matrix,
+        test = test, autoswitch = autoswitch, 
+        response=Y,method=method,
+        test_args = list(...)
+      ))
+      
+      if(class(limit)!="try-error"){CI[index,column] <- limit$root}
+    }
   }
+} else { 
+  CI <- NULL
 }
 
 
 
   
-  
   # create a simple KM curve for each recensored arm. Used in the plot
   # function - simple KM curves
   
   
-  if (!is.na(ans$root)) {
-    psiHat <- ans$root
-    if ("(treat_modifier)" %in% names(df)) {
-      psiHat <- psiHat * df[, "(treat_modifier)"]
-    }
-    
-    
-    #response <- model.response(df)#model.frame(formula_list$formula, data=df))
-    #treatment_matrix <- model.matrix(formula_list$treatment, data=df)
-    #rand_matrix <- model.matrix(formula_list$randomise, data=df)
-    
-    Sstar <- untreated(psiHat, Y,treatment_matrix, rand_matrix, data[,"(censor_time)"], autoswitch)
-    
-    df <- cbind(Sstar, df)
-    # Ignores any covariates, strata or adjustors. On Purpose as this is
-    # too general to deal with
-    fit <- survival::survfit(update(formula_list$randomise, Sstar ~ .) , data = data, conf.int=1-alpha)
-  } else {
-    fit <- NULL
-    Sstar <- NULL
-  }
+  
+  evaluation <- get("evaluation", envir=environment(min_eqn))
+  colnames(evaluation) <- c(paste0("psi_",1:dim_psi),"chi_sq")
+  fn_count <- get("fn_count", envir=environment(min_eqn))
+  
+
+
+
+
   regression=attr(ans$f.root, "fit")
   #modify the call and formula (for regressions)
   regression$call <- cl
@@ -346,7 +379,7 @@ for( side in c(-1,1)){
       formula_list=formula_list,
       #rand=rand_object,
       ans=ans,
-      #eval_z=eval_z,
+      evaluation=evaluation[1:min(fn_count,n_eval_z),],
       data=df),
       #for the print and summary methods
     regression

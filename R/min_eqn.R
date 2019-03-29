@@ -49,6 +49,14 @@ min_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_ma
   # a 'cheat' to enable this to plugged into uniroot as a function that
   # returns a number AND store the fit object.
     .value <-  extract_chisq(fit, arm = rand_names) - target 
-  attr(.value, "fit") <- fit
+    
+    
+    fn_count <<- fn_count+1
+    if( fn_count <= n_eval_z){
+    evaluation[fn_count,] <<- c(psi, .value+target)
+    }
+    attr(.value, "fit") <- fit
+  
   .value
 }
+
