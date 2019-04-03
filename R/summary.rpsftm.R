@@ -11,13 +11,11 @@
 
 
 summary.rpsftm <- function(object,...) {
-  #obj <- object$regression
-  # remove the call object without this it will print the entire data set
-  #obj$call <- NULL
   y <- object
   class(y) <- class(object)[2]
   obj.summary <- summary(y,...=...)
-  #print(object$call)
+  new_class <- sub("summary","rpsftm.summary", class(obj.summary))
+  class(obj.summary) <- c(new_class, class(obj.summary))
   print(object$rand)
   print(obj.summary)
   cat("\npsi:", object$psi)
@@ -35,7 +33,7 @@ summary.rpsftm <- function(object,...) {
 #'this drops the "arm" term as this is not a real parameter
 #'
 #'
-#'@name print.summary.coxph
+#'@name print.rpsftm.summary.coxph
 #' @param x the result of a call to \code{summary.coxph}
 #' @param digits significant digits to print
 #' @param signif.stars  show star to highlight small p-values
@@ -43,15 +41,11 @@ summary.rpsftm <- function(object,...) {
 #' @keywords internal
 #' 
 
-print.summary.coxph <- function (x, 
+print.rpsftm.summary.coxph <- function (x, 
                                  digits = max(getOption("digits") - 3, 3), 
                                  signif.stars = getOption("show.signif.stars"), 
                                  ...) {
-  #if (!is.null(x$call)) {
-  #  cat("Call:\n")
-  #  dput(x$call)
-  #  cat("\n")
-  #}
+ 
   if (!is.null(x$fail)) {
     cat(" Coxreg failed.", x$fail, "\n")
     return()
@@ -64,10 +58,6 @@ print.summary.coxph <- function (x,
   cat("\n")
   if (length(omit)) 
     cat("   (", stats::naprint(omit), ")\n", sep = "")
-  #if (nrow(x$coef) == 0) {
-  #  cat("   Null model\n")
-  #  return()
-  #}
   arm_index <- which(rownames(x$coefficients)==".arm")
   if (!is.null(x$coefficients) & nrow(x$coefficients)>1) {
     cat("\n")
@@ -83,11 +73,7 @@ print.summary.coxph <- function (x,
     cat("Concordance=", format(round(x$concordance[1], 3)), 
         " (se =", format(round(x$concordance[2], 3)), ")\n")
   }
-  cat("Rsquare=", format(round(x$rsq["rsq"], 3)), "  (max possible=", 
-      format(round(x$rsq["maxrsq"], 3)), ")\n")
-  
-  
-  invisible()
+   invisible()
 }
 
 #'modified version of print.summary.survreg
@@ -95,14 +81,14 @@ print.summary.coxph <- function (x,
 #'this drops the "arm" term as this is not a real parameter
 #'
 #'
-#'@name print.summary.survreg
+#'@name print.rpsftm.summary.survreg
 #' @param x the result of a call to \code{summary.survreg}
 #' @param digits significant digits to print
 #' @param ... further arguments for future methods
 #' @keywords internal
 #' 
 
-print.summary.survreg <- function (x, digits = max(options()$digits - 4, 3), ...) 
+print.rpsftm.summary.survreg <- function (x, digits = max(options()$digits - 4, 3), ...) 
 {
   correl <- x$correlation
   if (is.null(digits)) 

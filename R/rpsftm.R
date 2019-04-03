@@ -316,7 +316,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
                        df[,"(censor_time)"],df[, ".rx"], df[, ".arm"], autoswitch)
     # Ignores any covariates, strata or adjustors. On Purpose as this is
     # too general to deal with
-    fit <- survival::survfit(Sstar ~ .arm, data = df, conf.int=1-alpha)
+    fit <-survival::survfit(Sstar ~ .arm, conf.int=1-alpha, data = df)
   } else {
     fit <- NULL
     Sstar <- NULL

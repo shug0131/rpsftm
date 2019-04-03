@@ -414,7 +414,7 @@ test_that("print.rpsftm",{
   }
   fit1 <- rpsftm(Surv(progyrs,prog)~rand(imm,1 -xoyrs/progyrs), immdef2, censor_time=censyrs, test= coxph)
   fit3 <- rpsftm(Surv(progyrs,prog)~rand(imm,1 -xoyrs/progyrs), immdef2, censor_time=censyrs, test= survreg,scale=0.5)
-  expect_error(rpsftm:::print.coxph(NULL),"Input is not valid")
+  expect_error(print.rpsftm.coxph(NULL),"Input is not valid")
   expect_output(print(fit1),"observations deleted due to missingness")
   expect_output(print(fit3),"observations deleted due to missingness")
 })

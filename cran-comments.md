@@ -1,8 +1,9 @@
 ## Description of Changes
 
-This is a patch release. The outputs from the print and summary methods now finish with a new line.
+Following an update to the survival package, the print.summary for objects fitted with coxph(), now does not report the R-squared statistic. Also the names of the modified copies of print and summary methods have been changed to include "rpsftm." and a new class created internally, so as to be more explicit and avoid masking the methods from the survival package.
 
 ## Test environments
+* Windows 7 PC
 * travis
 * appveyor
 * win-builder
@@ -12,5 +13,4 @@ This is a patch release. The outputs from the print and summary methods now fini
 There were no ERRORs or WARNINGs or Notes. 
 
 
-## Downstream dependencies
-devtools::revdep_check()  issued No ERRORs or WARNINGs found :)
+

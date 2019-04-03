@@ -1,8 +1,8 @@
 Package: rpsftm
 Type: Package
 Title: Rank Preserving Structural Failure Time Models
-Version: 1.2.4
-Date: 2018-11-26
+Version: 1.2.5
+Date: 2019-04-03
 Authors@R: c(person("Simon","Bond", email="simon.bond@addenbrookes.nhs.uk", role = c("aut","cre"), comment = "primary author of code, secondary author of vignette"),person("Annabel", "Allison", role = "aut", comment = "primary author of vignette, secondary author of code"))
 Description: Implements methods described by the paper Robins and Tsiatis (1991) <DOI:10.1080/03610929108830654>. These use g-estimation to estimate the causal effect of a treatment in a two-armed randomised control trial where non-compliance exists and is measured, under an assumption of an accelerated failure time model and no unmeasured confounders.
 Depends: R (>= 2.10)
@@ -13,7 +13,7 @@ Imports:
     ggplot2,
     stats
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Suggests: 
     testthat,
     knitr,

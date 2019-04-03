@@ -17,8 +17,7 @@ print.rpsftm <- function(x,...) {
   #whereas this looks in the environment that defines the function for the method print.
   #manually setting the "next" method using a copy of the object
   y<- x
-  class(y) <- class(y)[2]
-  
+  class(y)[1] <- paste0("rpsftm.",class(y)[2])
   if( !is.null(y$fail)){
     cat("Fitting failed." , y$fail,"\n")
     return()
@@ -36,13 +35,13 @@ print.rpsftm <- function(x,...) {
 #'this drops the "arm" term as this is not a real parameter
 #'
 #'
-#'@name print.coxph
+#'@name print.rpsftm.coxph
 #' @param x an coxph()
 #' @param digits the number of digits to print out
 #' @param ... further arguments 
 #' @keywords internal
 
-print.coxph <- function (x, digits = max(options()$digits - 4, 3), ...){
+print.rpsftm.coxph <- function (x, digits = max(options()$digits - 4, 3), ...){
     if (!is.null(x$fail)) {
       cat(" Coxph failed.", x$fail, "\n")
       return()
@@ -71,14 +70,6 @@ print.coxph <- function (x, digits = max(options()$digits - 4, 3), ...){
     if(length(coef)>0){ 
       stats::printCoefmat(tmp, signif.stars = FALSE, P.values = TRUE, 
                  has.Pvalue = TRUE)}
-    #logtest <- -2 * (x$loglik[1] - x$loglik[2])
-    #if (is.null(x$df)) 
-    #  df <- sum(!is.na(coef))
-    #else df <- round(sum(x$df), 2)
-    #cat("\n")
-    #cat("Likelihood ratio test=", format(round(logtest, 2)), 
-    #    "  on ", df, " df,", " p=", format(1 - pchisq(logtest, 
-    #                                                  df)), "\n", sep = "")
     omit <- x$na.action
     cat("n=", x$n)
     if (!is.null(x$nevent)) cat(", number of events=", x$nevent)
@@ -92,12 +83,12 @@ print.coxph <- function (x, digits = max(options()$digits - 4, 3), ...){
 #'
 #'this drops the "arm" term as this is not a real parameter
 #'
-#'@name print.survreg
+#'@name print.rpsftm.survreg
 #' @param x a survreg() object
 #' @param ... further arguments 
 #' @keywords internal
 
-print.survreg <-function (x, ...) 
+print.rpsftm.survreg <-function (x, ...) 
 {
   
   if (!is.null(x$fail)) {
@@ -107,13 +98,6 @@ print.survreg <-function (x, ...)
   coef <- x$coefficients
   arm_index <- which(names(coef)==".arm")
   coef <- coef[-arm_index, drop=FALSE]
-# if (any(nas <- is.na(coef))) {
-#    if (is.null(names(coef))) 
-#      names(coef) <- paste("b", 1:length(coef), sep = "")
-#    cat("\nCoefficients: (", sum(nas), " not defined because of singularities)\n", 
-#        sep = "")
-#  }
-#  else 
   cat("\nCoefficients:\n")
   print(coef, ...)
   if (nrow(x$var)-1 == length(coef)) 
@@ -125,15 +109,6 @@ print.survreg <-function (x, ...)
     print(x$scale, ...)
   }
   nobs <- length(x$linear)
-  #chi <- 2 * diff(x$loglik)
-  #df <- sum(x$df) - x$idf
-  #cat("\nLoglik(model)=", format(round(x$loglik[2], 1)), "  Loglik(intercept only)=", 
-  #    format(round(x$loglik[1], 1)))
-  #if (df > 0) 
-  #  cat("\n\tChisq=", format(round(chi, 2)), "on", round(df, 
-  #                                                       1), "degrees of freedom, p=", format(signif(1 - pchisq(chi, 
-  #                                                                                                            df), 2)), "\n")
-  #else cat("\n")
   omit <- x$na.action
   if (length(omit)) 
     cat("n=", nobs, " (", stats::naprint(omit), ")\n", sep = "")
