@@ -45,7 +45,6 @@ r_binary_packages:
   - rcpp
   - survival
   - rootSolve
-  - tableone
 
 r_packages:
  
