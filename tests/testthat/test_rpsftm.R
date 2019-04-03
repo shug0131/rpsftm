@@ -3,7 +3,10 @@ library(survival)
 context("Test the rpsftm() function")
 
 
-
+full_immdef <- immdef
+n <- 200
+set.seed(1355)
+immdef <- immdef[sample(1:nrow(immdef),size=n),]
 
 test_that("first basict fit with mixed data sources",{
   propX <- with(immdef,1-xoyrs/progyrs)
@@ -11,14 +14,14 @@ test_that("first basict fit with mixed data sources",{
   expect_is(fit$psi, "numeric")
 })
 
-
+fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs)
+fit_coxph <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs, 
+                    test=coxph)
+fit_survreg <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
+                      test=survreg)
 
 test_that("print method",{
-  fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs)
-  fit_coxph <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs, 
-                test=coxph)
-  fit_survreg <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
-                        test=survreg)
+  
   expect_output(print(fit),"exp\\(psi\\):")
   expect_output(print(fit_coxph),"exp\\(psi\\):")
   expect_output(print(fit_survreg),"exp\\(psi\\):")
@@ -38,12 +41,12 @@ test_that("print method",{
 
 
 test_that("summary method",{
-  fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
-                low_psi=-1, hi_psi=1)
-  fit_coxph <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs, 
-                      test=coxph)
-  fit_survreg <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
-                        test=survreg)
+#  fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
+#                low_psi=-1, hi_psi=1)
+#  fit_coxph <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs, 
+#                      test=coxph)
+#  fit_survreg <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
+#                        test=survreg)
   expect_output(summary(fit),"Confidence Interval")
   expect_output(summary(fit_coxph),"Confidence Interval")
   expect_output(summary(fit_survreg),"Confidence Interval")
@@ -60,6 +63,8 @@ test_that("summary method",{
   
 })
 
+
+
 context("Placemarker for end of end-of-line tests")
 
 test_that("detailed print.coxph test",{
@@ -68,7 +73,7 @@ test_that("detailed print.coxph test",{
   expect_output(print(x),"Fitting failed")
   class(x) <- "coxph"
   expect_output(print(x),"Coxph failed")
-  site <- rep(1:10,each=100)
+  site <- rep(1:10,length.out=n) 
   fit_coxph <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs)+cluster(site)+entry,immdef, censor_time = censyrs, 
                       test=coxph)
   expect_output(print(fit_coxph),"robust")
@@ -77,7 +82,7 @@ test_that("detailed print.coxph test",{
 )
 
 test_that("detailed print.summary.coxph test",{
-  site <- rep(1:10,each=100)
+  site <- rep(1:10,length.out=n) 
   fit_coxph <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs)+entry,immdef, censor_time = censyrs, 
                       test=coxph)
   expect_output(summary(fit_coxph),"coef")
@@ -87,12 +92,13 @@ test_that("detailed print.summary.coxph test",{
 }
 )
 
+fit_coxph$fail <- NULL
 
 test_that("detailed print.survreg test",{
   x <- list(fail="yes")
   class(x) <- "survreg"
   expect_output(print(x),"Survreg failed")
-  site <- rep(1:10,each=100)
+  site <- rep(1:5,length.out=n) 
   fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs)+entry,immdef, censor_time = censyrs, 
                       test=survreg, scale=1)
   expect_output(print(fit),"Scale fixed at")
@@ -107,7 +113,7 @@ test_that("detailed print.survreg test",{
 )
 
 test_that("detailed print.summary.survreg test",{
-  site <- rep(1:10,each=100)
+  site <- rep(1:5,length.out=n) 
   fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs)+entry,immdef, censor_time = censyrs, 
                 test=survreg, scale=1)
   expect_output(print(fit),"Scale fixed at")
@@ -125,18 +131,15 @@ test_that("detailed print.summary.survreg test",{
 
 
 test_that("plot method",{
-  fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
-                low_psi=-1, hi_psi=1)
+  #fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs,
+  #              low_psi=-1, hi_psi=1)
   fig <- plot(fit)
   expect_s3_class(fig, class="ggplot")
   
 })
 
 
-test_that("first basic fit with mixed data source, calculating var in-functions",{
-  fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs),immdef, censor_time = censyrs)
-  expect_is(fit$psi, class="numeric")
-})
+
 
 test_that("first basic fit with the arm as a factor",{
   myArm <- factor(immdef$imm, labels=c("Control","Exper"))
@@ -172,8 +175,8 @@ test_that("fit with treatment weights",{
 
 test_that("Values from a basic fit match up with the Stata output",
           {
-            propX <- with(immdef, 1-xoyrs/progyrs)
-            fit <- rpsftm(Surv(progyrs, prog)~rand(imm,propX), immdef, censor_time = censyrs ,
+            propX <- with(full_immdef, 1-xoyrs/progyrs)
+            fit <- rpsftm(Surv(progyrs, prog)~rand(imm,propX), full_immdef, censor_time = censyrs ,
                           low_psi=-1, hi_psi=1)
             psivalue <-  -0.1816406 <=fit$psi & fit$psi<= -.1806641 
             ciLower <- -0.3505859<=fit$CI[1] & fit$CI[1]<= -0.3496094
@@ -246,8 +249,8 @@ test_that( "no t-test comparison avaialable",
 
 test_that( "check variants on fitting",
            {propX <- with(immdef,1-xoyrs/progyrs)
-           fit <- rpsftm(Surv(progyrs, prog)~rand(imm,propX), immdef, censor_time = censyrs,
-                         low_psi=-1, hi_psi=1)
+     #      fit <- rpsftm(Surv(progyrs, prog)~rand(imm,propX), immdef, censor_time = censyrs,
+    #                     low_psi=-1, hi_psi=1)
            
            f0 <- fit
            f1 <- update(fit, test=coxph)
@@ -280,9 +283,9 @@ test_that("Check that a strata and cluster fits",
                           low_psi=-1, hi_psi=1
                 #formula=~1
                          )
-            immdef$category <- rep(c("A","B","C","D"),rep(250,4))
-            immdef$covar <- rnorm(1000)
-            immdef$clusterId <- rep(1:100,10)
+            immdef$category <- rep(c("A","B","C","D"),length.out=n)
+            immdef$covar <- rnorm(n)
+            immdef$clusterId <- rep(1:100,length.out=n)
             f0 <- update(f0, data=immdef)
             f0.strata <- update(f0,~.+strata(category))
             f1 <- update(f0, test=coxph)
@@ -357,15 +360,15 @@ expect_equal(fit1$psi, fit2$psi)
 
 
 test_that("survfit",{
-          fit0 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+entry, 
-                         data=immdef, censor_time=censyrs, test=coxph)
-          fit1 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs), 
-                         data=immdef, censor_time=censyrs, test=survdiff)
-          fit2 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+entry, 
-                         data=immdef, censor_time=censyrs, test=survreg)
-          expect_s3_class(survfit(fit0), class="survfit")
-          expect_error(survfit(fit1),"No applicable method")
-          expect_error(survfit(fit2),"No applicable method")
+ #         fit0 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+entry, 
+#                         data=immdef, censor_time=censyrs, test=coxph)
+#          fit1 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs), 
+#                         data=immdef, censor_time=censyrs, test=survdiff)
+#          fit2 <- rpsftm(Surv(progyrs,prog)~rand(imm,1-xoyrs/progyrs)+entry, 
+#                         data=immdef, censor_time=censyrs, test=survreg)
+          expect_s3_class(survfit(fit_coxph), class="survfit")
+          expect_error(survfit(fit),"No applicable method")
+          expect_error(survfit(fit_survreg),"No applicable method")
           
           }
           
@@ -419,6 +422,7 @@ test_that("print.rpsftm",{
   expect_output(print(fit3),"observations deleted due to missingness")
 })
           
+
 
 
 #CHECK that each line of code has been called somehow in this testing process??

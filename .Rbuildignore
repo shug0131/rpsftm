@@ -1,3 +1,4 @@
+^CRAN-RELEASE$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 README.Rmd
@@ -7,5 +8,4 @@ vignettes\dev
 appveyor.yml
 ^revdep$
 inst\doc
-
 
