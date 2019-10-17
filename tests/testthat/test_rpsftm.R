@@ -384,7 +384,9 @@ test_that("residual",{
   expect_is(residuals(fit0), class="numeric")
   expect_is(residuals(fit1, "dfbetas"), class="matrix")
   expect_s3_class(cox.zph(fit0), "cox.zph")
+  expect_error(cox.zph(fit1),"This model did not use coxph within g-estimation")
 })
+
 
 
 test_that("extract_z",{
