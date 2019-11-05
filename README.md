@@ -1,7 +1,17 @@
+[![Travis-CI Build
+Status](https://travis-ci.org/shug0131/rpsftm.svg?branch=master)](https://travis-ci.org/shug0131/rpsftm)
+[![codecov](https://codecov.io/github/shug0131/rpsftm/branch/master/graphs/badge.svg)](https://codecov.io/github/shug0131/rpsftm)
+[![AppVeyor Build
+Status](https://ci.appveyor.com/api/projects/status/github/shug0131/rpsftm?branch=master&svg=true)](https://ci.appveyor.com/project/shug0131/rpsftm)
+[![CRAN
+version](http://www.r-pkg.org/badges/version/rpsftm)](https://cran.r-project.org/package=rpsftm)
+[![downloads](https://cranlogs.r-pkg.org/badges/rpsftm)](https://cran.rstudio.com/web/packages/rpsftm/index.html)
+<!-- README.md is generated from README.Rmd. Please edit that file -->
 
-[![Travis-CI Build Status](https://travis-ci.org/shug0131/rpsftm.svg?branch=master)](https://travis-ci.org/shug0131/rpsftm) [![codecov](https://codecov.io/github/shug0131/rpsftm/branch/master/graphs/badge.svg)](https://codecov.io/github/shug0131/rpsftm) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/shug0131/rpsftm?branch=master&svg=true)](https://ci.appveyor.com/project/shug0131/rpsftm) [![CRAN version](http://www.r-pkg.org/badges/version/rpsftm)](https://cran.r-project.org/package=rpsftm) [![downloads](https://cranlogs.r-pkg.org/badges/rpsftm)](https://cran.rstudio.com/web/packages/rpsftm/index.html) <!-- README.md is generated from README.Rmd. Please edit that file -->
-
-This is an R package that implements the method of Rank Preserving Strucutural Failure Time models to estimate causal effects in failure time models in randomised control trials where participants do not comply with the treatment assigned.
+This is an R package that implements the method of Rank Preserving
+Structural Failure Time models to estimate causal effects in failure
+time models in randomised control trials where participants do not
+comply with the treatment assigned.
 
 As an example:
 
@@ -16,7 +26,7 @@ summary(fit)
 #> 2   1 1.0000000  1.0000000 1.0000000 1.0000000  1.0000000 1.0000000
 #>         Length Class      Mode   
 #> psi        1   -none-     numeric
-#> fit       14   survfit    list   
+#> fit       17   survfit    list   
 #> CI         2   -none-     numeric
 #> Sstar   1000   Surv       numeric
 #> rand    2000   rand       numeric
@@ -40,6 +50,8 @@ plot(fit)
 
 ![](tools/README-unnamed-chunk-2-1.png)
 
-The main function is `rpsftm` which returns an object that has `print`, `summary`, and `plot` S3 methods.
+The main function is `rpsftm` which returns an object that has `print`,
+`summary`, and `plot` S3 methods.
 
-See the vignette rpsftm\_vignette for further details, explanation and examples.
+See the vignette rpsftm\_vignette for further details, explanation and
+examples.

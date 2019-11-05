@@ -1,6 +1,6 @@
 # rpsftm 1.2.6
 
-Version control readiness
+Added in a version of the cox.zph function to comply with the new survival V3 package.
 
 # rpsftm 1.2.5
 
@@ -30,7 +30,7 @@ Defined a class "rand" for rand() output;added a print method that gives summary
 
 added an example to the plot.rpsftm documentation to illustrate how to modify the ggplot2 object. Standardised the underlying data.frame to have lower-case variable names. Modified the call to survfit() in rpsftm to use the same alpha argument (original set for CI around psi), but for the KM curves.
 
-made the returned object inherit from survreg/coxph/survdiff as appopriate. Moved the returned object from the survival objects directly into the returned list rather than nested, with modified formula, terms, and call elements. Modified the print and summary methods. Hence standard methods are availble: anova, extractIAC, logLik, model.frame, model.matrix, predict, residuals, vcov.
+made the returned object inherit from survreg/coxph/survdiff as appropriate. Moved the returned object from the survival objects directly into the returned list rather than nested, with modified formula, terms, and call elements. Modified the print and summary methods. Hence standard methods are available: anova, extractIAC, logLik, model.frame, model.matrix, predict, residuals, vcov.
 
 added checks on the treat_modifier values: fail if they are all zero, and warn if not all strictly positive.
 

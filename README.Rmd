@@ -1,7 +1,7 @@
 ---
 title: "README"
 author: "Simon Bond"
-date: "19 October 2017"
+date: "5 November 2019"
 output:
   md_document:
     variant: markdown_github
@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-This is an R package that implements the method of Rank Preserving Strucutural Failure Time models to estimate causal effects in failure time models in randomised control trials where participants do not comply with the treatment assigned.
+This is an R package that implements the method of Rank Preserving Structural Failure Time models to estimate causal effects in failure time models in randomised control trials where participants do not comply with the treatment assigned.
 
 As an example:
 

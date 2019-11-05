@@ -128,7 +128,7 @@ The above formula fits a RPSFTM where `progyrs` is the observed event time, `pro
 * __CI__ a vector of the confidence interval around __psi__
 * __Sstar__ the (possibly) recensored `Surv()` data using __psi__ 
 * __rand__ the `rand()` object used to specify the allocated and observed amount of treatment
-* __ans__ the values from `uniroot.all` used to solve the estimating equation, but embeded within a list as per `uniroot`, with an extra element `root_all`, a vector of all roots found in the case of multiple solutions. The first element of `root_all` is subsequently used.
+* __ans__ the values from `uniroot.all` used to solve the estimating equation, but embedded within a list as per `uniroot`, with an extra element `root_all`, a vector of all roots found in the case of multiple solutions. The first element of `root_all` is subsequently used.
 * __eval_z__ a data frame giving values of the Z-statistics at different values of __psi__
 * Further elements corresponding to either a `survdiff`, `coxph`, or `survreg` object. This will always include:
     * __call__ the R call object
@@ -161,7 +161,7 @@ plot(rpsftm_fit_cph)
 ```
 
 <!--SURVREG-->
-Similary, for the Weibull model we have:
+Similarly, for the Weibull model we have:
 
 ```{r}
 rpsftm_fit_wb <- rpsftm(formula=Surv(progyrs, prog) ~ rand(imm, rx) + entry, 

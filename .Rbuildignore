@@ -9,3 +9,5 @@ appveyor.yml
 ^revdep$
 inst\doc
 
+^doc$
+^Meta$
