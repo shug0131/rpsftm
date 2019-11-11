@@ -5,7 +5,7 @@ Status](https://travis-ci.org/shug0131/rpsftm.svg?branch=master)](https://travis
 Status](https://ci.appveyor.com/api/projects/status/github/shug0131/rpsftm?branch=master&svg=true)](https://ci.appveyor.com/project/shug0131/rpsftm)
 [![CRAN
 version](http://www.r-pkg.org/badges/version/rpsftm)](https://cran.r-project.org/package=rpsftm)
-[![downloads](https://cranlogs.r-pkg.org/badges/rpsftm)](https://cran.rstudio.com/web/packages/rpsftm/index.html)
+[![downloads](https://cranlogs.r-pkg.org/badges/rpsftm)](https://cran.r-project.org/package=rpsftm)
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 This is an R package that implements the method of Rank Preserving
@@ -48,7 +48,7 @@ summary(fit)
 plot(fit)
 ```
 
-![](tools/README-unnamed-chunk-2-1.png)
+![](tools/README-unnamed-chunk-2-1.png)<!-- -->
 
 The main function is `rpsftm` which returns an object that has `print`,
 `summary`, and `plot` S3 methods.
