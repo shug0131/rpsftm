@@ -8,6 +8,6 @@ vignettes\dev
 appveyor.yml
 ^revdep$
 inst\doc
-
+^build_dashboard.R$
 ^doc$
 ^Meta$
