@@ -24,9 +24,12 @@
 est_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_matrix,  target = 0, test = "survdiff", 
                    autoswitch, ...) {
   
+  # ensure the psi is now always a matrix, with rows equal to n.
   if ("(treat_modifier)" %in% names(data)) {
-      psi <- psi * data[, "(treat_modifier)"]
-  }
+      psi <-  data[, "(treat_modifier)"] %*%diag(psi, length(psi), length(psi))
+  } else{ 
+    psi <- matrix(psi, nrow=nrow(treatment_matrix), ncol=length(psi), byrow=TRUE)
+    }
   
   #response <- model.response(data)
   #treatment_matrix <- model.matrix(treatment, data=data)

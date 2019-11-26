@@ -43,51 +43,52 @@ print.rpsftm <- function(x,...) {
 #' @keywords internal
 
 print.coxph <- function (x, digits = max(options()$digits - 4, 3), ...){
-    if (!is.null(x$fail)) {
-      cat(" Coxph failed.", x$fail, "\n")
-      return()
-    }
-    savedig <- options(digits = digits)
-    on.exit(options(savedig))
-    coef <- x$coefficients
-    rand_names <- colnames(model.matrix(x$formula_list$randomise, data=x$data))
-    rand_names <- rand_names[rand_names!="(Intercept)"]
-    arm_index <- which(names(coef) %in% rand_names)
-    coef <- coef[-arm_index, drop=FALSE]
-    se <- sqrt(diag(x$var[-arm_index, -arm_index, drop=FALSE]))
-    if (is.null(coef) | is.null(se)) 
-      stop("Input is not valid")
-    if (is.null(x$naive.var)) {
-      tmp <- cbind(coef, exp(coef), se, coef/se, 1 - stats::pchisq((coef/se)^2, 
-                                                            1))
-      dimnames(tmp) <- list(names(coef), c("coef", "exp(coef)", 
-                                           "se(coef)", "z", "p"))
-    }
-    else {
-      nse <- sqrt(diag(x$naive.var[-arm_index, -arm_index, drop=FALSE]))
-      tmp <- cbind(coef, exp(coef), nse, se, coef/se, 1 - stats::pchisq((coef/se)^2, 
+  if (!is.null(x$fail)) {
+    cat(" Coxph failed.", x$fail, "\n")
+    return()
+  }
+ 
+  savedig <- options(digits = digits)
+  on.exit(options(savedig))
+  coef <- x$coefficients
+  if (is.null(coef))  stop("Input is not valid")
+  rand_names <- colnames(model.matrix(x$formula_list$randomise, data=x$data))
+  rand_names <- rand_names[rand_names!="(Intercept)"]
+  arm_index <- which(names(coef) %in% rand_names)
+  coef <- coef[-arm_index, drop=FALSE]
+  se <- sqrt(diag(x$var[-arm_index, -arm_index, drop=FALSE]))
+  if (is.null(se))  stop("Input is not valid")
+  if (is.null(x$naive.var)) {
+    tmp <- cbind(coef, exp(coef), se, coef/se, 1 - stats::pchisq((coef/se)^2, 
                                                                  1))
-      dimnames(tmp) <- list(names(coef), c("coef", "exp(coef)", 
-                                           "se(coef)", "robust se", "z", "p"))
-    }
-    if(length(coef)>0){ 
-      stats::printCoefmat(tmp, signif.stars = FALSE, P.values = TRUE, 
-                 has.Pvalue = TRUE)}
-    #logtest <- -2 * (x$loglik[1] - x$loglik[2])
-    #if (is.null(x$df)) 
-    #  df <- sum(!is.na(coef))
-    #else df <- round(sum(x$df), 2)
-    #cat("\n")
-    #cat("Likelihood ratio test=", format(round(logtest, 2)), 
-    #    "  on ", df, " df,", " p=", format(1 - pchisq(logtest, 
-    #                                                  df)), "\n", sep = "")
-    omit <- x$na.action
-    cat("n=", x$n)
-    if (!is.null(x$nevent)) cat(", number of events=", x$nevent)
-    cat("\n")
-    if (length(omit)) 
-      cat("   (", stats::naprint(omit), ")\n", sep = "")
-    invisible(x)
+    dimnames(tmp) <- list(names(coef), c("coef", "exp(coef)", 
+                                         "se(coef)", "z", "p"))
+  }
+  else {
+    nse <- sqrt(diag(x$naive.var[-arm_index, -arm_index, drop=FALSE]))
+    tmp <- cbind(coef, exp(coef), nse, se, coef/se, 1 - stats::pchisq((coef/se)^2, 
+                                                                      1))
+    dimnames(tmp) <- list(names(coef), c("coef", "exp(coef)", 
+                                         "se(coef)", "robust se", "z", "p"))
+  }
+  if(length(coef)>0){ 
+    stats::printCoefmat(tmp, signif.stars = FALSE, P.values = TRUE, 
+                        has.Pvalue = TRUE)}
+  #logtest <- -2 * (x$loglik[1] - x$loglik[2])
+  #if (is.null(x$df)) 
+  #  df <- sum(!is.na(coef))
+  #else df <- round(sum(x$df), 2)
+  #cat("\n")
+  #cat("Likelihood ratio test=", format(round(logtest, 2)), 
+  #    "  on ", df, " df,", " p=", format(1 - pchisq(logtest, 
+  #                                                  df)), "\n", sep = "")
+  omit <- x$na.action
+  cat("n=", x$n)
+  if (!is.null(x$nevent)) cat(", number of events=", x$nevent)
+  cat("\n")
+  if (length(omit)) 
+    cat("   (", stats::naprint(omit), ")\n", sep = "")
+  invisible(x)
 }
 
 #'modified version of print.survreg

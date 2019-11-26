@@ -6,8 +6,8 @@ context("Test the rpsftm() function")
 
 test_that("check of test that with mixed data sources",{
   propX <- with(immdef,I(1-xoyrs/progyrs))
-  fit <- lm(progyrs~propX, data=immdef)
-  expect_is(fit$coefficients, "numeric")
+  fit <- rpsftm(Surv(progyrs,prog)~rand(propX~imm), data=immdef,censyrs)
+  expect_is(fit$psi, "numeric")
 })
 
 test_that("first basict fit",{

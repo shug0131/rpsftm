@@ -25,23 +25,26 @@ untreated <- function(psi, response,treatment_matrix, rand_matrix, censor_time, 
   
  
   nontreatment <- 1-rowSums(treatment_matrix) #apply(treatment_matrix,1,sum)
- # won't work with treatment_modifier at present!!!
-  #treatment_matrix <- sweep(treatment_matrix,2, exp(psi), FUN="*")
-  #treatment <- rowSums(treatment_matrix)#apply(treatment_matrix,1, sum)
-  treatment <- treatment_matrix %*% exp(psi)
+  treatment <- rowSums(treatment_matrix*exp(psi))
   
   u <- time * (nontreatment + treatment)
   
   
   #make use of setting censor_time=Inf to avoid recensoring, and implimenting Autoswitch
   
-  c_star <- censor_time* min(1, exp(psi) ) #apply(cbind( censor_time , censor_time %o% exp(psi)),1, min)
-  if( autoswitch){
+  
+  
+  c_star <- censor_time* apply(cbind(1, exp(psi)),1, min)#min(1, exp(psi) ) #apply(cbind( censor_time , censor_time %o% exp(psi)),1, min)
+  if( autoswitch & ncol(treatment_matrix)==1){
+    check <- aggregate( treatment_matrix[,1], by=list(rand_matrix[,-1]), FUN=sd)
+    switch_values <- check[check[,2]==0,1]
+    c_star <- ifelse( rand_matrix[,-1] %in% switch_values, Inf, c_star)
+    
     #if( all(rx[arm==1]==1)){ c_star <- ifelse(arm==1, Inf, c_star)}
     #if( all(rx[arm==0]==0)){ c_star <- ifelse(arm==0, Inf, c_star)}
   }
   
-  t_star <-  (u < c_star)*(u-c_star) + c_star  #pmin(u, c_star)
+  t_star <-  pmin(u, c_star) # doesn't work if c_star=Inf  : (u < c_star)*(u-c_star) + c_star 
   #only change delta if necessary
   delta_star <-  (u < c_star)*delta #ifelse( c_star < u, 0, delta)
   output <- cbind("time"=t_star, "status"=delta_star)
