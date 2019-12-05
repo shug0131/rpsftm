@@ -203,6 +203,8 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   #print(head(df))
   
   treatment_matrix <- model.matrix(formula_list$treatment, data=df)
+  if( any( 1 < rowSums(treatment_matrix) | 1<treatment_matrix )){warning("Your treaments are individually, or sum to, greater than 1")}
+  if( any( treatment_matrix)<0){warning("You have negative values for treatment")}
   rand_matrix <- model.matrix(formula_list$randomise, data=df)
   
   eval_z$Z <- apply(eval_z,1, est_eqn, 
@@ -316,6 +318,8 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     psiHat <- ans$root
     if ("(treat_modifier)" %in% names(df)) {
       psiHat <- psiHat * df[, "(treat_modifier)"]
+    }else{
+      psiHat <- matrix(psiHat, nrow=nrow(df), ncol=length(psiHat), byrow=TRUE)
     }
     
     

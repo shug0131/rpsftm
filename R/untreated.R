@@ -23,7 +23,7 @@ untreated <- function(psi, response,treatment_matrix, rand_matrix, censor_time, 
   
   
   
- 
+  # assumes and is user dependent! that the treatment matrix rowSums to a max of 1 
   nontreatment <- 1-rowSums(treatment_matrix) #apply(treatment_matrix,1,sum)
   treatment <- rowSums(treatment_matrix*exp(psi))
   
@@ -32,17 +32,27 @@ untreated <- function(psi, response,treatment_matrix, rand_matrix, censor_time, 
   
   #make use of setting censor_time=Inf to avoid recensoring, and implimenting Autoswitch
   
-  
-  
-  c_star <- censor_time* apply(cbind(1, exp(psi)),1, min)#min(1, exp(psi) ) #apply(cbind( censor_time , censor_time %o% exp(psi)),1, min)
+  #psi is a matrix, row - patient, cols for treatments (which go from 0 to 1)
+   # works out which treatment, or none, gives the smallest possible transformed censor time.
+  max_psi <- apply(cbind(1, exp(psi)),1, min)
+  c_star <- censor_time* max_psi #min(1, exp(psi) ) #apply(cbind( censor_time , censor_time %o% exp(psi)),1, min)
   if( autoswitch & ncol(treatment_matrix)==1){
     check <- aggregate( treatment_matrix[,1], by=list(rand_matrix[,-1]), FUN=sd)
     switch_values <- check[check[,2]==0,1]
-    c_star <- ifelse( rand_matrix[,-1] %in% switch_values, Inf, c_star)
+    c_star <- ifelse( rand_matrix[,-1] %in% switch_values, Inf, c_star)# DOES have to be Inf to work. 
+    #psi_star <- ifelse(rand_matrix[,-1] %in% switch_values, 0, psi )   
+    
+    #then I wan tot work this across all the columns of Psi, to do the multi-arm version....
     
     #if( all(rx[arm==1]==1)){ c_star <- ifelse(arm==1, Inf, c_star)}
     #if( all(rx[arm==0]==0)){ c_star <- ifelse(arm==0, Inf, c_star)}
+    
+    
   }
+  
+  # Doesn't work yet see line 42:43
+  #max_psi <- apply(cbind(1, exp(psi_star)),1, min)
+  #c_star <- censor_time* max_psi 
   
   t_star <-  pmin(u, c_star) # doesn't work if c_star=Inf  : (u < c_star)*(u-c_star) + c_star 
   #only change delta if necessary
