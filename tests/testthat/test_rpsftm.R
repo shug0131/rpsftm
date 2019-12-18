@@ -15,6 +15,13 @@ test_that("first basict fit",{
   expect_is(fit$psi, "numeric")
 })
 
+test_that("syntax backwards compatibility",{
+  expect_warning(fit <- rpsftm(Surv(progyrs, prog)~rand(imm,I(1-xoyrs/progyrs)),immdef, censyrs),
+                 "is deprecated syntax")
+  expect_is(fit$psi, "numeric")
+})
+
+
 
 test_that("first basict fit with mixed data sources",{
   propX <- with(immdef,I(1-xoyrs/progyrs))

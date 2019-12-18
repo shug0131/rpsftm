@@ -163,7 +163,12 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
 
   #force the default value to be included in df if needed.
   if( !( "(censor_time)" %in% names(data))){
-    data <- cbind(data, "(censor_time)" = Inf)
+    
+    #finite approximation to infinity
+    max_time <- max(abs(Y[,1]))
+    # Note that if exp(psi)>1000 then this could fail to work. 
+    # But that would be an implausible parameter value in medical statistics at least.
+    data <- cbind(data, "(censor_time)" = 1000*max_time)
     attr(data,"terms") <- mf$formula
   }
  
@@ -175,7 +180,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   
   
   if (p!=q) {
-    stop("the treament and rand model matrices must be the same rank")
+    stop("the treament and randomisation model matrices must be the same rank")
   }
   
   # check the values of treatment modifier
@@ -203,8 +208,10 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   #print(head(df))
   
   treatment_matrix <- model.matrix(formula_list$treatment, data=df)
-  if( any( 1 < rowSums(treatment_matrix) | 1<treatment_matrix )){warning("Your treaments are individually, or sum to, greater than 1")}
-  if( any( treatment_matrix)<0){warning("You have negative values for treatment")}
+  # need to ignore the intercept column.
+  if( any( 1 < rowSums(treatment_matrix[,-1, drop=FALSE]) | 1<treatment_matrix[,-1, drop=FALSE] )){
+    warning("Your treaments are individually, or sum to, greater than 1")}
+  if( any( treatment_matrix[,-1, drop=FALSE]<0)){warning("You have negative values for treatment")}
   rand_matrix <- model.matrix(formula_list$randomise, data=df)
   
   eval_z$Z <- apply(eval_z,1, est_eqn, 
@@ -317,7 +324,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   if (!is.na(ans$root)) {
     psiHat <- ans$root
     if ("(treat_modifier)" %in% names(df)) {
-      psiHat <- psiHat * df[, "(treat_modifier)"]
+      psiHat <- psiHat * df[, "(treat_modifier)", drop=FALSE]
     }else{
       psiHat <- matrix(psiHat, nrow=nrow(df), ncol=length(psiHat), byrow=TRUE)
     }

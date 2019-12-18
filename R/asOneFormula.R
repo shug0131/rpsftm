@@ -46,7 +46,14 @@ one_becomes_three <- function(formula, env=parent.frame()){
   }
   rand_expression <- var_list[[1+rand_index]]
   if( length(rand_expression)!=2 ){
-    stop("'",deparse(rand_expression), "' must have only one argument, which is a  formula")
+    # Converting from the old syntax with a warning for back compatibility
+    old_expression <- rand_expression
+    rand_expression <- substitute(rand(.treat~.arm),  list(.treat=rand_expression[[3]],.arm=rand_expression[[2]]))
+    warning("'",deparse(old_expression), "' is deprecated syntax. This is converted to '", 
+            deparse(rand_expression),"'", call. = FALSE
+            )
+    
+    
   }
   if(!grepl("~",deparse(rand_expression[[2]]))){
     warning("'",deparse(rand_expression[[2]]), "' does not look like a formula")

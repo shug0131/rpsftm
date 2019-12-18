@@ -30,31 +30,35 @@ untreated <- function(psi, response,treatment_matrix, rand_matrix, censor_time, 
   u <- time * (nontreatment + treatment)
   
   
-  #make use of setting censor_time=Inf to avoid recensoring, and implimenting Autoswitch
+  
   
   #psi is a matrix, row - patient, cols for treatments (which go from 0 to 1)
-   # works out which treatment, or none, gives the smallest possible transformed censor time.
-  max_psi <- apply(cbind(1, exp(psi)),1, min)
-  c_star <- censor_time* max_psi #min(1, exp(psi) ) #apply(cbind( censor_time , censor_time %o% exp(psi)),1, min)
-  if( autoswitch & ncol(treatment_matrix)==1){
-    check <- aggregate( treatment_matrix[,1], by=list(rand_matrix[,-1]), FUN=sd)
-    switch_values <- check[check[,2]==0,1]
-    c_star <- ifelse( rand_matrix[,-1] %in% switch_values, Inf, c_star)# DOES have to be Inf to work. 
-    #psi_star <- ifelse(rand_matrix[,-1] %in% switch_values, 0, psi )   
-    
-    #then I wan tot work this across all the columns of Psi, to do the multi-arm version....
-    
-    #if( all(rx[arm==1]==1)){ c_star <- ifelse(arm==1, Inf, c_star)}
-    #if( all(rx[arm==0]==0)){ c_star <- ifelse(arm==0, Inf, c_star)}
-    
-    
-  }
+  #works out which treatment, or none, gives the smallest possible transformed censor time.
   
-  # Doesn't work yet see line 42:43
-  #max_psi <- apply(cbind(1, exp(psi_star)),1, min)
+  # From an earlier version with no autoswitch... But simpler to understand
+  #max_psi <- apply(cbind(1, exp(psi)),1, min)
   #c_star <- censor_time* max_psi 
   
-  t_star <-  pmin(u, c_star) # doesn't work if c_star=Inf  : (u < c_star)*(u-c_star) + c_star 
+    treatment_var <- rep(1, nrow(psi))
+    treatment_fix <- rep(0, nrow(psi))
+    trans_ratio_var <- rep(1, nrow(psi))
+    for( col in 1:ncol(treatment_matrix)){
+     
+      treatment_sd <- aggregate( treatment_matrix[,col], by=list(rand_matrix[,-1]), FUN=sd)
+      fixed_arms <- treatment_sd[ treatment_sd[,2]==0,1]# column 2 is the variance, column 1 the arm
+      if(!autoswitch){ fixed_arms <- fixed_arms[0]}
+      
+      
+     treatment_var <- treatment_var- ifelse( rand_matrix[,-1] %in% fixed_arms, treatment_matrix[,col],0)
+    treatment_fix <- treatment_fix+ifelse( rand_matrix[,-1] %in% fixed_arms, treatment_matrix[,col]*exp(psi[,col]),0)
+      trans_ratio_var <- pmin( ifelse( rand_matrix[,-1] %in% fixed_arms, 1, exp(psi[,col])),trans_ratio_var) 
+      
+  }
+  
+  c_star <- censor_time*(treatment_fix+trans_ratio_var*treatment_var)
+  
+  
+  t_star <-  (u < c_star)*(u-c_star) + c_star  # doesn't work if c_star=Inf , so we've set 1000*max_time as the fall-back for infinity : 
   #only change delta if necessary
   delta_star <-  (u < c_star)*delta #ifelse( c_star < u, 0, delta)
   output <- cbind("time"=t_star, "status"=delta_star)
