@@ -1,4 +1,8 @@
 #' @keywords internal
+#' 
+#' 
+#' MAYBE this could be merged with the multi-dim case, but add in a functino for
+#' error checking on top. 
 conf_interval_1d <- function(){
   lower <- try(root(qnorm(1 - alpha/2)), silent = TRUE)
   upper <- try(root(qnorm(alpha/2)), silent = TRUE)
@@ -65,9 +69,13 @@ conf_interval_multi <- function(dim_psi,n_events, alpha){
 
 #'@keywords internal
 
+# LOOS THE ... apart from being able to add args to the fit function.
+
 ## OK but if we are 3 arms, =2 psi, so down to 1d again for CI profiling...
 
 min_eqn_profile <- function(nuisance,x, index, test_args, ...){
+  # tweak how action/object are defined to do profiling. 
+  
   psi <- rep(0,length(nuisance)+1)
   psi[-index] <- nuisance
   psi[index] <- x
@@ -82,6 +90,9 @@ find_limit <- function(x, psi_hat,alpha,n_events,
                        index, ... ) {
   outer_target=qchisq(1-alpha,df=1)
   dots <- list(...)
+  # tweak action, object, arglist here
+  # call root.
+  
   
   if(length(psi_hat)==-2){
     optim(par=psi_hat[-index], fn=min_eqn_profile,
