@@ -68,9 +68,16 @@
 #' @importFrom survival Surv strata cluster survdiff
 #' @importFrom stats terms model.extract update drop.terms reformulate uniroot qnorm
 
-rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdiff, low_psi = -1, 
-                   hi_psi = 1, alpha = 0.05, treat_modifier = 1, autoswitch = TRUE, 
-                   n_eval_z = 100, ...) {
+rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdiff, 
+                   alpha = 0.05, treat_modifier = 1, autoswitch = TRUE,
+                   n_eval_z = 100,
+                   # 1-d psi
+                   low_psi = -1, hi_psi = 1,  
+                   # 2+ -d psi
+                   method="Nelder-Mead", conf_interval=TRUE, 
+                   start=NULL, ci_search_limit=NULL,
+                   
+                    ...) {
   cl <- match.call()
   
   # create formula for fitting, and to feed into model.frame() from the
@@ -136,31 +143,6 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
       warning("a variable appears on both the left and right sides of the formula")
   }
   
-  
-  
-  # rand_index <- attr(mf$formula, "specials")$rand
-  # rand_drops <- which(attr(mf$formula, "factors")[rand_index, ] > 0)
-  # if (length(rand_drops) != 1) {
-  #   stop("Exactly one rand() term allowed")
-  # }
-  # rand_column <- attr(mf$formula, "factors")[, rand_drops]
-  # if (sum(rand_column > 0) > 1) {
-  #   stop("rand() term must not be in any interactions")
-  # }
-  # 
-  # check for special terms
-  # if( length(labels(mf$formula))>1){
-  #   adjustor_formula <- drop.terms( mf$formula, dropx = rand_drops , keep.response = FALSE)
-  #   adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), terms.inner)[-1])
-  #   if( any( adjustor_names %in% c(".arm",".rx","time","status"))){
-  #     warning( "'.arm', '.rx', 'time', 'status' are used internally within rpsftm. Please rename these variables used in the formula outside of rand() and surv()")
-  #   }
-  # }
-  # add in the special covariate .arm
-  
- 
-  
-
   #force the default value to be included in df if needed.
   if( !( "(censor_time)" %in% names(data))){
     
@@ -171,13 +153,30 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     data <- cbind(data, "(censor_time)" = 1000*max_time)
     attr(data,"terms") <- mf$formula
   }
- 
+  if (any(data[,"(censor_time)"] < Y[,"time"])) {
+    warning("You have observed events AFTER censoring")
+  }
   
 #
   
-  p <- qr(model.matrix(formula_list$randomise, data=df))$rank
-  q <- qr(model.matrix(formula_list$treatment, data=df))$rank
   
+  treatment_matrix <- model.matrix(formula_list$treatment, data=df)  
+  rand_matrix <- model.matrix(formula_list$randomise, data=df)
+  
+  if (any(!(0 <= treatment_matrix & treatment_matrix <= 1))) {
+    stop("Invalid values for treatment. Must be proportions in [0,1]")
+  }
+  # need to ignore the intercept column.
+  if( any( 1 < rowSums(treatment_matrix[,-1, drop=FALSE]) | 1<treatment_matrix[,-1, drop=FALSE] )){
+    warning("Your treaments are individually, or sum to, greater than 1")}
+  
+  
+  
+  
+  
+  p <- qr(rand_matrix)$rank
+  #q <- qr(treatment_matrix)$rank
+  q <- max( ncol(treatment_matrix), qr(treatment_matrix)$rank)
   
   if (p!=q) {
     stop("the treament and randomisation model matrices must be the same rank")
@@ -193,6 +192,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     }
   }
   
+ 
   
   
   test <- deparse(substitute(test))
@@ -200,121 +200,107 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
     stop("Test must be one of: survdiff, coxph, survreg")
   }
   
+ 
+  
+  
+  ### THIS is  good place to fork for 1d and 2+d psi...
+  
+  
+  
+  if(p==2){
+    object <- est_eqn
+    action <-  rootSolve::uniroot.all
+    action_inputs <- list( f=est_eqn_vectorize,
+                           interval=c(low_psi, hi_psi)
+                           )
+  } else{
+    object <- min_eqn
+    action <- optim
+    # do a check on the length of start
+    if( is.null(start)){start <- rep(0,p-1)}
+    if( length(start)!=p-1){stop("your starting parameters `start` are the wrong length")}
+    action_inputs <- list( par=start,
+                           fn=min_eqn,
+                           method=method
+                           )
+  }
+  #environment(object) <- new.env(parent=emptyenv())
+  object_inputs <- list(data = data, 
+                        formula_list=formula_list, 
+                        response=Y,
+                        treatment_matrix=treatment_matrix, 
+                        rand_matrix=rand_matrix, 
+                        test = test, autoswitch = autoswitch, 
+                        ... = ... )
+  
+  
   #check the format of n_eval_z is an single integer >=2
   if (!is.numeric(n_eval_z)|| length(n_eval_z)>1 || n_eval_z<2) {stop ("invalid value of n_eval_z")}
-  #create values of psi to evaluate in a data frame
-  eval_z <- data.frame( psi = seq(low_psi, hi_psi, length=n_eval_z))
-  # evaluate them
-  #print(head(df))
+  #initialisation to keep a history of evaluations of the object function
+  #assign("fn_count", 0, envir= environment(object))
+  #assign("n_eval_z", n_eval_z, envir= environment(object))
+  #assign("evaluation", matrix(0,nrow=n_eval_z, ncol=p), 
+  #      envir=environment(object)) 
   
-  treatment_matrix <- model.matrix(formula_list$treatment, data=df)
-  # need to ignore the intercept column.
-  if( any( 1 < rowSums(treatment_matrix[,-1, drop=FALSE]) | 1<treatment_matrix[,-1, drop=FALSE] )){
-    warning("Your treaments are individually, or sum to, greater than 1")}
-  if( any( treatment_matrix[,-1, drop=FALSE]<0)){warning("You have negative values for treatment")}
-  rand_matrix <- model.matrix(formula_list$randomise, data=df)
   
-  eval_z$Z <- apply(eval_z,1, est_eqn, 
-                    response=Y,
-                    data=data, 
-                    formula_list=formula_list, 
-                    treatment_matrix=treatment_matrix, 
-                    rand_matrix=rand_matrix,
-                    test=test,
-                    target=0, autoswitch=autoswitch,...=...)
- 
   
   # solve to find the value of psi that gives the root to z=0, and the
   # limits of the CI.
   
   root <- function(target) {
-    est_eqn_vectorize <- Vectorize(est_eqn, vectorize.args="psi")
-    ans <- rootSolve::uniroot.all(est_eqn_vectorize, 
-                                  c(low_psi, hi_psi), data = data, formula_list=formula_list, 
-                                  response=Y,
-                                  treatment_matrix=treatment_matrix, 
-                                  rand_matrix=rand_matrix, 
-                                  target = target, test = test, autoswitch = autoswitch, 
-                                  ... = ...)
-    #give back the same elements as uniroot()
-    if( length(ans)>1){warning("Multiple Roots found")}
-    list( root=ans[1], 
-          root_all=ans,
-          f.root= est_eqn(ans[1],
-                          data = data, formula_list=formula_list, 
-                          response=Y,
-                          treatment_matrix=treatment_matrix, 
-                          rand_matrix=rand_matrix,
-                          target = target, test = test, autoswitch = autoswitch, 
-                          ... = ...),
-          iter=NA,
-          estim.prec=NA
+     ans <- do.call(action, c(action_inputs, list(target=target),object_inputs))
+     
+    if( p==2 & length(ans)>1){warning("Multiple Roots found")}
+    output=unlist(ans[1]) # to pick out whatever is given back first : uniroot or optim.
+    list( root=output, 
+          details=ans,
+          f.root= do.call(object,c(list(psi=output), list(target=target),object_inputs))
     )  
-    
   }
-  ans <- try(root(0), silent = TRUE)
+  ans <- root(0)#try(, silent = TRUE)
+  
   ans.error <- class(ans) == "try-error"
-  
+  if (ans.error) {
+    warning("Evaluation of the estimated values of psi failed. It is set to NA")
+    ans <- list(root = NA)
+  }
  
-  
+ #Failure diagnostics for 1d psi
+if(p==2){  
   # Preliminary check of ans,  low_psi and hi_psi with a meaningful warning
-  
-  est_eqn_low <- eval_z[1,"Z"]
-  est_eqn_hi <-  eval_z[n_eval_z,"Z"]
-  
-  
+  est_eqn_low <- do.call(object,c(list(psi=low_psi), list(target=0),object_inputs))
+  est_eqn_hi <- do.call(object,c(list(psi=hi_psi), list(target=0),object_inputs))
   if (
-      (  # still get try-errors in simple case as I guess uniroot.all, looks at silly places for psi and crashes survdiff
-        (!ans.error && length(ans$root_all)==0 ) || 
-         ans.error
-      ) &&
-      !is.na( est_eqn_low) && 
-      !is.na( est_eqn_hi ) &&  
-      est_eqn_low * est_eqn_hi > 0) {
+    (  # still get try-errors in simple case as I guess uniroot.all, looks at silly places for psi and crashes survdiff
+      (!ans.error && length(ans$root_all)==0 ) || 
+      ans.error
+    ) &&
+    !is.na( est_eqn_low) && 
+    !is.na( est_eqn_hi ) &&  
+    est_eqn_low * est_eqn_hi > 0) {
     message <- paste("\nThe starting interval (", low_psi, ", ", hi_psi, 
                      ") to search for a solution for psi\ngives values of the same sign (", 
                      signif(est_eqn_low, 3), ", ", signif(est_eqn_hi, 3), ").\nTry a wider interval. plot(obj$eval_z, type=\"s\"), where obj is the output of rpsftm()", 
                      sep = "")
     warning(message)
   }
+}
   
   #Find limits to confidence interval
   
-  lower <- try(root(qnorm(1 - alpha/2)), silent = TRUE)
-  upper <- try(root(qnorm(alpha/2)), silent = TRUE)
-  
-  # handle errors in root and CI finding
-  
- 
-  lower.error <- class(lower) == "try-error"
-  upper.error <- class(upper) == "try-error"
-  if (ans.error) {
-    warning("Evaluation of the estimated values of psi failed. It is set to NA")
-    ans <- list(root = NA)
+  CI <- NULL
+  if(p==2){
+    environment(conf_interval_1d) <- environment(root)
+    #to emulate running the function like a script and accessing the correct objects/envir.
+    CI <- conf_interval_1d()
+    
+    
   }
-  if (lower.error) {
-    lower <- list(root = NA)
+  if(p>2 & conf_interval==TRUE){
+    environment(conf_interval_multi) <- environment(root)
+    CI <- conf_interval_multi(dim_psi=length(ans$root), n_events=sum(Y[,2]),alpha=alpha)
+    
   }
-  if (upper.error) {
-    upper <- list(root = NA)
-  }
-  if (lower.error|| upper.error) {
-    warning("Evaluation of a limit of the Confidence Interval failed.  It is set to NA")
-  }
-  
-  
-  
-  # sort the ordering
-  if (!is.na(upper$root) & !is.na(lower$root) & upper$root < lower$root) {
-    temp <- lower
-    lower <- upper
-    upper <- temp
-    rm(temp)
-  }
-  
-  
-  
-  
   
   
   # create a simple KM curve for each recensored arm. Used in the plot
@@ -329,12 +315,8 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
       psiHat <- matrix(psiHat, nrow=nrow(df), ncol=length(psiHat), byrow=TRUE)
     }
     
-    
-    #response <- model.response(df)#model.frame(formula_list$formula, data=df))
-    #treatment_matrix <- model.matrix(formula_list$treatment, data=df)
-    #rand_matrix <- model.matrix(formula_list$randomise, data=df)
-    
-    Sstar <- untreated(psiHat, Y,treatment_matrix, rand_matrix, data[,"(censor_time)"], autoswitch)
+    rand_var <- data[, attr(formula_list$randomise,"term.labels")]
+    Sstar <- untreated(psiHat, Y,treatment_matrix, rand_var, data[,"(censor_time)"], autoswitch)
     
     df <- cbind(Sstar, df)
     # Ignores any covariates, strata or adjustors. On Purpose as this is
@@ -351,17 +333,22 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   regression$terms <- formula
   
   
+ # evaluation <- get("evaluation", envir=environment(object))
+  #dim_psi <- length(ans$root)
+ # colnames(evaluation) <- c(paste0("psi_",1:dim_psi),"chi_sq")
+#  fn_count <- get("fn_count", envir=environment(object))
+  
   value=c(
     list(
       psi=ans$root, 
       #for the plot function
       fit=fit, 
-      CI=c(lower$root,upper$root),
+      CI=CI,
       Sstar=Sstar, 
       formula_list=formula_list,
       #rand=rand_object,
       ans=ans,
-      eval_z=eval_z,
+    #  eval_z=evaluation[1:min(fn_count,n_eval_z),],
       data=df),
       #for the print and summary methods
     regression

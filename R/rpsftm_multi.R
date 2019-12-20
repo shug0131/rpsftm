@@ -72,7 +72,9 @@
 #' @importFrom survival Surv strata cluster survdiff
 #' @importFrom stats terms model.extract update drop.terms reformulate uniroot qnorm
 
-rpsftm_multi <- function(formula, data, censor_time, subset, na.action,  test = survdiff, start=0, alpha = 0.05, treat_modifier = 1, autoswitch = TRUE, 
+rpsftm_multi <- function(formula, data, censor_time, subset, na.action,  test = survdiff, 
+                         start=0, 
+                         alpha = 0.05, treat_modifier = 1, autoswitch = TRUE, 
                    n_eval_z = 100, method="Nelder-Mead", conf_interval=TRUE, ci_search_limit=NULL, ...) {
   cl <- match.call()
   

@@ -9,12 +9,7 @@
 #'@param arm the randomised treatment arm. a factor with 2 levels, or numeric variable with values 0/1.
 #'@param rx the proportion of time on active treatment (arm=1 or the non-reference level of the factor)
 #'@seealso \code{\link{print.rand}}, \code{\link{rpsftm}}
-#'@examples 
-#'x <- with(immdef, rand(imm , 1 - xoyrs / progyrs ) )
-#'x
-#'class(x)
-#'y <- as.data.frame(x)
-#'head(y)
+
 
 
 

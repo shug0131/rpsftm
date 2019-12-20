@@ -25,14 +25,15 @@ min_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_ma
                    autoswitch, ...) {
   
   if ("(treat_modifier)" %in% names(data)) {
-      psi <- psi * data[, "(treat_modifier)"]
+    psi <-  data[, "(treat_modifier)"] %*%diag(psi, length(psi), length(psi))
+  } else{ 
+    psi <- matrix(psi, nrow=nrow(treatment_matrix), ncol=length(psi), byrow=TRUE)
   }
-  
   #response <- model.response(data)
   #treatment_matrix <- model.matrix(treatment, data=data)
   #rand_matrix <- model.matrix(rand, data=data)
-  
-  Sstar <- untreated(psi, response,treatment_matrix, rand_matrix, data[,"(censor_time)"], autoswitch)
+  rand_var <- data[, attr(formula_list$randomise,"term.labels")]
+  Sstar <- untreated(psi, response,treatment_matrix, rand_var, data[,"(censor_time)"], autoswitch)
   data$Sstar <-Sstar# cbind(Sstar, data)
   # build a formula object,
   fit_formula <- reformulate(  c(as.character(formula_list$formula)[3], as.character(formula_list$rand)[2]), response="Sstar")
@@ -46,15 +47,15 @@ min_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_ma
   # https://www.burns-stat.com/pages/Tutor/R_inferno.pdf 8.3.15 ???
   dots <- list(...)
   fit <- do.call(functionName, c( list(fit_formula, data),dots))
-  # a 'cheat' to enable this to plugged into uniroot as a function that
+  # a 'cheat' to enable this to plugged into optimiser/rootsolver as a function that
   # returns a number AND store the fit object.
     .value <-  extract_chisq(fit, arm = rand_names) - target 
     
-    
-    fn_count <<- fn_count+1
-    if( fn_count <= n_eval_z){
-    evaluation[fn_count,] <<- c(psi, .value+target)
-    }
+    # as a side-effect store the history of evaluations
+ #   fn_count <<- fn_count+1
+#    if( fn_count <= n_eval_z){
+#    evaluation[fn_count,] <<- c(psi, .value+target)
+#    }
     attr(.value, "fit") <- fit
   
   .value

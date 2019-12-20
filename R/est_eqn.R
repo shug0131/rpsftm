@@ -33,9 +33,9 @@ est_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_ma
   
   #response <- model.response(data)
   #treatment_matrix <- model.matrix(treatment, data=data)
-  #rand_matrix <- model.matrix(rand, data=data)
+  rand_var <- data[, attr(formula_list$randomise,"term.labels")]
   
-  Sstar <- untreated(psi, response,treatment_matrix, rand_matrix, data[,"(censor_time)"], autoswitch)
+  Sstar <- untreated(psi, response,treatment_matrix, rand_var, data[,"(censor_time)"], autoswitch)
   data <- cbind(Sstar, data)
   # build a formula object,
   fit_formula <- reformulate(  c(as.character(formula_list$formula)[3], as.character(formula_list$rand)[2]), response="Sstar")
@@ -52,3 +52,7 @@ est_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_ma
   attr(.value, "fit") <- fit
   .value
 }
+
+
+#' @keywords internal
+est_eqn_vectorize <- Vectorize(est_eqn, vectorize.args="psi")

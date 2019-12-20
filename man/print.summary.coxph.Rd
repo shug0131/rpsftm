@@ -4,8 +4,13 @@
 \alias{print.summary.coxph}
 \title{modified version of print.summary.coxph}
 \usage{
-\method{print}{summary.coxph}(x, digits = max(getOption("digits") - 3,
-  3), signif.stars = getOption("show.signif.stars"), ...)
+\method{print}{summary.coxph}(
+  x,
+  arm_index,
+  digits = max(getOption("digits") - 3, 3),
+  signif.stars = getOption("show.signif.stars"),
+  ...
+)
 }
 \arguments{
 \item{x}{the result of a call to \code{summary.coxph}}

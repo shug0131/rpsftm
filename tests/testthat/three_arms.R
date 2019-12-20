@@ -25,14 +25,15 @@ df %<>% mutate( censtime=6,
                 )
 
 rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs)
-rpsftm_multi(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="BFGS")
-fit <- rpsftm_multi(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="Nelder-Mead")
+#rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="BFGS")
+fit <- rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="Nelder-Mead")
 
 library(profvis)
 profvis({
 
-  fitm <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
-                     method="BFGS")
+  fitm <- rpsftm(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime, start=c(0,0),
+                 autoswitch=TRUE
+                 )
 })
 fitm
 
@@ -56,4 +57,12 @@ X <- matrix(runif(12), ncol=3)
 pmin(list(X[,1],X[,2],X[,3]))
 
 
-
+trt_mat <- model.matrix(~t_p+p_p, data=df)
+rx_mat <- model.matrix(~rx, data=df)
+Y <- with(df, Surv(survtime, status))
+cens <- df$censtime
+dim(trt_mat)
+length(cens)
+psi <- matrix(0, nrow=3000, ncol=2)
+U <- untreated(psi, Y, trt_mat,rx_mat, cens, autoswitch=FALSE)
+length(U)

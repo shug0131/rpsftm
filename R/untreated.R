@@ -15,7 +15,7 @@
 #' @importFrom survival Surv
 #' @keywords internal
 
-untreated <- function(psi, response,treatment_matrix, rand_matrix, censor_time, autoswitch) {
+untreated <- function(psi, response,treatment_matrix, rand_var, censor_time, autoswitch) {
   
   time <- response[,"time"]
   delta <- response[,"status"]
@@ -25,10 +25,13 @@ untreated <- function(psi, response,treatment_matrix, rand_matrix, censor_time, 
   
   # assumes and is user dependent! that the treatment matrix rowSums to a max of 1 
   nontreatment <- 1-rowSums(treatment_matrix) #apply(treatment_matrix,1,sum)
+  
+  #print(head(treatment_matrix))
+  #print(head(psi))
+  
   treatment <- rowSums(treatment_matrix*exp(psi))
   
   u <- time * (nontreatment + treatment)
-  
   
   
   
@@ -42,23 +45,33 @@ untreated <- function(psi, response,treatment_matrix, rand_matrix, censor_time, 
     treatment_var <- rep(1, nrow(psi))
     treatment_fix <- rep(0, nrow(psi))
     trans_ratio_var <- rep(1, nrow(psi))
-    for( col in 1:ncol(treatment_matrix)){
+  #these are not the rand_matrixes you are looking for... Unhelpfully they include the intercept...
+    #print(dim(treatment_matrix))
+    #print(length(rand_var))
+  
+    
+      for( col in 1:ncol(treatment_matrix)){
      
-      treatment_sd <- aggregate( treatment_matrix[,col], by=list(rand_matrix[,-1]), FUN=sd)
+      treatment_sd <- aggregate( treatment_matrix[,col], by=list(rand_var), FUN=sd)
       fixed_arms <- treatment_sd[ treatment_sd[,2]==0,1]# column 2 is the variance, column 1 the arm
       if(!autoswitch){ fixed_arms <- fixed_arms[0]}
       
       
-     treatment_var <- treatment_var- ifelse( rand_matrix[,-1] %in% fixed_arms, treatment_matrix[,col],0)
-    treatment_fix <- treatment_fix+ifelse( rand_matrix[,-1] %in% fixed_arms, treatment_matrix[,col]*exp(psi[,col]),0)
-      trans_ratio_var <- pmin( ifelse( rand_matrix[,-1] %in% fixed_arms, 1, exp(psi[,col])),trans_ratio_var) 
+     treatment_var <- treatment_var- ifelse( rand_var %in% fixed_arms, treatment_matrix[,col],0)
+    treatment_fix <- treatment_fix+ifelse( rand_var %in% fixed_arms, treatment_matrix[,col]*exp(psi[,col]),0)
+      trans_ratio_var <- pmin( ifelse( rand_var %in% fixed_arms, 1, exp(psi[,col])),trans_ratio_var) 
       
   }
   
   c_star <- censor_time*(treatment_fix+trans_ratio_var*treatment_var)
   
-  
-  t_star <-  (u < c_star)*(u-c_star) + c_star  # doesn't work if c_star=Inf , so we've set 1000*max_time as the fall-back for infinity : 
+  if( any(is.infinite(c_star))){
+    t_star <- ifelse(u<c_star,u, c_star)
+  } else{
+  t_star <-  (u < c_star)*(u-c_star) + c_star  
+  # doesn't work if c_star=Inf , so we've set 1000*max_time as the fall-back for infinity 
+  # coding efficiency prefers this line to ifelse.
+  }
   #only change delta if necessary
   delta_star <-  (u < c_star)*delta #ifelse( c_star < u, 0, delta)
   output <- cbind("time"=t_star, "status"=delta_star)

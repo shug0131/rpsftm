@@ -4,8 +4,14 @@
 \alias{untreated}
 \title{Untreated Event Time}
 \usage{
-untreated(psi, response, treatment_matrix, rand_matrix, censor_time,
-  autoswitch)
+untreated(
+  psi,
+  response,
+  treatment_matrix,
+  rand_matrix,
+  censor_time,
+  autoswitch
+)
 }
 \arguments{
 \item{psi}{the parameter that measures how more rapidly the lifetime is expended under treatment}
