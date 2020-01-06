@@ -30,6 +30,7 @@ est_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_ma
   } else{ 
     psi <- matrix(psi, nrow=nrow(treatment_matrix), ncol=length(psi), byrow=TRUE)
     }
+ 
   
   #response <- model.response(data)
   #treatment_matrix <- model.matrix(treatment, data=data)

@@ -1,3 +1,83 @@
+
+conf_interval <- function(alpha, object_inputs,psi_hat, ci_search_limit){
+  #find roots of profile(index,)=target
+  target <- c(qnorm(alpha/2), qnorm(1-alpha/2))
+  if( 2<=length(psi_hat)){
+    target <- target^2
+  }
+  
+  
+ 
+  n_events=sum(object_inputs$response[,2])
+  dim_psi <- length(psi_hat)
+  CI <- data.frame(lower=rep(NA,dim_psi), upper=rep(NA, dim_psi))
+  
+  if(is.null(ci_search_limit)){
+    limit <- rep(6*dim_psi/sqrt(n_events), dim_psi)
+    ci_search_limit <- cbind(-limit, limit)
+  }
+  
+  for( column in 1:2){
+    for(index in 1:dim_psi){
+      if(dim_psi<=2){ 
+        interval <- psi_hat[index] + ci_search_limit[index,]
+      } else{ 
+        interval <-c(psi_hat[index], psi_hat[index]+ci_search_limit[index, column])  
+      }
+      
+      limit <- rootSolve::uniroot.all(
+       f= profile,interval=interval, 
+       index=index, target=target[column],object_inputs=object_inputs,
+       psi_hat=psi_hat
+      )
+      
+      if(class(limit)!="try-error"){CI[index,column] <- limit$root}
+    }
+  }
+  
+  CI_order <- CI
+  CI_order[,1] <- pmin(CI[,1],CI[,2])
+  CI_order[,2] <- pmax(CI[,1],CI[,2])
+  CI_order  
+}
+
+
+profile <- function(x, index, target, object_inputs, psi_hat){
+  if(length(psi_hat)==1){ 
+    do.call(est_eqn_vectorize, c(list(psi=x), object_inputs)) -target
+  } else{
+    fixed_inputs <- list( x=x, index=index, object_inputs=object_inputs)
+    if( length(psi_hat)== -2){
+      action <- rootSolve::uniroot.all
+      fixed_inputs <- c(fixed_inputs, list( object= est_eqn))
+      ans <- do.call(action, c(list(f=fix_x_vectorise, interval=psi_hat[-index]+c(-2,+2)), fixed_inputs))
+    }
+    if( length(psi_hat)>=2){
+      action <- optim
+      fixed_inputs <- c(fixed_inputs, list(object= min_eqn))
+      ans <- do.call(action, c(list( par=psi_hat[-index],fn=fix_x_vectorise), fixed_inputs))
+    }
+    output=unlist(ans[1]) # to pick out whatever is given back first : uniroot or optim.
+    do.call(fix_x,c(list(nuisance=output),fixed_inputs))-target
+  }  
+}
+
+
+fix_x <- function(nuisance, x, index, object_inputs, object){
+  psi <- rep(0,length(nuisance)+1)
+  psi[-index] <- nuisance
+  psi[index] <- x
+  do.call(object, c(list(psi=psi),object_inputs))
+}
+
+
+fix_x_vectorise <- Vectorize(fix_x, vectorize.args=c("nuisance","x"))
+
+
+
+#### FROM Here down is old versions, ignore (when I've debugged the code above!)
+
+
 #' @keywords internal
 #' 
 #' 

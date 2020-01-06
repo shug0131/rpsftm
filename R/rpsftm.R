@@ -248,13 +248,14 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   # limits of the CI.
   
   root <- function(target) {
+    # works as the functino is defined internally, so can find the objects below.
      ans <- do.call(action, c(action_inputs, list(target=target),object_inputs))
      
     if( p==2 & length(ans)>1){warning("Multiple Roots found")}
     output=unlist(ans[1]) # to pick out whatever is given back first : uniroot or optim.
     list( root=output, 
           details=ans,
-          f.root= do.call(object,c(list(psi=output), list(target=target),object_inputs))
+          f.root= do.call(object,c(list(psi=output, target=target),object_inputs))
     )  
   }
   ans <- root(0)#try(, silent = TRUE)
@@ -289,25 +290,30 @@ if(p==2){
   #Find limits to confidence interval
   
   CI <- NULL
-  if(p==2){
-    environment(conf_interval_1d) <- environment(root)
-    #to emulate running the function like a script and accessing the correct objects/envir.
-    CI <- conf_interval_1d()
-    
-    
-  }
-  if(p>2 & conf_interval==TRUE){
-    environment(conf_interval_multi) <- environment(root)
-    CI <- conf_interval_multi(dim_psi=length(ans$root), n_events=sum(Y[,2]),alpha=alpha)
-    
-  }
+  
+  CI <- conf_interval( alpha=alpha, object_inputs=object_inputs,
+                       psi_hat=ans$root, 
+                       ci_search_limit=ci_search_limit)
+  
+  # if(p==2){
+  #   environment(conf_interval_1d) <- environment(root)
+  #   #to emulate running the function like a script and accessing the correct objects/envir.
+  #   CI <- conf_interval_1d()
+  #   
+  #   
+  # }
+  # if(p>2 & conf_interval==TRUE){
+  #   environment(conf_interval_multi) <- environment(root)
+  #   CI <- conf_interval_multi(dim_psi=length(ans$root), n_events=sum(Y[,2]),alpha=alpha)
+  #   
+  # }
   
   
   # create a simple KM curve for each recensored arm. Used in the plot
   # function - simple KM curves
   
   
-  if (!is.na(ans$root)) {
+  if (!any(is.na(ans$root))) {
     psiHat <- ans$root
     if ("(treat_modifier)" %in% names(df)) {
       psiHat <- psiHat * df[, "(treat_modifier)", drop=FALSE]
@@ -355,6 +361,6 @@ if(p==2){
   )
 
   if (length(na.action)){ value$na.action <- na.action }
-  if( is.na( value$psi )){ value$fail <- "yes"}
+  if( any(is.na( value$psi ))){ value$fail <- "yes"}
   structure(value, class=c("rpsftm",test))
 }
