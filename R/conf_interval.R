@@ -2,7 +2,7 @@
 conf_interval <- function(alpha, object_inputs,psi_hat, ci_search_limit){
   #find roots of profile(index,)=target
   target <- c(qnorm(alpha/2), qnorm(1-alpha/2))
-  if( 2<=length(psi_hat)){
+  if( 2<length(psi_hat)){
     target <- target^2
   }
   
@@ -13,7 +13,7 @@ conf_interval <- function(alpha, object_inputs,psi_hat, ci_search_limit){
   CI <- data.frame(lower=rep(NA,dim_psi), upper=rep(NA, dim_psi))
   
   if(is.null(ci_search_limit)){
-    limit <- rep(6*dim_psi/sqrt(n_events), dim_psi)
+    limit <- rep(6*dim_psi/sqrt(n_events), dim_psi)#rep(10,dim_psi)#
     ci_search_limit <- cbind(-limit, limit)
   }
   
@@ -25,13 +25,13 @@ conf_interval <- function(alpha, object_inputs,psi_hat, ci_search_limit){
         interval <-c(psi_hat[index], psi_hat[index]+ci_search_limit[index, column])  
       }
       
-      limit <- rootSolve::uniroot.all(
+      limit <- try(uniroot(
        f= profile,interval=interval, 
        index=index, target=target[column],object_inputs=object_inputs,
-       psi_hat=psi_hat
+       psi_hat=psi_hat, extendInt = "yes"
       )
-      
-      if(class(limit)!="try-error"){CI[index,column] <- limit$root}
+      )
+      if(class(limit)!="try-error"){CI[index,column] <- limit[1]}
     }
   }
   
@@ -46,28 +46,57 @@ profile <- function(x, index, target, object_inputs, psi_hat){
   if(length(psi_hat)==1){ 
     do.call(est_eqn_vectorize, c(list(psi=x), object_inputs)) -target
   } else{
-    fixed_inputs <- list( x=x, index=index, object_inputs=object_inputs)
-    if( length(psi_hat)== -2){
-      action <- rootSolve::uniroot.all
+    fixed_inputs <- list( x=x, index=index, psi_hat=psi_hat, object_inputs=object_inputs)
+    if( length(psi_hat)==2){
+      action <- uniroot#rootSolve::uniroot.all
       fixed_inputs <- c(fixed_inputs, list( object= est_eqn))
-      ans <- do.call(action, c(list(f=fix_x_vectorise, interval=psi_hat[-index]+c(-2,+2)), fixed_inputs))
+      values <- do.call(fix_x,c(list(nuisance=psi_hat[-index]+c(-5,+5),return_index=3-index),fixed_inputs))
+     # print("nuisance")
+    #  print(psi_hat[-index]+c(-5,+5))
+    #  print("x")
+     # print(x)
+    #  print(values)
+    #  print("optim")
+      #crashes within here - ends up with NA as the returned value...
+      ans <- do.call(action, c(list(f=fix_x, interval=psi_hat[-index]+c(-1,+1), trace=10,
+                                    return_index= 3-index
+                                    ), fixed_inputs))
+     # print(ans)
     }
-    if( length(psi_hat)>=2){
+    if( 2< length(psi_hat)){
       action <- optim
       fixed_inputs <- c(fixed_inputs, list(object= min_eqn))
-      ans <- do.call(action, c(list( par=psi_hat[-index],fn=fix_x_vectorise), fixed_inputs))
+      ans <- do.call(action, c(list( par=psi_hat[-index],fn=fix_x), fixed_inputs))
     }
     output=unlist(ans[1]) # to pick out whatever is given back first : uniroot or optim.
-    do.call(fix_x,c(list(nuisance=output),fixed_inputs))-target
+    #print(output)
+    #print(x)
+    output <- do.call(fix_x,c(list(nuisance=output,return_index=index),fixed_inputs))-target
+    #print(output)
+    output
   }  
 }
 
 
-fix_x <- function(nuisance, x, index, object_inputs, object){
-  psi <- rep(0,length(nuisance)+1)
-  psi[-index] <- nuisance
-  psi[index] <- x
-  do.call(object, c(list(psi=psi),object_inputs))
+fix_x <- function(nuisance, x, index, psi_hat, return_index, object_inputs, object){
+  # MAKE this work with vectorised inputs, and be able to use
+  # est_eqn_vectorize
+  p <- length(psi_hat)
+  i <- length(nuisance)
+  j <- length(x)
+  psi <- array(0, dim=c(p,i,j))
+  answer <- array(0,dim=c(i,j))
+  psi[-index,1:i,] <- nuisance
+  psi[index,,1:j] <- x
+  for( row in 1:i){
+    for(col in 1:j){
+       value <- do.call(object, c(list(psi=psi[,row,col]),object_inputs))    
+      #est_eqn gives back a vector of z-statistics! so this will only really work if p=2.
+      answer[row,col] <-value[return_index]
+    }
+  }
+  if( i==1 | j==1){answer <- as.vector(answer)}
+  answer
 }
 
 
