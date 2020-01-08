@@ -1,10 +1,10 @@
 #'Generic S3 methods to extract the z-statistic from a set of survival fit objects
 #'
-#'@title Extracting the z-statistic from a survival object
+#'@title Extracting the chi-squared statistic from a survival object
 #'
 #'@param x an R object
 #'@param ... extendible arguments to the S3 method
-#'@return a numeric value, the z statistic for the independence test of the treatment arm
+#'@return a numeric value, the chi-squared statistic for the independence test of the treatment arms
 #'@author Simon Bond
 #'@keywords internal
 
@@ -45,7 +45,9 @@ extract_chisq.survdiff <- function(fit, ...) {
 #'
 extract_chisq.coxph <- function(fit, arm, ...) {
   beta <-fit$coefficients[arm]
-  var_beta <- fit$var[arm,arm]
+  labels <- names(fit$coefficients)
+  index <- match(arm, labels)
+  var_beta <- fit$var[index,index]
   sum( solve(var_beta, beta)*beta)
   
 }

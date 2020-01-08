@@ -1,13 +1,7 @@
 
 conf_interval <- function(alpha, object_inputs,psi_hat, ci_search_limit){
-  #find roots of profile(index,)=target
+  #find roots of profile(x, index,....)=target
   target <- c(qnorm(alpha/2), qnorm(1-alpha/2))
-  if( 2<length(psi_hat)){
-    target <- target^2
-  }
-  
-  
- 
   n_events=sum(object_inputs$response[,2])
   dim_psi <- length(psi_hat)
   CI <- data.frame(lower=rep(NA,dim_psi), upper=rep(NA, dim_psi))
@@ -19,16 +13,11 @@ conf_interval <- function(alpha, object_inputs,psi_hat, ci_search_limit){
   
   for( column in 1:2){
     for(index in 1:dim_psi){
-      if(dim_psi<=2){ 
-        interval <- psi_hat[index] + ci_search_limit[index,]
-      } else{ 
-        interval <-c(psi_hat[index], psi_hat[index]+ci_search_limit[index, column])  
-      }
-      
+      interval <- psi_hat[index] + ci_search_limit[index,]
       limit <- try(uniroot(
-       f= profile,interval=interval, 
-       index=index, target=target[column],object_inputs=object_inputs,
-       psi_hat=psi_hat, extendInt = "yes"
+        f= profile,interval=interval, 
+        index=index, target=target[column],object_inputs=object_inputs,
+        psi_hat=psi_hat, extendInt = "yes"
       )
       )
       if(class(limit)!="try-error"){CI[index,column] <- limit[1]}
@@ -50,18 +39,10 @@ profile <- function(x, index, target, object_inputs, psi_hat){
     if( length(psi_hat)==2){
       action <- uniroot#rootSolve::uniroot.all
       fixed_inputs <- c(fixed_inputs, list( object= est_eqn))
-      values <- do.call(fix_x,c(list(nuisance=psi_hat[-index]+c(-5,+5),return_index=3-index),fixed_inputs))
-     # print("nuisance")
-    #  print(psi_hat[-index]+c(-5,+5))
-    #  print("x")
-     # print(x)
-    #  print(values)
-    #  print("optim")
-      #crashes within here - ends up with NA as the returned value...
-      ans <- do.call(action, c(list(f=fix_x, interval=psi_hat[-index]+c(-1,+1), trace=10,
-                                    return_index= 3-index
+      # need to improve the interval limits from this hard coding.
+      ans <- do.call(action, c(list(f=fix_x, interval=psi_hat[-index]+c(-2,2),  extendInt = "yes",
+                                    return_index= 3-index # this flips between 1 & 2.
                                     ), fixed_inputs))
-     # print(ans)
     }
     if( 2< length(psi_hat)){
       action <- optim
@@ -69,10 +50,12 @@ profile <- function(x, index, target, object_inputs, psi_hat){
       ans <- do.call(action, c(list( par=psi_hat[-index],fn=fix_x), fixed_inputs))
     }
     output=unlist(ans[1]) # to pick out whatever is given back first : uniroot or optim.
-    #print(output)
-    #print(x)
-    output <- do.call(fix_x,c(list(nuisance=output,return_index=index),fixed_inputs))-target
-    #print(output)
+    # SHOULD always be est_eqn in fact...
+    psi <- psi_hat
+    # does this need to be vectorised to work with uniroot?? Seems not!
+    psi[index] <- x
+    psi[-index] <- output
+    output <- do.call(est_eqn,c(list(psi=psi),object_inputs))[index]-target
     output
   }  
 }

@@ -26,7 +26,7 @@ df %<>% mutate( censtime=6,
 
 rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs)
 #rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="BFGS")
-fit <- rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="Nelder-Mead")
+fit <- rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs,test=coxph)
 
 library(profvis)
 profvis({
@@ -37,14 +37,19 @@ profvis({
 })
 fitm
 
-fitrho <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
+fitrho <- rpsftm(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
              method="BFGS", rho=0.5) 
 
-fitm <- rpsftm_multi(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
-                     method="Nelder-Mead", test=survreg)
-fitm
+fitreg <- rpsftm(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
+                     method="BFGS", test=survreg)
+#fails with invalid survival times for distribution...
+fitcox <- rpsftm(Surv(survtime,status)~rand(t_p+p_p~rx)+switchtime, data=df, censor_time = censtime,
+                 test=coxph)
+# gets to a place with no non-missing obs when searching over psi...
 
-plot(fitm)
+fitreg
+fitreg$CI
+plot(fitreg)
 
 fit <- survdiff(Surv(survtime,status)~rx, data=df)
 
