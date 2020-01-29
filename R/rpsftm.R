@@ -121,8 +121,16 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   environment(mf$formula) <- coxenv
   
   
+  mf[[1L]] <- quote(stats::get_all_vars)
+  df_simple <- try(eval(mf, parent.frame()))
+  #this can fail if _all_ the variables are at a global level, rather than in a data.frame
+  # but then we can't deal with formulae like I(1-xoyr/progyrs) for the print_rand() function.
+  
   mf[[1L]] <- quote(stats::model.frame)
   df <- eval(mf, parent.frame())
+  if(class(df_simple)=="try-error"){df_simple <- df}
+ 
+  
   #print(head(df))
   #df has everything in it  with na.action applied universally
   na.action <- attr(df, "na.action")
@@ -224,7 +232,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
                            method=method
                            )
   }
-  #environment(object) <- new.env(parent=emptyenv())
+  
   object_inputs <- list(data = data, 
                         formula_list=formula_list, 
                         response=Y,
@@ -236,16 +244,11 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   
   #check the format of n_eval_z is an single integer >=2
   if (!is.numeric(n_eval_z)|| length(n_eval_z)>1 || n_eval_z<2) {stop ("invalid value of n_eval_z")}
-  #initialisation to keep a history of evaluations of the object function
-  #assign("fn_count", 0, envir= environment(object))
-  #assign("n_eval_z", n_eval_z, envir= environment(object))
-  #assign("evaluation", matrix(0,nrow=n_eval_z, ncol=p), 
-  #      envir=environment(object)) 
+  #initialisation to keep a history of evaluations of the object function up to the n_eval_z -th evaluation
+  reset_record(n_eval_z)
   
   
-  
-  # solve to find the value of psi that gives the root to z=0, and the
-  # limits of the CI.
+  # solve to find the value of psi that gives the root to z=0,
   
   root <- function(target) {
     # works as the functino is defined internally, so can find the objects below.
@@ -258,7 +261,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
           f.root= do.call(object,c(list(psi=output, target=target),object_inputs))
     )  
   }
-  ans <- root(0)#try(, silent = TRUE)
+  ans <- try(root(0), silent = TRUE)
   
   ans.error <- class(ans) == "try-error"
   if (ans.error) {
@@ -289,24 +292,12 @@ if(p==2){
   
   #Find limits to confidence interval
   
-  CI <- NULL
   
   CI <- conf_interval( alpha=alpha, object_inputs=object_inputs,
                        psi_hat=ans$root, 
                        ci_search_limit=ci_search_limit)
   
-  # if(p==2){
-  #   environment(conf_interval_1d) <- environment(root)
-  #   #to emulate running the function like a script and accessing the correct objects/envir.
-  #   CI <- conf_interval_1d()
-  #   
-  #   
-  # }
-  # if(p>2 & conf_interval==TRUE){
-  #   environment(conf_interval_multi) <- environment(root)
-  #   CI <- conf_interval_multi(dim_psi=length(ans$root), n_events=sum(Y[,2]),alpha=alpha)
-  #   
-  # }
+ 
   
   
   # create a simple KM curve for each recensored arm. Used in the plot
@@ -338,12 +329,6 @@ if(p==2){
   regression$formula <- formula
   regression$terms <- formula
   
-  
- # evaluation <- get("evaluation", envir=environment(object))
-  #dim_psi <- length(ans$root)
- # colnames(evaluation) <- c(paste0("psi_",1:dim_psi),"chi_sq")
-#  fn_count <- get("fn_count", envir=environment(object))
-  
   value=c(
     list(
       psi=ans$root, 
@@ -354,8 +339,8 @@ if(p==2){
       formula_list=formula_list,
       #rand=rand_object,
       ans=ans,
-    #  eval_z=evaluation[1:min(fn_count,n_eval_z),],
-      data=df),
+      eval_z=list(rpsftm_env$psi, rpsftm_env$value),#evaluation[1:min(fn_count,n_eval_z),],
+      data=df_simple),
       #for the print and summary methods
     regression
   )

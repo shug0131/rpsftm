@@ -29,8 +29,10 @@ plot.rpsftm <- function(x,...) {
   fit <- x$fit
   df <- data.frame(time = fit$time, survival = fit$surv, upper = fit$upper, 
                    lower = fit$lower)
-  group_names <- c("Reference","Comparator")
-  df$group <- factor( rep(1:2, fit$strata), labels=group_names)
+  n_strata <- length(fit$strata)
+  if(n_strata==2){ group_names <- c("Reference","Comparator")
+  } else{ group_names <- c("Reference", paste("Comparator", 1:(n_strata-1)))}
+  df$group <- factor( rep(1:n_strata, fit$strata), labels=group_names)
   ggplot2::ggplot(data = df, ggplot2::aes_string(x = "time", y = "survival", group = "group", 
                                           lty = "group")) + 
     ggplot2::geom_step() + ggplot2::ylim(0, 1) + 

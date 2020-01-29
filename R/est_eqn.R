@@ -25,6 +25,7 @@ est_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_ma
                    autoswitch, ...) {
   
   # ensure the psi is now always a matrix, with rows equal to n.
+  psi_scalar <- psi
   if ("(treat_modifier)" %in% names(data)) {
       psi <-  data[, "(treat_modifier)"] %*%diag(psi, length(psi), length(psi))
   } else{ 
@@ -50,6 +51,7 @@ est_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_ma
   # a 'cheat' to enable this to plugged into uniroot as a function that
   # returns a number AND store the fit object.
   .value <- extract_z(fit, arm = rand_names) - target
+  add_record(psi_scalar, .value)
   attr(.value, "fit") <- fit
   .value
 }

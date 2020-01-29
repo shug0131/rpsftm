@@ -11,6 +11,12 @@
 
 
 summary.rpsftm <- function(object,...) {
+  if (!is.null(object$fail)) {
+    cat("Fitting failed.", object$fail, "\n")
+    return()
+  }
+  
+  
   #obj <- object$regression
   # remove the call object without this it will print the entire data set
   #obj$call <- NULL
@@ -24,7 +30,7 @@ summary.rpsftm <- function(object,...) {
   arm_index <- which(names(object$coefficients) %in% rand_names)
   obj.summary <- summary(y, ...=...)
   
-  print(object$rand)
+  print_rand(object)
   print(obj.summary,arm_index=arm_index)
   cat("\npsi:", object$psi)
   cat("\nexp(psi):", exp(object$psi))

@@ -11,7 +11,7 @@
 
 
 print.rpsftm <- function(x,...) {
-  print(x$rand)
+ 
   #NextMethod(generic="print", object=x, ...=...)
   #searches in the global environment first so doesn't use the print.* defined below.
   #whereas this looks in the environment that defines the function for the method print.
@@ -25,6 +25,9 @@ print.rpsftm <- function(x,...) {
   } else {
     print(y)
   }
+  
+  
+  print_rand(x)
   
   cat("\npsi:", x$psi)
   cat("\nexp(psi):", exp(x$psi),"\n")
@@ -150,16 +153,26 @@ print.survreg <-function (x, ...)
 #'
 #'@title Print method
 #'@export
-#'@name print.rand
-#'@param x a rand() object
-#'@param ... further arguments passed to or from other methods.
-#'@return a summary of rx values broken down by arm for a rand() object
-#'@seealso \code{\link{rand}}, \code{\link{rpsftm}}
+#'@name print_rand
+#'@param x a rpsftm object
+#'@return a summary of treatment received values broken down by arm.
+#'@seealso \code{\link{rpsftm}}
 #'@author Simon Bond
 
 
-print.rand <- function(x,...){
-  print( stats::aggregate(rx~arm, data=x, summary) )
+
+print_rand <- function(x){
+  # get complete cases
+  frm <- add_formula_list(x$formula_list[c("treatment","randomise")])
+  data <- get_all_vars( frm, data=x$data)
+  data <- data[complete.cases(data),]
+  #create a matrix of all the treatments
+  .treatment <- model.matrix(update(x$formula_list$treatment, ~.-1),data=data, na.action=na.fail)
+  #summarise by arm
+  expr <- update(x$formula_list$randomise, .treatment~., )
+  print( stats::aggregate(expr, data=c(data, list(.treatment=.treatment)), summary))
   invisible(x)
+  
 }
+
 

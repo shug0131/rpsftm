@@ -101,7 +101,7 @@ test_that("detailed print.summary.coxph test",{
   expect_output(summary(fit_coxph),"coef")
   
   fit_coxph$fail <- "yes"
-  expect_output(summary(fit_coxph),"Coxreg failed")
+  expect_output(summary(fit_coxph),"Fitting failed")
 }
 )
 
@@ -131,7 +131,7 @@ test_that("detailed print.summary.survreg test",{
   expect_output(print(fit),"Scale fixed at")
   
   fit$fail <- "yes"
-  expect_output(summary(fit),"Survreg failed")
+  expect_output(summary(fit),"Fitting failed")
   fit <- rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm)+strata(site),immdef, censor_time = censyrs, 
                 test=survreg)
   expect_output(summary(fit),"Scale:")
@@ -344,7 +344,7 @@ test_that("eval_z output",
           {
             fit <- rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),
                           data=immdef, censor_time = censyrs, n_eval_z=40)
-            expect_equal(dim(fit$eval_z)[1],40)
+            expect_equal(length(fit$eval_z[[1]]),40)
           }
 )
 

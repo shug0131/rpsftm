@@ -23,7 +23,7 @@
 
 min_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_matrix,  target = 0, test = "survdiff", 
                    autoswitch, ...) {
-  
+  psi_scalar <- psi
   if ("(treat_modifier)" %in% names(data)) {
     psi <-  data[, "(treat_modifier)"] %*%diag(psi, length(psi), length(psi))
   } else{ 
@@ -50,12 +50,7 @@ min_eqn <- function(psi, response, data, formula_list, treatment_matrix, rand_ma
   # a 'cheat' to enable this to plugged into optimiser/rootsolver as a function that
   # returns a number AND store the fit object.
     .value <-  extract_chisq(fit, arm = rand_names) - target 
-    
-    # as a side-effect store the history of evaluations
- #   fn_count <<- fn_count+1
-#    if( fn_count <= n_eval_z){
-#    evaluation[fn_count,] <<- c(psi, .value+target)
-#    }
+    add_record(psi_scalar, .value)
     attr(.value, "fit") <- fit
   
   .value

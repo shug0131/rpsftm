@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_chisq.R
 \name{extract_chisq}
 \alias{extract_chisq}
-\title{Extracting the z-statistic from a survival object}
+\title{Extracting the chi-squared statistic from a survival object}
 \usage{
 extract_chisq(x, ...)
 }
@@ -12,7 +12,7 @@ extract_chisq(x, ...)
 \item{...}{extendible arguments to the S3 method}
 }
 \value{
-a numeric value, the z statistic for the independence test of the treatment arm
+a numeric value, the chi-squared statistic for the independence test of the treatment arms
 }
 \description{
 Generic S3 methods to extract the z-statistic from a set of survival fit objects

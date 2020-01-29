@@ -20,7 +20,7 @@ rpsftm(
   hi_psi = 1,
   method = "Nelder-Mead",
   conf_interval = TRUE,
-  start = 0,
+  start = NULL,
   ci_search_limit = NULL,
   ...
 )
