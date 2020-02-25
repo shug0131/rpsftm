@@ -6,3 +6,6 @@
 rpsftm.Rproj
 .Renviron
 revdep/
+tests/simulation
+R/plot_history_script.R
+

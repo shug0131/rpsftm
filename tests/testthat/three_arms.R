@@ -34,24 +34,36 @@ profvis({
   fitm <- rpsftm(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime, start=c(0,0),
                  autoswitch=TRUE
                  )
-  fitm <- rpsftm(Surv(survtime,status)~rand(p_p+t_p~rx), data=df, censor_time = censtime, start=c(0,0),
+  fitm1 <- rpsftm(Surv(survtime,status)~rand(p_p+t_p~rx), data=df, censor_time = censtime, start=c(0,0),
                  autoswitch=TRUE
+  )
+  
+  
+  fitcox1 <- rpsftm(Surv(survtime,status)~rand(p_p+t_p~rx), data=df, censor_time = censtime, start=c(0,0),
+                test=coxph
   )
 })
 summary(fitm)
+summary(fitm1)
 
+summary(fitcox1)
 
 fitrho <- rpsftm(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
              method="BFGS", rho=0.5) 
 
-fitreg <- rpsftm(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
+fitreg1 <- rpsftm(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
                       test=survreg)
-summary(fitreg)
+fitreg2 <- rpsftm(Surv(survtime,status)~rand(p_p+t_p~rx), data=df, censor_time = censtime,
+                  test=survreg)
+
+summary(fitreg1)
+summary(fitreg2)
 
 #fails with invalid survival times for distribution...
 fitcox <- rpsftm(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime,
-                 test=coxph, method="Nelder-Mead", start=fitm$psi+0.05)
+                 test=coxph,start=c(0,0))#, method="Nelder-Mead", start=fitm$psi+0.05)
 summary(fitcox)
+summary(fitcox1)
 # gets to a place with no non-missing obs when searching over psi...
 
 fitreg

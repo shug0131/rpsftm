@@ -182,7 +182,7 @@ simulate <- function(){
 
 
 results <- list()
-nsim <- 10000
+nsim <- 1000
 system.time(
 for( iter in 1:nsim){
   ans <- try(simulate())
@@ -190,7 +190,9 @@ for( iter in 1:nsim){
 }
 )
 
-save(results,file="tests/simulation/results.Rdata" )
+date_stamp <- format(Sys.time(),format="%d-%m-%Y")
+
+save(results,file=paste0("tests/simulation/results",date_stamp,".Rdata" ))
 
 psi_true <- c(0.5,1)
 
@@ -225,4 +227,4 @@ OC <- data.frame(
   coverage=coverage
 )
 OC
-save(OC, file="tests/simulation/OC.Rdata")
+save(OC, file=paste0("tests/simulation/OC",date_stamp,".Rdata"))
