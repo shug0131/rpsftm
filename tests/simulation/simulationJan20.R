@@ -1,6 +1,6 @@
 library(evd)
 library(dplyr)
-library(rpsftm)
+#library(rpsftm)
 library(magrittr)
 
 
@@ -205,9 +205,9 @@ bias <- apply(delta,1, mean)
 rmse <- sqrt(apply(delta^2, 1, mean))
 cis <- lapply(results, function(x){x$ci})
 width <- sapply(cis, function(x){x[,"upper"]-x[,"lower"]})
-mean_ci_width <- apply(width,1, mean)
+mean_ci_width <- apply(width,1, mean, na.rm=TRUE)
 cover <- sapply(cis, function(x, psi_true){x$lower<psi_true & psi_true < x$upper}, psi_true=psi_true)
-coverage <- apply(cover,1, mean)
+coverage <- apply(cover,1, mean, na.rm=TRUE)
 
 
 
@@ -215,9 +215,9 @@ coverage <- apply(cover,1, mean)
 index <- sapply(cis, function(x){!any(is.na(x[2,]))})
 cis2 <- cis[index]
 width <- sapply(cis2, function(x){x[,"upper"]-x[,"lower"]})
-mean_ci_width <- apply(width,1, mean)
+mean_ci_width <- apply(width,1, mean, na.rm=TRUE)
 cover <- sapply(cis2, function(x, psi_true){x$lower<psi_true & psi_true < x$upper}, psi_true=psi_true)
-coverage <- apply(cover,1, mean)
+coverage <- apply(cover,1, mean, na.rm=TRUE)
 
 OC <- data.frame(
   psi=psi_true,

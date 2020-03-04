@@ -10,7 +10,7 @@ conf_interval <- function(alpha, object_inputs,psi_hat, ci_search_limit){
   CI <- data.frame(lower=rep(NA,dim_psi), upper=rep(NA, dim_psi))
   
   if(is.null(ci_search_limit)){
-    limit <- rep(6*dim_psi/sqrt(n_events), dim_psi)#rep(10,dim_psi)#
+    limit <- rep(3*dim_psi^2/sqrt(n_events), dim_psi)#rep(10,dim_psi)#
     ci_search_limit <- cbind(-limit, limit)
   }
   
@@ -20,12 +20,12 @@ conf_interval <- function(alpha, object_inputs,psi_hat, ci_search_limit){
       if( dim_psi==1){ 
         interval <- psi_hat[index] + ci_search_limit[index,]
       } else{
-        interval <- c(psi_hat[index], psi_hat[index]+ci_search_limit[index,column])
+        interval <- c(psi_hat[index], psi_hat[index]+ 100*(2*column -3)) #ci_search_limit[index,column])
       }
       limit <- try(uniroot(
         f= profile,interval=interval, 
         index=index, target=target[column],object_inputs=object_inputs,
-        psi_hat=psi_hat, ci_search_limit=ci_search_limit+psi_hat, extendInt = "no"
+        psi_hat=psi_hat, search_limit=ci_search_limit+psi_hat, extendInt = "no"
       )
       )
       if(class(limit)!="try-error"){CI[index,column] <- limit[1]}
@@ -39,7 +39,7 @@ conf_interval <- function(alpha, object_inputs,psi_hat, ci_search_limit){
 }
 
 
-profile <- function(x, index, target, object_inputs, psi_hat, ci_search_limit){
+profile <- function(x, index, target, object_inputs, psi_hat, search_limit){
   if(length(psi_hat)==1){ 
     do.call(est_eqn_vectorize, c(list(psi=x), object_inputs)) -target
   } else{
@@ -48,13 +48,13 @@ profile <- function(x, index, target, object_inputs, psi_hat, ci_search_limit){
       action <- optimize
       #fixed_inputs <- c(fixed_inputs, list( object= min_eqn))
       # need to improve the interval limits from this hard coding.
-      ans <- do.call(action, c(list(f=fix_x, interval=ci_search_limit[-index,]), 
+      ans <- do.call(action, c(list(f=fix_x_simple, interval=search_limit[-index,]), 
                                fixed_inputs))
     }
     if( 2< length(psi_hat)){
       action <- optim
       #fixed_inputs <- c(fixed_inputs, list(object= min_eqn))
-      ans <- do.call(action, c(list( par=psi_hat[-index],fn=fix_x), fixed_inputs))
+      ans <- do.call(action, c(list( par=psi_hat[-index],fn=fix_x_simple), fixed_inputs))
     }
     output=unlist(ans[1]) # to pick out whatever is given back first : uniroot or optim.
     # SHOULD always be est_eqn in fact...
@@ -68,27 +68,48 @@ profile <- function(x, index, target, object_inputs, psi_hat, ci_search_limit){
 }
 
 # maybe we don't need the object argument!
-fix_x <- function(nuisance, x, index, psi_hat, object_inputs){#}, object){
-  # MAKE this work with vectorised inputs, and be able to use
-  # est_eqn_vectorize
+# fix_x <- function(nuisance, x, index, psi_hat, object_inputs){#}, object){
+#   # MAKE this work with vectorised inputs, and be able to use
+#   # est_eqn_vectorize
+#   p <- length(psi_hat)
+#   i <- length(nuisance)
+#   j <- length(x)
+#   psi <- array(0, dim=c(p,i,j))
+#   answer <- array(0,dim=c(i,j))
+#   psi[-index,1:i,] <- nuisance
+#   psi[index,,1:j] <- x
+#   for( row in 1:i){
+#     for(col in 1:j){
+#        value <- do.call(min_eqn, c(list(psi=psi[,row,col]),object_inputs))    
+#       #est_eqn gives back a vector of z-statistics! We want the element for the nuisance parameter
+#       #if( p==2 & object==est_eqn){ value <- value[-index]}
+#        answer[row,col] <-value
+#       }
+#   }
+#   if( i==1 | j==1){answer <- as.vector(answer)}
+#   answer
+# }
+
+fix_x_simple <- function(nuisance, x, index, psi_hat, object_inputs){#}, object){
+  # MAKE this work with vectorised input, x 
   p <- length(psi_hat)
-  i <- length(nuisance)
   j <- length(x)
-  psi <- array(0, dim=c(p,i,j))
-  answer <- array(0,dim=c(i,j))
-  psi[-index,1:i,] <- nuisance
-  psi[index,,1:j] <- x
-  for( row in 1:i){
-    for(col in 1:j){
-       value <- do.call(min_eqn, c(list(psi=psi[,row,col]),object_inputs))    
+  psi <- array(0, dim=c(p,j))
+  answer <- array(0,dim=c(1,j))
+  psi[-index,1:j] <- nuisance
+  psi[index,1:j] <- x
+      for(col in 1:j){
+      value <- do.call(min_eqn, c(list(psi=psi[,col]),object_inputs))    
       #est_eqn gives back a vector of z-statistics! We want the element for the nuisance parameter
       #if( p==2 & object==est_eqn){ value <- value[-index]}
-       answer[row,col] <-value
-      }
-  }
-  if( i==1 | j==1){answer <- as.vector(answer)}
+      answer[col] <-value
+    }
+  
+  if( j==1){answer <- as.vector(answer)}
   answer
 }
+
+
 
 
 #fix_x_vectorise <- Vectorize(fix_x, vectorize.args=c("nuisance","x"))

@@ -1,43 +1,39 @@
 df <- read.csv(file=system.file("extdata","sim_data.csv",package="rpsftm"), stringsAsFactors = FALSE)
-df <- read.csv(file="V:/STATISTICS/NON STUDY FOLDER/Staff/Annabel/R code/rpsftm/sim_data.csv", stringsAsFactors = FALSE)
+df <- read.csv(file="V:/STATISTICS/NON STUDY FOLDER/Staff/Annabel/R code/rpsftm/sim_data2.csv", stringsAsFactors = FALSE)
 
-#df <- read.csv(file="U:/My Documents/R/rpsftm/rpsftm/tests/simulation/sim_data2.csv")
+df <- read.csv(file="U:/My Documents/R/rpsftm/rpsftm/tests/simulation/sim_data2.csv")
 
 subset(df, complier==1 & switchtime<survtime)
 
 libs <- c("magrittr", "dplyr")
 for( lib in libs){ library(lib, character.only = TRUE)}
 
-df %<>% mutate(censtime=6,
+df %<>% mutate(
                 p1 = ifelse(complier,1, pmin(1, switchtime/survtime)),
                 p2 = ifelse(complier,0,1-p1),
-                r_p = case_when(rx=="R"~p1,
-                                newtrt=="R"~p2,
-                                TRUE~0
-                                ),
-                t_p = case_when(rx=="T"~p1,
-                                newtrt=="T"~p2,
-                                TRUE~0
-                ),
-                p_p = case_when(rx=="P"~p1,
-                                newtrt=="P"~p2,
-                                TRUE~0
-                ),
-                rx=factor(rx, levels=c("R","P","T"))
-                )
-
-fitm2 <- rpsftm(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime, start=c(0,0),
-               autoswitch=TRUE)
-summary(fitm2)
+                p_ref= (rx=="Placebo")*p1+(newtrt=="Placebo")*p2,
+                p_A= (rx=="Treat 1")*p1+(newtrt=="Treat 1")*p2,
+                p_B= (rx=="Treat 2")*p1+(newtrt=="Treat 2")*p2,
+                p_C= (rx=="Treat 3")*p1+(newtrt=="Treat 3")*p2,
+                
+              )
+fitm4 <- rpsftm(Surv(survtime, status)~rand(p_A+p_B+p_C~rx),data=df,
+                censor_time=censtime
+)
+summary(fitm4)
 
 
-psftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs)
+
+rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs)
 #rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs, method="BFGS")
 fit <- rpsftm(Surv(progyrs, prog)~rand(I(1-xoyrs/progyrs)~imm),immdef, censyrs,test=coxph)
 
 library(profvis)
 profvis({
-
+  fitm4 <- rpsftm(Surv(survtime, status)~rand(p_A+p_B+p_C~rx),data=df,
+                  censor_time=censtime
+                  )
+  
   fitm <- rpsftm(Surv(survtime,status)~rand(t_p+p_p~rx), data=df, censor_time = censtime, start=c(0,0),
                  autoswitch=TRUE
                  )
