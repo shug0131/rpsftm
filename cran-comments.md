@@ -4,7 +4,7 @@ created a local  copy of the function rootSolve::uniroot.all -> rpsftm:::uniroot
 
 
 ## Test environments
-* Windows 7 PC
+* Windows 10 PC
 * travis
 * appveyor
 * win-builder
