@@ -4,8 +4,7 @@
 \alias{print.rpsftm.coxph}
 \title{modified version of print.coxph}
 \usage{
-\method{print}{rpsftm.coxph}(x, digits = max(options()$digits - 4, 3),
-  ...)
+\method{print}{rpsftm.coxph}(x, digits = max(options()$digits - 4, 3), ...)
 }
 \arguments{
 \item{x}{an coxph()}

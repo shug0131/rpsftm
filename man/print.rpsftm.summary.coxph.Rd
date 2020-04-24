@@ -4,8 +4,12 @@
 \alias{print.rpsftm.summary.coxph}
 \title{modified version of print.summary.coxph}
 \usage{
-\method{print}{rpsftm.summary.coxph}(x, digits = max(getOption("digits")
-  - 3, 3), signif.stars = getOption("show.signif.stars"), ...)
+\method{print}{rpsftm.summary.coxph}(
+  x,
+  digits = max(getOption("digits") - 3, 3),
+  signif.stars = getOption("show.signif.stars"),
+  ...
+)
 }
 \arguments{
 \item{x}{the result of a call to \code{summary.coxph}}

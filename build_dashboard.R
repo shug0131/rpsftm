@@ -1,6 +1,7 @@
 
 rcmdcheck::rcmdcheck()
 
+spelling::spell_check_package()
 
 devtools::build_vignettes(clean=FALSE)
 devtools::clean_vignettes()
@@ -13,12 +14,12 @@ devtools::document(roclets = c('rd', 'collate', 'namespace'))
 devtools::build()
 
 #Check you've got the right version number
-install.packages("../rpsftm_1.2.6.tar.gz",
+install.packages("../rpsftm_1.2.7.tar.gz",
                  repos = NULL, type = "source")
-devtools::build("../rpsftm_1.2.6.tar.gz", binary=TRUE)
+devtools::build("../rpsftm_1.2.7.tar.gz", binary=TRUE)
 
-install.packages("V:/STATISTICS/NON STUDY FOLDER/Software/R/R Code Library/cctu_0.9.0.zip",
-                 repos = NULL, type="win.binary")
+#install.packages("V:/STATISTICS/NON STUDY FOLDER/Software/R/R Code Library/cctu_0.9.0.zip",
+#                 repos = NULL, type="win.binary")
 
 #devtools::build( binary=TRUE)
 # modify news.md, cran-comments.md README.rmd

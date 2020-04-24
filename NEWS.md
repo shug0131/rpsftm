@@ -1,3 +1,7 @@
+# rpsftm 1.2.7
+
+created a local  copy of the function rootSolve::uniroot.all -> rpsftm:::uniroot_all to remove dependency.
+
 # rpsftm 1.2.6
 
 Added in a version of the cox.zph function to comply with the new survival V3 package.

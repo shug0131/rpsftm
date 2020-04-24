@@ -4,8 +4,7 @@
 \alias{est_eqn}
 \title{Estimating Equations for \code{rpsftm()}}
 \usage{
-est_eqn(psi, data, formula, target = 0, test = "survdiff", autoswitch,
-  ...)
+est_eqn(psi, data, formula, target = 0, test = "survdiff", autoswitch, ...)
 }
 \arguments{
 \item{psi}{the parameter that measures how more rapidly the lifetime is expended under treatment}

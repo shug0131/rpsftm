@@ -4,8 +4,7 @@
 \alias{print.rpsftm.summary.survreg}
 \title{modified version of print.summary.survreg}
 \usage{
-\method{print}{rpsftm.summary.survreg}(x, digits = max(options()$digits -
-  4, 3), ...)
+\method{print}{rpsftm.summary.survreg}(x, digits = max(options()$digits - 4, 3), ...)
 }
 \arguments{
 \item{x}{the result of a call to \code{summary.survreg}}

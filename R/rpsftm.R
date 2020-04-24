@@ -32,7 +32,7 @@
 #' \item CI: a vector of the confidence interval around psi
 #' \item Sstar: the recensored \code{Surv()} data using the estimate value of psi to give counterfactual untreated failure times.
 #' \item rand: the rand() object used to specify the allocated and observed amount of treatment.
-#' \item ans: the values from \code{\link[rootSolve]{uniroot.all}} used to solve the estimating equation, 
+#' \item ans: the values from \code{\link{uniroot_all}} used to solve the estimating equation, 
 #' but embedded within a list as per \code{\link[stats]{uniroot}}, with an extra element \code{root_all},
 #' a vector of all roots found in the case of multiple solutions. The first element of \code{root_all} 
 #' is subsequently used.
@@ -219,7 +219,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   
   root <- function(target) {
     est_eqn_vectorize <- Vectorize(est_eqn, vectorize.args="psi")
-    ans <- rootSolve::uniroot.all(est_eqn_vectorize, 
+    ans <- uniroot_all(est_eqn_vectorize, 
                                   c(low_psi, hi_psi), data = df, formula = fit_formula, 
                                   target = target, test = test, autoswitch = autoswitch, 
                                   ... = ...)

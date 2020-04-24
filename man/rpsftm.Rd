@@ -4,9 +4,21 @@
 \alias{rpsftm}
 \title{Rank Preserving Structural Failure Time Model}
 \usage{
-rpsftm(formula, data, censor_time, subset, na.action, test = survdiff,
-  low_psi = -1, hi_psi = 1, alpha = 0.05, treat_modifier = 1,
-  autoswitch = TRUE, n_eval_z = 100, ...)
+rpsftm(
+  formula,
+  data,
+  censor_time,
+  subset,
+  na.action,
+  test = survdiff,
+  low_psi = -1,
+  hi_psi = 1,
+  alpha = 0.05,
+  treat_modifier = 1,
+  autoswitch = TRUE,
+  n_eval_z = 100,
+  ...
+)
 }
 \arguments{
 \item{formula}{a formula with a minimal structure of \code{Surv(time, status)~rand(arm,rx)}.
