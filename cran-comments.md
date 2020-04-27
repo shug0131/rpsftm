@@ -5,7 +5,7 @@ This is a patch release. The outputs from the print and summary methods now fini
 ## Test environments
 * travis
 * appveyor
-* win-builder
+* win-builder#
 
 
 ## R CMD check results
