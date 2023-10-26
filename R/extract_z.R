@@ -2,7 +2,7 @@
 #'
 #'@title Extracting the z-statistic from a survival object
 #'
-#'@param x an R object
+#'@param fit an R object
 #'@param ... extendible arguments to the S3 method
 #'@return a numeric value, the z statistic for the independence test of the treatment arm
 #'@author Simon Bond

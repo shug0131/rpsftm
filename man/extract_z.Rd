@@ -21,8 +21,6 @@ extract_z(fit, ...)
 \item{...}{extendible arguments to the S3 method}
 
 \item{arm}{a character vector giving the name of the covariate representing the treatment arm.}
-
-\item{x}{an R object}
 }
 \value{
 a numeric value, the z statistic for the independence test of the treatment arm
