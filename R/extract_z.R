@@ -11,7 +11,7 @@
 
 
 
-extract_z <- function(x, ...) {
+extract_z <- function(fit, ...) {
   UseMethod("extract_z")
 }
 

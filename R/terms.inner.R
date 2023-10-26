@@ -6,11 +6,12 @@
 #'
 #'@return a list of variables referred to in a formula or call object
 #'@param x an R object
+#'@param ... extendible arguments to the S3 method
 #'@return a character vector
 #'@importFrom survival Surv
 #'@keywords internal
 
-terms.inner <- function (x) 
+terms.inner <- function (x,...) 
 {
   #if (class(x) == "formula") 
   #  c(terms.inner(x[[2]]), terms.inner(x[[3]]))
