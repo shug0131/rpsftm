@@ -7,7 +7,7 @@
 \alias{extract_z.survreg}
 \title{Extracting the z-statistic from a survival object}
 \usage{
-extract_z(x, ...)
+extract_z(fit, ...)
 
 \method{extract_z}{survdiff}(fit, ...)
 
@@ -16,13 +16,13 @@ extract_z(x, ...)
 \method{extract_z}{survreg}(fit, arm, ...)
 }
 \arguments{
-\item{x}{an R object}
+\item{fit}{a fitted survival object : survdiff, coxph, survreg}
 
 \item{...}{extendible arguments to the S3 method}
 
-\item{fit}{a fitted survival object : survdiff, coxph, survreg}
-
 \item{arm}{a character vector giving the name of the covariate representing the treatment arm.}
+
+\item{x}{an R object}
 }
 \value{
 a numeric value, the z statistic for the independence test of the treatment arm

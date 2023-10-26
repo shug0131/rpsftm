@@ -4,10 +4,12 @@
 \alias{terms.inner}
 \title{terms.inner}
 \usage{
-\method{terms}{inner}(x)
+\method{terms}{inner}(x, ...)
 }
 \arguments{
 \item{x}{an R object}
+
+\item{...}{extendible arguments to the S3 method}
 }
 \value{
 a list of variables referred to in a formula or call object
