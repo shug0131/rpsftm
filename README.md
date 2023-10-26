@@ -1,8 +1,11 @@
-[![Travis-CI Build
-Status](https://travis-ci.org/shug0131/rpsftm.svg?branch=master)](https://travis-ci.org/shug0131/rpsftm)
-[![codecov](https://codecov.io/github/shug0131/rpsftm/branch/master/graphs/badge.svg)](https://codecov.io/github/shug0131/rpsftm)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/shug0131/rpsftm?branch=master&svg=true)](https://ci.appveyor.com/project/shug0131/rpsftm)
+<!--[![Travis-CI Build
+Status](https://travis-ci.org/shug0131/rpsftm.svg?branch=master)](https://travis-ci.org/shug0131/rpsftm)-->
+[![R-CMD-check](https://github.com/shug0131/rpsftm/workflows/R-CMD-check/badge.svg)](https://github.com/shug0131/rpsftm/actions)
+<!--[![codecov](https://codecov.io/github/shug0131/rpsftm/branch/master/graphs/badge.svg)](https://app.codecov.io/github/shug0131/rpsftm) -->
+[![Codecov
+eudract_pkg](https://codecov.io/gh/shug0131/rpsftm/branch/master/graph/badge.svg)](https://app.codecov.io/gh/shug0131/rpsftm?branch=master)
+<!--[![AppVeyor Build
+Status](https://ci.appveyor.com/api/projects/status/github/shug0131/rpsftm?branch=master&svg=true)](https://ci.appveyor.com/project/shug0131/rpsftm) -->
 [![CRAN
 version](http://www.r-pkg.org/badges/version/rpsftm)](https://cran.r-project.org/package=rpsftm)
 [![downloads](https://cranlogs.r-pkg.org/badges/rpsftm)](https://cran.r-project.org/package=rpsftm)
