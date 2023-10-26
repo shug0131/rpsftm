@@ -8,8 +8,11 @@ vignettes\dev
 appveyor.yml
 ^revdep$
 inst\doc
-^build_dashboard.R$
+^build_dashboard\.R$
 ^doc$
 ^Meta$
 ^R/plot_history_script.R$
 ^tests/simulation$
+^R/wierd estimate\.R$
+^\.github$
+^Rplots\.pdf$

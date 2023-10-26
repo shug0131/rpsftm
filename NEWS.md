@@ -1,4 +1,6 @@
-#Place holder for the next version
+# rpsftm 1.2.8
+
+Changing contact email. minor bug fix to internal function.
 
 
 # rpsftm 1.2.7

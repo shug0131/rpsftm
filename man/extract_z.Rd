@@ -32,13 +32,13 @@ Generic S3 methods to extract the z-statistic from a set of survival fit objects
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{survdiff}: Method for survdiff
+\item \code{extract_z(survdiff)}: Method for survdiff
 
-\item \code{coxph}: Method for coxph objects
+\item \code{extract_z(coxph)}: Method for coxph objects
 
-\item \code{survreg}: Method for survreg objects
+\item \code{extract_z(survreg)}: Method for survreg objects
+
 }}
-
 \author{
 Simon Bond
 }

@@ -1,6 +1,6 @@
 ## Description of Changes
 
-created a local  copy of the function rootSolve::uniroot.all -> rpsftm:::uniroot_all to remove dependency.
+Change contact email.  Modified terms.inner to use inherit().
 
 
 ## Test environments
