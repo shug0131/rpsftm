@@ -116,7 +116,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
                sep = ""))
   response_index <-  attr(mf$formula, "response")
   
-  if(length(formula>2)){
+  if(length(formula)>2){
     ytemp <- terms.inner(formula[[2]])
     xtemp <- terms.inner(formula[[3]])
     if (any(!is.na(match(xtemp, ytemp)))) 
