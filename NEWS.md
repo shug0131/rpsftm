@@ -1,3 +1,9 @@
+# rpsftm 1.2.9
+
+Minor update to code to deal with generic function arguments, bugs, and not using order comparisons
+on R language objects.
+
+
 # rpsftm 1.2.8
 
 Changing contact email. minor bug fix to internal function.

@@ -1,11 +1,8 @@
-<!--[![Travis-CI Build
-Status](https://travis-ci.org/shug0131/rpsftm.svg?branch=master)](https://travis-ci.org/shug0131/rpsftm)-->
-[![R-CMD-check](https://github.com/shug0131/rpsftm/workflows/R-CMD-check/badge.svg)](https://github.com/shug0131/rpsftm/actions)
-<!--[![codecov](https://codecov.io/github/shug0131/rpsftm/branch/master/graphs/badge.svg)](https://app.codecov.io/github/shug0131/rpsftm) -->
-[![Codecov
-eudract_pkg](https://codecov.io/gh/shug0131/rpsftm/branch/master/graph/badge.svg)](https://app.codecov.io/gh/shug0131/rpsftm?branch=master)
-<!--[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/shug0131/rpsftm?branch=master&svg=true)](https://ci.appveyor.com/project/shug0131/rpsftm) -->
+[![Travis-CI Build
+Status](https://app.travis-ci.com/shug0131/rpsftm.svg?branch=master)](https://app.travis-ci.com/shug0131/rpsftm)
+[![codecov](https://app.codecov.io/github/shug0131/rpsftm/branch/master/graphs/badge.svg)](https://app.codecov.io/github/shug0131/rpsftm)
+[![AppVeyor Build
+Status](https://ci.appveyor.com/api/projects/status/github/shug0131/rpsftm?branch=master&svg=true)](https://ci.appveyor.com/project/shug0131/rpsftm)
 [![CRAN
 version](http://www.r-pkg.org/badges/version/rpsftm)](https://cran.r-project.org/package=rpsftm)
 [![downloads](https://cranlogs.r-pkg.org/badges/rpsftm)](https://cran.r-project.org/package=rpsftm)
@@ -21,7 +18,6 @@ As an example:
 ``` r
 library(rpsftm)
 ?immdef
-#> starting httpd help server ... done
 fit <- rpsftm(Surv(progyrs, prog)~rand(imm,1-xoyrs/progyrs), data = immdef, censor_time = censyrs)
 summary(fit)
 #>   arm   rx.Min. rx.1st Qu. rx.Median   rx.Mean rx.3rd Qu.   rx.Max.
@@ -40,14 +36,15 @@ summary(fit)
 #> exp        2   -none-     numeric
 #> var        4   -none-     numeric
 #> chisq      1   -none-     numeric
+#> pvalue     1   -none-     numeric
 #> call       4   -none-     call   
 #> formula    3   terms      call   
 #> terms      3   terms      call   
 #> 
-#> psi: -0.1810871
-#> exp(psi): 0.8343627
-#> Confidence Interval, psi -0.3496948 0.002042503
-#> Confidence Interval, exp(psi)  0.7049032 1.002045
+#> psi: -0.1813226
+#> exp(psi): 0.8341662
+#> Confidence Interval, psi -0.34984 0.002287789
+#> Confidence Interval, exp(psi)  0.7048008 1.00229
 plot(fit)
 ```
 
@@ -56,5 +53,5 @@ plot(fit)
 The main function is `rpsftm` which returns an object that has `print`,
 `summary`, and `plot` S3 methods.
 
-See the vignette rpsftm\_vignette for further details, explanation and
+See the vignette rpsftm_vignette for further details, explanation and
 examples.

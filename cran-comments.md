@@ -1,10 +1,11 @@
 ## Description of Changes
 
-Change contact email.  Modified terms.inner to use inherit(). Fixed doi link.
+Minor update to code to deal with generic function arguments, bugs, and not using order comparisons
+on R language objects.
 
 
 ## Test environments
-* Windows 10 PC
+* Rocker ubuntu image
 * win-builder
 * github
 * r-hub

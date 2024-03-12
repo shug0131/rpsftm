@@ -4,10 +4,10 @@
 \alias{survfit.rpsftm}
 \title{survfit() method for rpsftm objects}
 \usage{
-\method{survfit}{rpsftm}(object, ...)
+\method{survfit}{rpsftm}(formula, ...)
 }
 \arguments{
-\item{object}{an object returned from the \code{rpsftm()} function.}
+\item{formula}{an object returned from the \code{rpsftm()} function. (with the name "formula" to agree with generic argument names)}
 
 \item{...}{further arguments passed to or from other methods.}
 }

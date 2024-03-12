@@ -1,6 +1,7 @@
 devtools::load_all()
 devtools::test()
 
+Sys.setenv("_R_CHECK_FORCE_SUGGESTS_"=TRUE)
 rcmdcheck::rcmdcheck()
 
 spelling::spell_check_package()
@@ -25,6 +26,9 @@ devtools::build("../rpsftm_1.2.8.tar.gz", binary=TRUE)
 
 #devtools::build( binary=TRUE)
 # modify news.md, cran-comments.md README.rmd
+devtools::build_readme()
+urlchecker::url_check()
+
 devtools::check_win_release()
 rcmdcheck::rcmdcheck()
 devtools::check_win_devel()
