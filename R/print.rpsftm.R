@@ -49,7 +49,7 @@ print.rpsftm.coxph <- function (x, digits = max(options()$digits - 4, 3), ...){
     savedig <- options(digits = digits)
     on.exit(options(savedig))
     coef <- x$coefficients
-    arm_index <- which(names(coef)==".arm")
+    arm_index <- which(names(coef) == ".arm")
     coef <- coef[-arm_index, drop=FALSE]
     se <- sqrt(diag(x$var[-arm_index, -arm_index, drop=FALSE]))
     if (is.null(coef) | is.null(se)) 
@@ -96,13 +96,13 @@ print.rpsftm.survreg <-function (x, ...)
     return(invisible(x))
   }
   coef <- x$coefficients
-  arm_index <- which(names(coef)==".arm")
+  arm_index <- which(names(coef) == ".arm")
   coef <- coef[-arm_index, drop=FALSE]
   cat("\nCoefficients:\n")
   print(coef, ...)
-  if (nrow(x$var)-1 == length(coef)) 
+  if ( (nrow(x$var) -1 ) == length(coef)) 
     cat("\nScale fixed at", format(x$scale), "\n")
-  else if (length(x$scale) == 1) 
+  else if (length(x$scale) ==  1) 
     cat("\nScale=", format(x$scale), "\n")
   else {
     cat("\nScale:\n")

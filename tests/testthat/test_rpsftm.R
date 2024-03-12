@@ -1,5 +1,5 @@
-library(rpsftm)
-library(survival)
+#library(rpsftm)
+#library(survival)
 context("Test the rpsftm() function")
 
 

@@ -1,4 +1,4 @@
-library(rpsftm)
+#library(rpsftm)
 context("Test for desired errors in rpsftm")
 
 immdef$propX <- with(immdef, 1-xoyrs/progyrs)
@@ -57,6 +57,15 @@ test_that("Variables on left and right terms",
      }
 )
 
+# formula <- Surv(progyrs, prog)~rand(imm, 1-xoyrs/progyrs)+progyrs
+# 
+# if(length(formula)>2){
+#   ytemp <- termsinner(formula[[2]])
+#   xtemp <- termsinner(formula[[3]])
+#   if (any(!is.na(match(xtemp, ytemp)))) 
+#     stop("a variable appears on both the left and right sides of the formula")
+# }
+
 
 
 
@@ -86,6 +95,7 @@ test_that("rand() interaction",
 
 test_that("using covariates with special clashing names",
           {
+            
             .arm <- rep(0:1,500)
             expect_warning(
               rpsftm(Surv(progyrs, prog)~rand(imm, 1-xoyrs/progyrs)+ .arm ,immdef, test=coxph, censor_time = censyrs)

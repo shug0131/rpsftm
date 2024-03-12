@@ -4,7 +4,7 @@
 \alias{survfit.rpsftm}
 \title{survfit() method for rpsftm objects}
 \usage{
-survfit.rpsftm(object, ...)
+\method{survfit}{rpsftm}(object, ...)
 }
 \arguments{
 \item{object}{an object returned from the \code{rpsftm()} function.}

@@ -23,3 +23,12 @@ Communications in Statistics--Theory and Methods 1991; 20: 2609--2631
 
 \code{\link[survival]{survreg}}
 }
+\author{
+\strong{Maintainer}: Simon Bond \email{simon.bond7@nhs.net} (primary author of code, secondary author of vignette)
+
+Authors:
+\itemize{
+  \item Annabel Allison (primary author of vignette, secondary author of code)
+}
+
+}

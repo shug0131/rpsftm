@@ -117,8 +117,8 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   response_index <-  attr(mf$formula, "response")
   
   if(length(formula)>2){
-    ytemp <- terms.inner(formula[[2]])
-    xtemp <- terms.inner(formula[[3]])
+    ytemp <- termsinner(formula[[2]])
+    xtemp <- termsinner(formula[[3]])
     if (any(!is.na(match(xtemp, ytemp)))) 
       stop("a variable appears on both the left and right sides of the formula")
   }
@@ -138,7 +138,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   # check for special terms
   if( length(labels(mf$formula))>1){
     adjustor_formula <- drop.terms( mf$formula, dropx = rand_drops , keep.response = FALSE)
-    adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), terms.inner)[-1])
+    adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), termsinner)[-1])
     if( any( adjustor_names %in% c(".arm",".rx","time","status"))){
       warning( "'.arm', '.rx', 'time', 'status' are used internally within rpsftm. Please rename these variables used in the formula outside of rand() and surv()")
     }
@@ -160,7 +160,7 @@ rpsftm <- function(formula, data, censor_time, subset, na.action,  test = survdi
   if( length( attr( fit_formula, "variables")) > 2){
     #this pulls out the core variables, rather than strata(var), say
     adjustor_formula <- drop.terms( mf$formula, dropx = rand_drops , keep.response = FALSE)
-    adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), terms.inner)[-1])
+    adjustor_names <- unlist( lapply( attr( terms( adjustor_formula), "variables"), termsinner)[-1])
     mf$formula <- reformulate(adjustor_names)
     mf$formula <- if (missing(data)) {
       terms(mf$formula)

@@ -7,7 +7,8 @@
 #' @return a survfit object.
 #' @seealso \code{\link[survival]{survfit}}
 #' @author Simon Bond
-#' 
+#' @importFrom survival survfit
+# need to import the original generic. else it won't be abel to find it in tests
 
 
 survfit.rpsftm <- function(object, ...){
