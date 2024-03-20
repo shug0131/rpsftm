@@ -28,6 +28,19 @@ summary.rpsftm <- function(object,...) {
   invisible(obj.summary)
 }
 
+#' @export
+
+summary.ipe <- function(x,...){
+  y <- x
+  y$CI <- c(-Inf, Inf)
+  class(y) <- class(y)[-1]
+  print(y)
+  
+}
+
+
+
+
 #'modified version of print.summary.coxph 
 #'
 #'this drops the "arm" term as this is not a real parameter

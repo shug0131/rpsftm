@@ -2,9 +2,10 @@
 % Please edit documentation in R/print.rpsftm.R
 \name{print.rpsftm}
 \alias{print.rpsftm}
+\alias{print.ipe}
 \title{Print Method}
 \usage{
-\method{print}{rpsftm}(x, ...)
+\method{print}{ipe}(x, ...)
 }
 \arguments{
 \item{x}{an object returned from the \code{\link{rpsftm}} function.}

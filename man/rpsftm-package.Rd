@@ -3,25 +3,9 @@
 \docType{package}
 \name{rpsftm-package}
 \alias{rpsftm-package}
-\title{rpsftm: a package to fit Rank Preserving Structural Failure Time Model}
+\title{rpsftm: Rank Preserving Structural Failure Time Models}
 \description{
-This implements the method of Robins JM, Tsiatis AA. 
-The key function is \code{\link{rpsftm}}, which provides estimates of the causal parameter of interest.
-}
-\details{
-rpfstm: a package to fit Rank Preserving Structural Failure Time Model
-}
-\references{
-Robins JM, Tsiatis AA. Correcting for non-compliance in randomized trials 
-using rank preserving structural failure time models. 
-Communications in Statistics--Theory and Methods 1991; 20: 2609--2631
-}
-\seealso{
-\code{\link[survival]{survdiff}}
-
-\code{\link[survival]{coxph}}
-
-\code{\link[survival]{survreg}}
+Implements methods described by the paper Robins and Tsiatis (1991) \doi{10.1080/03610929108830654}. These use g-estimation to estimate the causal effect of a treatment in a two-armed randomised control trial where non-compliance exists and is measured, under an assumption of an accelerated failure time model and no unmeasured confounders.
 }
 \author{
 \strong{Maintainer}: Simon Bond \email{simon.bond7@nhs.net} (primary author of code, secondary author of vignette)
@@ -32,3 +16,4 @@ Authors:
 }
 
 }
+\keyword{internal}

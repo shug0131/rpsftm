@@ -9,7 +9,14 @@
 #' @author Simon Bond
 #' 
 
+print.ipe <- function(x,...){
+  y <- x
+  class(y) <- class(y)[-1]
+  print(y)
+  
+}
 
+#' @export
 print.rpsftm <- function(x,...) {
   print(x$rand)
   #NextMethod(generic="print", object=x, ...=...)
